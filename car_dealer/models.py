@@ -13,6 +13,7 @@ class Modele(models.Model):
     def __str__(self):
         return f"{self.nom}"
 
+
 class Voiture(models.Model):
     marque = models.ForeignKey(Marque, on_delete=models.PROTECT, related_name='voitures', help_text="Marque de la voiture")
     modele = models.ForeignKey(Modele, on_delete=models.CASCADE, help_text="Modèle de la voiture")

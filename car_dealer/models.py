@@ -28,7 +28,7 @@ class Voiture(models.Model):
         ('Autres', 'Autres'),
     ]
     
-
+    sold = models.BooleanField(default=False, verbose_name="Vendu")
     marque = models.ForeignKey(Marque, on_delete=models.PROTECT, related_name='voitures', help_text="Marque de la voiture")
     modele = models.ForeignKey(Modele, on_delete=models.CASCADE, help_text="Modèle de la voiture")
     annee_fabrication = models.PositiveIntegerField(help_text="Année de fabrication")
@@ -70,7 +70,7 @@ class Voiture(models.Model):
     car_photo_8 = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
     car_photo_9 = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
 
-    prix = models.DecimalField(max_digits=10, decimal_places=2, help_text="Prix de la voiture")
+    prix = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix de la voiture")
 
     class Meta:
         ordering = ['-date_poste']  # Tri par date de publication par défaut

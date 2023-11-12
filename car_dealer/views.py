@@ -1,5 +1,8 @@
 from django.shortcuts import render
+from .models import Voiture
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html', {})
+    voitures = Voiture.objects.all()
+
+    return render(request, 'home.html', {'voitures' :voitures})

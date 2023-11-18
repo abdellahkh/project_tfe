@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Connexion</h1>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <div class="row">
+        <center>
+            <div class="col-8">
+                <br /><br />
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" placeholder="Entrez votre Username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" name="password"
+                            placeholder="Entrez votre mot de passe">
+                    </div>
+                    <br/><br/>
+                    <button type="submit" class="btn btn-secondary">Login</button>
+                </form>
+                <br /><br />
+            </div>
+        </center>
+    </div>
+</div>
+
+
+{% endblock %}

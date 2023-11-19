@@ -15,22 +15,19 @@
             </ul>
             <form class="d-flex">
                 {% if user.is_authenticated %}
-                <button class="btn btn-outline-dark me-2" type="submit">
-                    <i class="bi-person-fill me-1"></i>
-                    {{ user.username }}                    
-                </button>
+                <a class="btn btn-outline-dark me-2" href="{% url 'cart_summary' %}"><i class="bi-person-fill me-1">{{ user.username }}</i> </a>
                 <button class="btn btn-outline-dark me-2" type="submit">
                     <a href="{% url 'logout' %}">
                         Logout
                     </a>
                 </button>
-                    {% if user.is_superuser %}
-                    <button class="btn btn-outline-dark me-2" type="submit">
-                        <a href="/admin/">
-                            admin
-                        </a>
-                    </button>
-                    {% endif %}
+                {% if user.is_superuser %}
+                <button class="btn btn-outline-dark me-2" type="submit">
+                    <a href="/admin/">
+                        admin
+                    </a>
+                </button>
+                {% endif %}
                 {% else %}
                 <button class="btn btn-outline-dark me-2" type="submit">
                     <a href="{% url 'login' %}">

@@ -27,7 +27,13 @@ class Voiture(models.Model):
         ('Hybride (Elec - Diesel)', 'Hybride (Elec - Diesel)'),
         ('Autres', 'Autres'),
     ]
+    TRANSMISSION_CHOICES = [
+        ('Manuelle','Manuelle'),
+        ('Automatique','Automatique'),
+        ('Semi-automatique','Semi-qutomatique')
+    ]
     
+    reserve = models.BooleanField(default=False, verbose_name="Reserver")
     sold = models.BooleanField(default=False, verbose_name="Vendu")
     marque = models.ForeignKey(Marque, on_delete=models.PROTECT, related_name='voitures', help_text="Marque de la voiture")
     modele = models.ForeignKey(Modele, on_delete=models.CASCADE, help_text="Modèle de la voiture")
@@ -38,6 +44,13 @@ class Voiture(models.Model):
         max_length=90,
         choices=CARBURANT_CHOICES,
         help_text="Type de carburant de la voiture"
+    )
+    transmission = models.CharField(
+        null = True,
+        blank = True,
+        max_length=90,
+        choices=TRANSMISSION_CHOICES,
+        help_text="Type de transmission"
     )
     kilometrage = models.PositiveIntegerField(help_text="Kilométrage actuel")
     cruise_control = models.BooleanField(default=False, verbose_name="Cruise Control")
@@ -52,7 +65,7 @@ class Voiture(models.Model):
     start_stop = models.BooleanField(default=False, verbose_name="Start Stop")
     essui_auto = models.BooleanField(default=False, verbose_name="Essui-glace Auto")
     car_play = models.BooleanField(default=False, verbose_name="Car Play-System")
-
+    
     
     description = models.TextField(blank=True, null=True, help_text="Description de la voiture")
     date_poste = models.DateTimeField(auto_now_add=True, help_text="Date de publication de l'annonce")

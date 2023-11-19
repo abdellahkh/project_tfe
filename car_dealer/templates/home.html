@@ -21,8 +21,10 @@
             <div class="col mb-5">
                 <div class="card h-100">
                     {% if voiture.sold %}
-                    <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Vendu !
-                    </div>
+                    <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Vendu !</div>
+                    {% endif %}
+                    {% if voiture.reserve %}
+                    <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Réservé !</div>
                     {% endif %}
                     <!-- Product image-->
                     {% if voiture.car_photo_1 %}
@@ -43,7 +45,7 @@
 
                     <!-- Product actions-->
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                        <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View details</a></div>
+                        <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'voiture' voiture.id %}">Details</a></div>
                     </div>
                 </div>
             </div>

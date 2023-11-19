@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Header -->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Details</h1>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <br/><br/>
+
+    <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-8">
+                        <img src="{{ voiture.car_photo_1.url }}" class="img-fluid rounded-start" style="max-width: 100%;" alt="Car Photo">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                {{ voiture.marque.nom }} - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}
+                            </h5>
+                            <ul>
+                                <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
+                                <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
+                                <li><b>Carburant:</b> {{ voiture.carburant }}</li>
+                                <li><b>Transmission:</b> {{ voiture.transmission }}</li>
+                                <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <p class="card-text mb-3">{{ voiture.description }}</p>
+                        <p class="card-text"><small class="text-muted">Ajoutée le {{ voiture.date_poste }}</small></p>
+                        {% if user.is_authenticated %}
+                            <button class="btn btn-outline-dark me-2" type="submit">
+                                <i class="bi-cart-fill me-1"></i> Réserver
+                            </button>
+                        {% endif %}
+                        <br/><br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="row">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-center">
+                <!-- Vos images ici... -->
+                {% if voiture.car_photo_2 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_2.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                {% if voiture.car_photo_3 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_3.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                {% if voiture.car_photo_4 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_4.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                {% if voiture.car_photo_5 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_5.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                {% if voiture.car_photo_6 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_6.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                {% if voiture.car_photo_7 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_7.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                {% if voiture.car_photo_8 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_8.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                {% if voiture.car_photo_9 %}
+                <div class="col mb-5">
+                    <img class="img-fluid" src="{{ voiture.car_photo_9.url }}" alt="Car Image" />
+                </div>
+                {% endif %}
+                <br/><br/>
+            </div>
+        </div>
+    </div>
+
+    <br /><br />
+</div>
+
+{% endblock %}

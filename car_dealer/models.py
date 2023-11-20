@@ -90,7 +90,7 @@ class Voiture(models.Model):
 class Service(models.Model):
     nom = models.CharField(max_length=100, help_text="Nom du service")
     description = models.TextField(blank=True, null=True, help_text="Commentaire")
-    prix = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix du service")
+    prix = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True,help_text="Prix du service")
 
     def __str__(self):
         return self.nom
@@ -101,7 +101,9 @@ class Review(models.Model):
     service_id = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True, help_text="Identifiant du Service")
 
     def __str__(self):
-        return f"({self.user.username}) : {self.comment}"
+        return f"({self.user_id.username}) : {self.comment}"
+
+        
 
 class Vente(models.Model):
     GENRE_CHOICES = [

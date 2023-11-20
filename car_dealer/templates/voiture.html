@@ -36,11 +36,11 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <p class="card-text mb-3">{{ voiture.description }}</p>
-                        <p class="card-text"><small class="text-muted">Ajoutée le {{ voiture.date_poste }}</small></p>
+                        <p class="card-text mb-3 m-2">{{ voiture.description }}</p>
+                        <p class="card-text m-2"><small class="text-muted">Ajoutée le {{ voiture.date_poste }}</small></p>
                         {% if user.is_authenticated %}
-                            <button class="btn btn-outline-dark me-2" type="submit">
-                                <i class="bi-cart-fill me-1"></i> Réserver
+                            <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}" id="add-cart">
+                                <i class="bi-cart-fill me-1">Réserver</i> 
                             </button>
                         {% endif %}
                         <br/><br/>
@@ -103,5 +103,30 @@
 
     <br /><br />
 </div>
+<script>
+$(document).on('click', '#add-cart', function(e){
+    e.preventDefault();
+    $.ajax({
+        type: 'POST',
+        url: '{% url 'cart_add' %}',
+        data: {
+            voiture_id: $('#add-cart').val(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+
+        success: function(json){
+            console.log(json)
+        },
+        error: function(xhr, errmsg, err){
+            
+        }
+
+
+    });
+})
+
+</script>
+
 
 {% endblock %}

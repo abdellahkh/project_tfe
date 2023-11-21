@@ -11,45 +11,47 @@
 </header>
 
 <div class="container">
-    <br/><br/>
-
+    <br /><br />
+    {% if voiture %}
     <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-8">
-            <div class="card mb-3">
-                <div class="row g-0">
-                    <div class="col-md-8">
-                        <img src="{{ voiture.car_photo_1.url }}" class="img-fluid rounded-start" style="max-width: 100%;" alt="Car Photo">
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                {{ voiture.marque.nom }} - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}
-                            </h5>
-                            <ul>
-                                <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
-                                <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
-                                <li><b>Carburant:</b> {{ voiture.carburant }}</li>
-                                <li><b>Transmission:</b> {{ voiture.transmission }}</li>
-                                <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
-                            </ul>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <img src="{{ voiture.car_photo_1.url }}" class="img-fluid rounded-start" style="max-width: 100%;" alt="Car Photo">
+                            <h3>{{ voiture }}kugku</h3>
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        <p class="card-text mb-3 m-2">{{ voiture.description }}</p>
-                        <p class="card-text m-2"><small class="text-muted">Ajoutée le {{ voiture.date_poste }}</small></p>
-                        {% if user.is_authenticated %}
-                            <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}" id="add-cart">
-                                <i class="bi-cart-fill me-1">Réserver</i> 
+                        <div class="col-md-4">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {{ voiture.marque.nom }} - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}
+                                </h5>
+                                <ul>
+                                    <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
+                                    <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
+                                    <li><b>Carburant:</b> {{ voiture.carburant }}</li>
+                                    <li><b>Transmission:</b> {{ voiture.transmission }}</li>
+                                    <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <p class="card-text mb-3 m-2">{{ voiture.description }}</p>
+                            <p class="card-text m-2"><small class="text-muted">Ajoutée le {{ voiture.date_poste }}</small></p>
+                            {% if user.is_authenticated %}
+                            <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}"
+                                id="add-cart">
+                                <i class="bi-cart-fill me-1">Réserver</i>
                             </button>
-                        {% endif %}
-                        <br/><br/>
+                            {% endif %}
+                            <br /><br />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
     <div class="row">
@@ -96,35 +98,36 @@
                     <img class="img-fluid" src="{{ voiture.car_photo_9.url }}" alt="Car Image" />
                 </div>
                 {% endif %}
-                <br/><br/>
+                <br /><br />
             </div>
         </div>
     </div>
+    {% endif %}
 
     <br /><br />
 </div>
 <script>
-$(document).on('click', '#add-cart', function(e){
-    e.preventDefault();
-    $.ajax({
-        type: 'POST',
-        url: '{% url 'cart_add' %}',
-        data: {
-            voiture_id: $('#add-cart').val(),
-            csrfmiddlewaretoken: '{{ csrf_token }}',
-            action: 'post'
-        },
+    $(document).on('click', '#add-cart', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'cart_add' %}',
+            data: {
+                voiture_id: $('#add-cart').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
 
-        success: function(json){
-            console.log(json)
-        },
-        error: function(xhr, errmsg, err){
-            
-        }
+            success: function (json) {
+                console.log(json)
+            },
+            error: function (xhr, errmsg, err) {
+
+            }
 
 
-    });
-})
+        });
+    })
 
 </script>
 

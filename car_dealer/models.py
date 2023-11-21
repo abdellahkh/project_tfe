@@ -85,7 +85,7 @@ class Voiture(models.Model):
         ordering = ['-date_poste']
 
     def __str__(self):
-        return f"({self.marque}) {self.modele} - {self.annee_fabrication}"
+        return f"{self.marque} {self.modele} - {self.annee_fabrication}"
 
 class Service(models.Model):
     nom = models.CharField(max_length=100, help_text="Nom du service")

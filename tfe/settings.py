@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'car_dealer',
     'cart',
+    'import_export',
 ]
 
 MIDDLEWARE = [

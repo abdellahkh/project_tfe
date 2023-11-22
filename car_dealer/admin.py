@@ -1,8 +1,9 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Marque, Modele, Voiture, Service, Review, Vente
+from .models import Marque, Modele, Voiture, Service, Review, Vente, Member
 
+admin.site.register(Member)
 admin.site.register(Marque)
 admin.site.register(Modele)
 admin.site.register(Service)

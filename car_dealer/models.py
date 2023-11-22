@@ -1,6 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+class Member(models.Model):
+    username = models.CharField(max_length=100, help_text="username")
+    first_name = models.CharField(max_length=100, help_text="Prenom")
+    last_name = models.CharField(max_length=100, help_text="Nom")
+    email = models.EmailField(max_length=100, help_text="Nom du modèle")
+    phone = models.CharField(max_length=100, help_text="Phone")
+    address = models.CharField(max_length=100, help_text="adresse")
+    postal = models.IntegerField( help_text="Code Postal")
+    ville = models.CharField(max_length=100, help_text="Ville")
+
+    def __str__(self):
+        return self.username
+
+
+
+
 class Marque(models.Model):
     nom = models.CharField(max_length=100, unique=True, help_text="Nom de la marque")
 

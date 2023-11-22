@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .forms import SignUpForm
+from .forms import SignUpForm, UserUpdateForm
 from django import forms
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
@@ -103,3 +103,26 @@ def allServices(request):
 def voiture(request, pk):
     voiture = Voiture.objects.get(id=pk)
     return render(request, 'voiture.html' ,{'voiture' : voiture})
+
+def profile(request, username):
+    if request.method == 'POST':
+        user = request.user
+        form = UserUpdateForm(request.POST, request.FILES, instance=user)  # Utilisez le même nom 'form' ici
+        if form.is_valid():
+            user_form = form.save()
+            messages.success(request, f'{user_form.username}, Votre profil a bien été modifié')
+            return redirect("profile", user_form.username)
+        else:
+            # Affichez le formulaire et les erreurs sur la console
+            print(form.errors)
+            messages.error(request, f'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+
+    user = get_user_model().objects.filter(username=username).first()
+    if user:
+        form = UserUpdateForm(instance=user)
+        return render(
+            request=request,
+            template_name="profile.html",
+            context={"form": form}  # Utilisez le même nom 'form' ici
+        )
+    return redirect("home")

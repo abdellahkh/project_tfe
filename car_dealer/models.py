@@ -4,24 +4,25 @@ from django.contrib.auth.models import User, AbstractUser
 
 
 class Member(AbstractUser):
-    SATUS = (
+    STATUS = (
         ('normal', 'normal'),
         ('client', 'client')
     )
-    status = models.CharField(max_length=100, choices=SATUS, default='normal')
+    status = models.CharField(max_length=100, choices=STATUS, default='normal')
     username = models.CharField(max_length=100, unique=True, help_text="username")
     first_name = models.CharField(max_length=100, help_text="Prenom")
     last_name = models.CharField(max_length=100, help_text="Nom")
     email = models.EmailField(max_length=100, help_text="Nom du modèle")
-    phone = models.CharField(max_length=100, help_text="Phone")
-    address = models.CharField(max_length=100, help_text="adresse")
+    phone = models.CharField(max_length=100, help_text="Phone", blank=True, null=True)
+    address = models.CharField(max_length=100, help_text="adresse", blank=True, null=True)
     postal = models.IntegerField(null=True, blank=True, help_text="Code Postal")
-    ville = models.CharField(max_length=100, help_text="Ville")
+    ville = models.CharField(max_length=100, help_text="Ville", blank=True, null=True)
 
     USERNAME_FIELD = 'username'
 
     def __str__(self):
         return self.username
+
 
 
 

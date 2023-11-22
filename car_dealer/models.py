@@ -1,16 +1,24 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 
 
-class Member(models.Model):
-    username = models.CharField(max_length=100, help_text="username")
+
+class Member(AbstractUser):
+    SATUS = (
+        ('normal', 'normal'),
+        ('client', 'client')
+    )
+    status = models.CharField(max_length=100, choices=SATUS, default='normal')
+    username = models.CharField(max_length=100, unique=True, help_text="username")
     first_name = models.CharField(max_length=100, help_text="Prenom")
     last_name = models.CharField(max_length=100, help_text="Nom")
     email = models.EmailField(max_length=100, help_text="Nom du modèle")
     phone = models.CharField(max_length=100, help_text="Phone")
     address = models.CharField(max_length=100, help_text="adresse")
-    postal = models.IntegerField( help_text="Code Postal")
+    postal = models.IntegerField(null=True, blank=True, help_text="Code Postal")
     ville = models.CharField(max_length=100, help_text="Ville")
+
+    USERNAME_FIELD = 'username'
 
     def __str__(self):
         return self.username
@@ -113,7 +121,7 @@ class Service(models.Model):
         return self.nom
 
 class Review(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, help_text="Identifiant du User qui a commenté")
+    user_id = models.ForeignKey(Member, on_delete=models.CASCADE, help_text="Identifiant du membre qui a commenté")
     comment = models.TextField(blank=True, null=True, help_text="Commentaire")
     service_id = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True, help_text="Identifiant du Service")
 
@@ -135,7 +143,7 @@ class Vente(models.Model):
         help_text="Type de service"
     )
     paid = models.BooleanField(default=False, verbose_name="Payé")
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, help_text="Identifiant du User")
+    user_id = models.ForeignKey(Member, on_delete=models.CASCADE, help_text="Identifiant du User")
     service_id = models.ForeignKey(Service, blank=True, null=True, on_delete=models.CASCADE, help_text="Identifiant du Service")
     voiture_id = models.ForeignKey(Voiture, blank=True, null=True,  on_delete=models.CASCADE, help_text="Identifiant de la voiture")
     date = models.DateTimeField(auto_now_add=True, help_text="Date de la vente")

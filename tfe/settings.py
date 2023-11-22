@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     'import_export',
 ]
 
+AUTH_USER_MODEL = 'car_dealer.Member'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

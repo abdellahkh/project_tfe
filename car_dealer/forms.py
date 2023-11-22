@@ -1,6 +1,7 @@
-from django.contrib.auth.models import User
+from .models import Member
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from .models import Member
 
 class SignUpForm(UserCreationForm):
 	email = forms.EmailField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Email Address'}))
@@ -10,7 +11,7 @@ class SignUpForm(UserCreationForm):
 	postal_code = forms.IntegerField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Code Postal'}))
 
 	class Meta:
-		model = User
+		model = Member
 		fields = ('username', 'first_name', 'last_name', 'email', 'address','postal_code', 'password1', 'password2')
 
 	def __init__(self, *args, **kwargs):

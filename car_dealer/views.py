@@ -1,29 +1,71 @@
 from django.shortcuts import render, redirect
 from .models import Voiture
 from django.contrib.auth import authenticate, login, logout
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_str, force_bytes
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .forms import SignUpForm
 from django import forms
+from .tokens import account_activation_token
+from django.core.mail import EmailMessage
+from django.contrib.auth import get_user_model
+
 
 # Create your views here.
 def home(request):
     voitures = Voiture.objects.all()
     return render(request, 'home.html', {'voitures' :voitures})
 
+def activate(request, uidb64, token):
+    # User = get_user_model()
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(id=uid)
+    except User.DoesNotExist:
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+
+        messages.success(request, 'Merci d\'avoir validé votre compte, vous pouvez maintenant vous connecter.')
+        return redirect('login')
+    else:
+        messages.error(request, "Le lien d\'activation n'est pas valide!")
+
+    return redirect('home')
+
+
+def activateEmail(request, user, to_email):
+    mail_subject = "Activez votre compte."
+    message = render_to_string("activate_account.html",{
+        'user': user.username,
+        'domain': get_current_site(request).domain,
+        'uid': urlsafe_base64_encode(force_bytes(user.id)),
+        'token': account_activation_token.make_token(user),
+        'protocol': 'https' if request.is_secure() else 'http'
+
+    })
+    email = EmailMessage(mail_subject, message, to=[to_email])
+    if email.send():
+        messages.success(request, f'Cher <b>{user}</b>, verifie votre boite de messagerie <b>{to_email}</b> et cliquez sur \
+                        le lien d\'activation pour confirmer l\'inscription.')
+    else:
+        messages.error(request, f'Une erreur est survenue. Verifie l\'adresse: {to_email}.')
+
 def register_user(request):
     form = SignUpForm()
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
-
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            messages.success(request, ("Inscription validee"))
+            user = form.save(commit=False)
+            #user.is_active = False
+            user.save()
+            activateEmail(request, user, form.cleaned_data.get('email'))
             return redirect('home')
         else:
             messages.success(request, ("Ooops, une erreur s'est produite"))

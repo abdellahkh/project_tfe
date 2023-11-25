@@ -17,44 +17,64 @@
 
 <!-- Section-->
 <section class="py-5">
-    <div class="container px-4 px-lg-5 mt-5">
-
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-
-            {% for voiture in voitures %}
-            <div class="col mb-5">
-                <div class="card h-100">
-                    {% if voiture.sold %}
-                    <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Vendu !</div>
-                    {% endif %}
-                    {% if voiture.reserve %}
-                    <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Réservé !</div>
-                    {% endif %}
-                    <!-- Product image-->
-                    {% if voiture.car_photo_1.url %}
-                    <img class="card-img-top" src="{{ voiture.car_photo_1.url }}" alt="Car Image" />
-                    {% endif %}
-
-                    <!-- Product details-->
-                    <div class="card-body p-4">
-                        <div class="text-center">
-                            <!-- Car name-->
-                            <h5 class="fw-bolder">{{ voiture.modele.nom }} - {{ voiture.annee_fabrication }}</h5>
-                            <!-- Car brand-->
-                            <p>{{ voiture.marque.nom }}</p>
-                            <!-- Car price-->
-                            {{ voiture.prix }}Eur
+    <div class="container  "> 
+        <div class="row ">
+            <!-- Left Part (9 columns) -->
+            <div class="col-md-8">
+                <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    {% for voiture in voitures %}
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            {% if voiture.sold %}
+                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Vendu !</div>
+                            {% endif %}
+                            {% if voiture.reserve %}
+                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Réservé !</div>
+                            {% endif %}
+                            <!-- Product image-->
+                            {% if voiture.car_photo_1.url %}
+                            <img class="card-img-top" src="{{ voiture.car_photo_1.url }}" alt="Car Image" />
+                            {% endif %}
+                            <!-- Product details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <!-- Car name-->
+                                    <h5 class="fw-bolder">{{ voiture.modele.nom }} - {{ voiture.annee_fabrication }}</h5>
+                                    <!-- Car brand-->
+                                    <p>{{ voiture.marque.nom }}</p>
+                                    <!-- Car price-->
+                                    {{ voiture.prix }}.00€
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'voiture' voiture.id %}">Details</a></div>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Product actions-->
-                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                        <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'voiture' voiture.id %}">Details</a></div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
 
+            <!-- Right Part (3 columns) -->
+<div class="col-md-4 px-4">
+    <div class="list-group">
+        <div class="d-flex w-100 justify-content-between">
+            <h5>Services</h5>
+        </div>
+
+        {% for service in services %}
+        <a href="{% url 'service_detail' service.id %}" class="list-group-item list-group-item-action mb-2" aria-current="true">
+            <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">{{ service }}</h6>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+        </div>
+    </div>
 </section>
 
 {% endblock %}

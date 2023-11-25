@@ -4,108 +4,247 @@
 <!-- Header -->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Details</h1>
+        <div class="d-flex justify-content-center align-items-center text-white">
+            <img src="/media/photos/site/cardealerLogo.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">Details</h1>
+            </div>
         </div>
     </div>
 </header>
-
+<br /><br />
+{% if voiture %}
 <div class="container">
-    <br /><br />
-    {% if voiture %}
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-8">
-                <div class="card mb-3">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <img src="{{ voiture.car_photo_1.url }}" class="img-fluid rounded-start" style="max-width: 100%;" alt="Car Photo">
-                            <h3>{{ voiture }}kugku</h3>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    {{ voiture.marque.nom }} - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}
-                                </h5>
-                                <ul>
-                                    <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
-                                    <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
-                                    <li><b>Carburant:</b> {{ voiture.carburant }}</li>
-                                    <li><b>Transmission:</b> {{ voiture.transmission }}</li>
-                                    <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <p class="card-text mb-3 m-2">{{ voiture.description }}</p>
-                            <p class="card-text m-2"><small class="text-muted">Ajoutée le {{ voiture.date_poste }}</small></p>
+    <div class="row justify-content-center">
+        <div class="card mb-6">
+            <div class="row g-0">
+                <div class="col-md-8 p-3">
+                    <img src="{{ voiture.car_photo_1.url }}" class="img-fluid rounded-start" style="max-width: 100%;"
+                        alt="Car Photo">
+                    <h3>{{ voiture }}</h3>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{ voiture.marque.nom }} - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}
+                        </h5>
+                        <ul>
+                            <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
+                            <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
+                            <li><b>Carburant:</b> {{ voiture.carburant }}</li>
+                            <li><b>Transmission:</b> {{ voiture.transmission }}</li>
+                            <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
+                        </ul>
+                        <div>
+                            <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}"
+                                id="contact">
+                                <i class="bi bi-chat-text me-1"></i>Contact
+                            </button>
+
                             {% if user.is_authenticated %}
                             <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}"
                                 id="add-cart">
                                 <i class="bi-cart-fill me-1">Réserver</i>
                             </button>
+                            {% else %}
+                            <button class="btn btn-outline-dark me-2 m-2" type="button" disabled>
+                                <i class="bi-cart-fill me-1">Réserver</i>
+                            </button>
+                            <p class="text-muted">Vous devez être connecté pour réserver.</p>
                             {% endif %}
-                            <br /><br />
                         </div>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <h5>Options:</h5>
+                    <div class="row list-unstyled">
+                        {% if voiture.cruise_control %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked"
+                                    checked="true">
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Cruise Control
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.direction_assistee %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Direction assistée
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.audio_interface %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Audio Interface
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.airbags %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Airbags
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.air_conditionne %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Air Conditionné
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.siege_chauffant %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Siège Chauffant
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.alarm_system %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Alarm System
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.parkassist %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Park Assist
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.camera_recul %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Camera de Recul
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.start_stop %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Start & Stop
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.essui_auto %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Essuie-glace Auto car_play
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% if voiture.car_play %}
+                        <li class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Car Play-System
+                                </label>
+                            </div>
+                        </li>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <p class="card-text mb-3 m-2">{{ voiture.description }}</p>
+                    <p class="card-text m-2"><small class="text-muted">Ajoutée le {{ voiture.date_poste }}</small></p>
+
+                    <br /><br />
+                </div>
             </div>
         </div>
+
     </div>
-
-
-    <div class="row">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-center">
-                <!-- Vos images ici... -->
-                {% if voiture.car_photo_2 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_2.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                {% if voiture.car_photo_3 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_3.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                {% if voiture.car_photo_4 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_4.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                {% if voiture.car_photo_5 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_5.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                {% if voiture.car_photo_6 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_6.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                {% if voiture.car_photo_7 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_7.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                {% if voiture.car_photo_8 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_8.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                {% if voiture.car_photo_9 %}
-                <div class="col mb-5">
-                    <img class="img-fluid" src="{{ voiture.car_photo_9.url }}" alt="Car Image" />
-                </div>
-                {% endif %}
-                <br /><br />
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <br /><br />
 </div>
+
+<div class="row">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-center">
+            <!-- Vos images ici... -->
+            {% if voiture.car_photo_2 %}
+            <div class="col mb-4">
+                <img class="img-fluid" src="{{ voiture.car_photo_2.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            {% if voiture.car_photo_3 %}
+            <div class="col mb-5">
+                <img class="img-fluid" src="{{ voiture.car_photo_3.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            {% if voiture.car_photo_4 %}
+            <div class="col mb-5">
+                <img class="img-fluid" src="{{ voiture.car_photo_4.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            {% if voiture.car_photo_5 %}
+            <div class="col mb-5">
+                <img class="img-fluid" src="{{ voiture.car_photo_5.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            {% if voiture.car_photo_6 %}
+            <div class="col mb-5">
+                <img class="img-fluid" src="{{ voiture.car_photo_6.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            {% if voiture.car_photo_7 %}
+            <div class="col mb-5">
+                <img class="img-fluid" src="{{ voiture.car_photo_7.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            {% if voiture.car_photo_8 %}
+            <div class="col mb-5">
+                <img class="img-fluid" src="{{ voiture.car_photo_8.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            {% if voiture.car_photo_9 %}
+            <div class="col mb-5">
+                <img class="img-fluid" src="{{ voiture.car_photo_9.url }}" alt="Car Image" />
+            </div>
+            {% endif %}
+            <br /><br />
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<br /><br />
+
 <script>
     $(document).on('click', '#add-cart', function (e) {
         e.preventDefault();
@@ -124,12 +263,8 @@
             error: function (xhr, errmsg, err) {
 
             }
-
-
         });
     })
-
 </script>
-
 
 {% endblock %}

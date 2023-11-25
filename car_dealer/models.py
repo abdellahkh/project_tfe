@@ -114,6 +114,8 @@ class Voiture(models.Model):
         return f"{self.marque} {self.modele} - {self.annee_fabrication}"
 
 class Service(models.Model):
+    is_available = models.BooleanField(default=False, verbose_name="Disponible")
+    image = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
     nom = models.CharField(max_length=100, help_text="Nom du service")
     description = models.TextField(blank=True, null=True, help_text="Commentaire")
     prix = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True,help_text="Prix du service")

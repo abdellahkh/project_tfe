@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Voiture, Member
+from .models import Service, Voiture, Member
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -97,8 +97,10 @@ def logout_user(request):
 
 def about(request):
     return render(request, 'about.html', {})
+
 def allServices(request):
-    return render(request, 'allServices.html', {})
+    services = Service.objects.all()
+    return render(request, 'allServices.html', { 'services': services })
 
 def voiture(request, pk):
     voiture = Voiture.objects.get(id=pk)

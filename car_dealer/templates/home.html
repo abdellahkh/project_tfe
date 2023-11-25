@@ -5,12 +5,16 @@
 <!-- Header-->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Cars - Services</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Les meilleurs services accompagnement</p>
+        <div class="d-flex justify-content-center align-items-center text-white">
+            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">Cars - Services</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Les meilleurs services accompagnement</p>
+            </div>
         </div>
     </div>
 </header>
+
 <!-- Section-->
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
@@ -27,7 +31,7 @@
                     <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Réservé !</div>
                     {% endif %}
                     <!-- Product image-->
-                    {% if voiture.car_photo_1 %}
+                    {% if voiture.car_photo_1.url %}
                     <img class="card-img-top" src="{{ voiture.car_photo_1.url }}" alt="Car Image" />
                     {% endif %}
 

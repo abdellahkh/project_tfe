@@ -17,7 +17,8 @@ from django.contrib.auth import get_user_model
 # Create your views here.
 def home(request):
     voitures = Voiture.objects.all()
-    return render(request, 'home.html', {'voitures' :voitures})
+    services = Service.objects.all()
+    return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
 
 def activate(request, uidb64, token):
     # User = get_user_model()
@@ -106,6 +107,10 @@ def voiture(request, pk):
     voiture = Voiture.objects.get(id=pk)
     return render(request, 'voiture.html' ,{'voiture' : voiture})
 
+def service(request, service_id):
+    service = Service.objects.get(id=service_id)
+    return render(request, 'formulaire/service_demande.html', {'service' : service})
+
 def profile(request, username):
     if request.method == 'POST':
         user = request.user
@@ -128,3 +133,6 @@ def profile(request, username):
             context={"form": form}  # Utilisez le même nom 'form' ici
         )
     return redirect("home")
+
+def vendre(request):
+    return render(request, 'formulaire/vendre.html', {})

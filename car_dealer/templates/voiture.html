@@ -28,6 +28,7 @@
                         <h5 class="card-title">
                             {{ voiture.marque.nom }} - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}
                         </h5>
+                        <h4>{{ voiture.prix }}.00€</h4>
                         <ul>
                             <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
                             <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
@@ -42,10 +43,15 @@
                             </button>
 
                             {% if user.is_authenticated %}
-                            <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}"
-                                id="add-cart">
-                                <i class="bi-cart-fill me-1">Réserver</i>
-                            </button>
+                                {% if voiture.reserve %}
+
+                                {% else %}
+                                    <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}"
+                                    id="add-cart">
+                                    <i class="bi-cart-fill me-1">Réserver</i>
+                                    </button>
+                                {% endif %}
+
                             {% else %}
                             <button class="btn btn-outline-dark me-2 m-2" type="button" disabled>
                                 <i class="bi-cart-fill me-1">Réserver</i>

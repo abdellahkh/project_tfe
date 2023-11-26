@@ -1,8 +1,9 @@
 from .models import Member
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .models import Member
+from .models import Member, Demande
 from django.contrib.auth import get_user_model
+from django.forms import ModelForm
 
 class SignUpForm(UserCreationForm):
 	email = forms.EmailField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Email Address'}))
@@ -42,3 +43,18 @@ class UserUpdateForm(forms.ModelForm):
 		model = get_user_model()
 		fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'postal', 'ville']
 	
+
+class DemandeDeplacement(forms.ModelForm):
+
+	class Meta:
+		model = Demande
+		fields = ['date_desiree', 'startLocation', 'endLocation', 'details',]
+		widgets = {
+            'date_desiree': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+	def __init__(self, *args, **kwargs):
+		super(DemandeDeplacement, self).__init__(*args, **kwargs)
+
+		self.fields['date_desiree'].label = 'Date'
+

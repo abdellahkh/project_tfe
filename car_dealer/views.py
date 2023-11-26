@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Service, Voiture, Member
+from .models import Service, Voiture, Member, Demande
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .forms import SignUpForm, UserUpdateForm
+from .forms import SignUpForm, UserUpdateForm, DemandeDeplacement
 from django import forms
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
@@ -107,9 +107,36 @@ def voiture(request, pk):
     voiture = Voiture.objects.get(id=pk)
     return render(request, 'voiture.html' ,{'voiture' : voiture})
 
+
+
+from django.shortcuts import render, redirect
+from .models import Service
+from .forms import DemandeDeplacement  # Make sure to import your form
+
 def service(request, service_id):
+    submitted = False
     service = Service.objects.get(id=service_id)
-    return render(request, 'formulaire/service_demande.html', {'service' : service})
+
+    if service.nom == 'Déplacement de Véhicule Longue Distance' or service.nom == 'Déplacement de Véhicule Courte Distance':
+        if request.method == 'POST':
+            form = DemandeDeplacement(request.POST)
+            form.instance.service = service
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                return redirect('home')
+            else:
+                # Affichez le formulaire et les erreurs sur la console
+                print(form.errors)
+                messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+        else:
+            form = DemandeDeplacement()  # Corrected this line
+            if 'submitted' in request.GET:
+                submitted = True
+    else:
+        form = None
+
+    return render(request, 'formulaire/service_demande.html', {'form': form, 'submitted': submitted, 'service': service})
 
 def profile(request, username):
     if request.method == 'POST':

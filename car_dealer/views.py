@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .forms import SignUpForm, UserUpdateForm, DemandeDeplacement
+from .forms import SignUpForm, UserUpdateForm, DemandeDeplacement, DemandeControlTech, DemandeControlTechMembre, DemandeDeplacementMembre, DemandeSortieDeFourriereMembre, DemandeSortieDeFourriere, VenteVehicule
 from django import forms
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
@@ -56,6 +56,45 @@ def activateEmail(request, user, to_email):
                         le lien d\'activation pour confirmer l\'inscription.')
     else:
         messages.error(request, f'Une erreur est survenue. Verifie l\'adresse: {to_email}.')
+
+def serviceEmailToAdmin(request, user, serviceNom, form, to_email):
+    mail_subject = "Nouvelle demande de service"
+    message = render_to_string("email_template/demande_submit.html", {
+        'user': user,  # Use dictionary syntax
+        'domain': get_current_site(request).domain,
+        'protocol': 'https' if request.is_secure() else 'http',
+        'service': serviceNom,
+        'first_name': form.cleaned_data['first_name'],  
+        'last_name': form.cleaned_data['last_name'],
+        'email': form.cleaned_data['email'],
+        'phone': form.cleaned_data['phone'],
+    })
+    email = EmailMessage(mail_subject, message, to=[to_email])
+    first_name = form.cleaned_data['first_name']
+    if email.send():
+        messages.success(request, f'Cher {first_name}, votre demande a bien été soumise, vous allez être recontacté sous peu.')
+    else:
+        messages.error(request, f'Une erreur est survenue. Veuillez réessayer plus tard.')
+
+
+
+def serviceEmailToAdminFromMembre(request, user, serviceNom, form, to_email):
+    mail_subject = "Nouvelle demande de service"
+    message = render_to_string("email_template/demande_submit.html", {
+        'user': user,  # Use dictionary syntax
+        'domain': get_current_site(request).domain,
+        'protocol': 'https' if request.is_secure() else 'http',
+        'service': serviceNom,
+    })
+    email = EmailMessage(mail_subject, message, to=[to_email])
+    first_name = user
+    if email.send():
+        messages.success(request, f'Cher {first_name}, votre demande a bien été soumise, vous allez être recontacté sous peu.')
+    else:
+        messages.error(request, f'Une erreur est survenue. Veuillez réessayer plus tard.')
+
+
+
 
 def register_user(request):
     form = SignUpForm()
@@ -108,35 +147,183 @@ def voiture(request, pk):
     return render(request, 'voiture.html' ,{'voiture' : voiture})
 
 
-
-from django.shortcuts import render, redirect
-from .models import Service
-from .forms import DemandeDeplacement  # Make sure to import your form
-
 def service(request, service_id):
     submitted = False
     service = Service.objects.get(id=service_id)
+    user = request.user
+    service_nom = service.nom
+    form = None
 
-    if service.nom == 'Déplacement de Véhicule Longue Distance' or service.nom == 'Déplacement de Véhicule Courte Distance':
-        if request.method == 'POST':
-            form = DemandeDeplacement(request.POST)
-            form.instance.service = service
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
-                return redirect('home')
+    if service.nom in ['Déplacement de Véhicule Longue Distance', 'Déplacement de Véhicule Courte Distance']:
+        mail_to = 'etu.abkh@gmail.com'
+        if request.user.is_authenticated:
+            if request.method == 'POST':
+                
+                form = DemandeDeplacementMembre(request.POST)
+                form.instance.service = service
+                if form.is_valid():
+                    form.save()
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
             else:
-                # Affichez le formulaire et les erreurs sur la console
-                print(form.errors)
-                messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+                form = DemandeDeplacementMembre()
+                if 'submitted' in request.GET:
+                    submitted = True
         else:
-            form = DemandeDeplacement()  # Corrected this line
-            if 'submitted' in request.GET:
-                submitted = True
-    else:
-        form = None
+            if request.method == 'POST':
+                form = DemandeDeplacement(request.POST)
+                form.instance.service = service
+                if form.is_valid():
+                    form.save()
+                    user = {
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                        'phone': form.cleaned_data['phone'],
+                        'email': form.cleaned_data['email'],
+                    }
+                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+            else:
+                form = DemandeDeplacement()
+                if 'submitted' in request.GET:
+                    submitted = True
+
+    elif service.nom in ['Passage au controle technique de vente', 'Passage au controle technique annuel']:
+        mail_to = 'etu.abkh@gmail.com'
+        if request.user.is_authenticated:
+            if request.method == 'POST':
+                form = DemandeControlTechMembre(request.POST)
+                form.instance.service = service
+                form.instance.member = request.user
+                if form.is_valid():
+                    form.save()
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+            else:
+                form = DemandeControlTechMembre()
+                if 'submitted' in request.GET:
+                    submitted = True
+        else:
+            if request.method == 'POST':
+                form = DemandeControlTech(request.POST)
+                form.instance.service = service
+                form.instance.member = request.user.id
+                if form.is_valid():
+                    form.save()
+                    user = {
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                        'phone': form.cleaned_data['phone'],
+                        'email': form.cleaned_data['email'],
+                    }
+                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+            else:
+                form = DemandeControlTech()
+                if 'submitted' in request.GET:
+                    submitted = True
+
+    elif service.nom == 'Service de Sortie de Fourrière':
+        if request.user.is_authenticated:
+            if request.method == 'POST':
+                form = DemandeSortieDeFourriereMembre(request.POST)
+                form.instance.service = service
+                form.instance.member = request.user
+                if form.is_valid():
+                    form.save()
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+            else:
+                form = DemandeSortieDeFourriereMembre()
+                if 'submitted' in request.GET:
+                    submitted = True
+        else:
+            if request.method == 'POST':
+                form = DemandeSortieDeFourriere(request.POST)
+                form.instance.service = service
+                form.instance.member = request.user.id
+                if form.is_valid():
+                    user = {
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                        'phone': form.cleaned_data['phone'],
+                        'email': form.cleaned_data['email'],
+                    }
+                    form.save()
+                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+            else:
+                form = DemandeSortieDeFourriere()
+                if 'submitted' in request.GET:
+                    submitted = True
+
+    elif service.nom == 'Service d\'Achat de Véhicule':
+        if request.user.is_authenticated:
+            if request.method == 'POST':
+                form = VenteVehicule(request.POST)
+                form.instance.service = service
+                form.instance.member = request.user
+                if form.is_valid():
+                    form.save()
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+            else:
+                form = VenteVehicule()
+                if 'submitted' in request.GET:
+                    submitted = True
+        else:
+            if request.method == 'POST':
+                form = VenteVehicule(request.POST)
+                form.instance.service = service
+                form.instance.member = request.user.id
+                if form.is_valid():
+                    user = {
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                        'phone': form.cleaned_data['phone'],
+                        'email': form.cleaned_data['email'],
+                    }
+                    form.save()
+                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                    return redirect('home')
+                else:
+                    print(form.errors)
+                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+            else:
+                form = VenteVehicule()
+                if 'submitted' in request.GET:
+                    submitted = True
 
     return render(request, 'formulaire/service_demande.html', {'form': form, 'submitted': submitted, 'service': service})
+
+
+
+
+
+
+
+
 
 def profile(request, username):
     if request.method == 'POST':

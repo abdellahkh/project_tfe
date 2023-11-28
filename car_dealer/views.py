@@ -64,7 +64,7 @@ def serviceEmailToAdmin(request, user, serviceNom, form, to_email):
         'domain': get_current_site(request).domain,
         'protocol': 'https' if request.is_secure() else 'http',
         'service': serviceNom,
-        'first_name': form.cleaned_data['first_name'],  # Use cleaned_data for form fields
+        'first_name': form.cleaned_data['first_name'],  
         'last_name': form.cleaned_data['last_name'],
         'email': form.cleaned_data['email'],
         'phone': form.cleaned_data['phone'],
@@ -75,6 +75,26 @@ def serviceEmailToAdmin(request, user, serviceNom, form, to_email):
         messages.success(request, f'Cher {first_name}, votre demande a bien été soumise, vous allez être recontacté sous peu.')
     else:
         messages.error(request, f'Une erreur est survenue. Veuillez réessayer plus tard.')
+
+
+
+def serviceEmailToAdminFromMembre(request, user, serviceNom, form, to_email):
+    mail_subject = "Nouvelle demande de service"
+    message = render_to_string("email_template/demande_submit.html", {
+        'user': user,  # Use dictionary syntax
+        'domain': get_current_site(request).domain,
+        'protocol': 'https' if request.is_secure() else 'http',
+        'service': serviceNom,
+    })
+    email = EmailMessage(mail_subject, message, to=[to_email])
+    first_name = user
+    if email.send():
+        messages.success(request, f'Cher {first_name}, votre demande a bien été soumise, vous allez être recontacté sous peu.')
+    else:
+        messages.error(request, f'Une erreur est survenue. Veuillez réessayer plus tard.')
+
+
+
 
 def register_user(request):
     form = SignUpForm()
@@ -132,6 +152,7 @@ def service(request, service_id):
     service = Service.objects.get(id=service_id)
     user = request.user
     service_nom = service.nom
+    form = None
 
     if service.nom in ['Déplacement de Véhicule Longue Distance', 'Déplacement de Véhicule Courte Distance']:
         mail_to = 'etu.abkh@gmail.com'
@@ -142,12 +163,9 @@ def service(request, service_id):
                 form.instance.service = service
                 if form.is_valid():
                     form.save()
-                    # Assurez-vous de fournir la définition de la fonction serviceEmail
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
-                    # Affichez le formulaire et les erreurs sur la console
                     print(form.errors)
                     messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
             else:
@@ -166,12 +184,9 @@ def service(request, service_id):
                         'phone': form.cleaned_data['phone'],
                         'email': form.cleaned_data['email'],
                     }
-                    # Assurez-vous de fournir la définition de la fonction serviceEmail
                     serviceEmailToAdmin(request, user, service_nom, form, mail_to)
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
                     return redirect('home')
                 else:
-                    # Affichez le formulaire et les erreurs sur la console
                     print(form.errors)
                     messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
             else:
@@ -180,6 +195,7 @@ def service(request, service_id):
                     submitted = True
 
     elif service.nom in ['Passage au controle technique de vente', 'Passage au controle technique annuel']:
+        mail_to = 'etu.abkh@gmail.com'
         if request.user.is_authenticated:
             if request.method == 'POST':
                 form = DemandeControlTechMembre(request.POST)
@@ -187,7 +203,7 @@ def service(request, service_id):
                 form.instance.member = request.user
                 if form.is_valid():
                     form.save()
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -203,7 +219,13 @@ def service(request, service_id):
                 form.instance.member = request.user.id
                 if form.is_valid():
                     form.save()
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                    user = {
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                        'phone': form.cleaned_data['phone'],
+                        'email': form.cleaned_data['email'],
+                    }
+                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -221,7 +243,7 @@ def service(request, service_id):
                 form.instance.member = request.user
                 if form.is_valid():
                     form.save()
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -236,8 +258,14 @@ def service(request, service_id):
                 form.instance.service = service
                 form.instance.member = request.user.id
                 if form.is_valid():
+                    user = {
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                        'phone': form.cleaned_data['phone'],
+                        'email': form.cleaned_data['email'],
+                    }
                     form.save()
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -255,7 +283,7 @@ def service(request, service_id):
                 form.instance.member = request.user
                 if form.is_valid():
                     form.save()
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -270,8 +298,14 @@ def service(request, service_id):
                 form.instance.service = service
                 form.instance.member = request.user.id
                 if form.is_valid():
+                    user = {
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                        'phone': form.cleaned_data['phone'],
+                        'email': form.cleaned_data['email'],
+                    }
                     form.save()
-                    messages.success(request, 'Votre demande a bien été soumise, vous allez être recontacté sous peu.')
+                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -290,15 +324,6 @@ def service(request, service_id):
 
 
 
-
-
-
-
-
-
-
-
-    return render(request, 'formulaire/service_demande.html', {'form': form, 'submitted': submitted, 'service': service})
 
 def profile(request, username):
     if request.method == 'POST':

@@ -167,7 +167,7 @@ class VoitureSoumisse(models.Model):
     car_play = models.BooleanField(default=False, verbose_name="Car Play-System")
     
     description = models.TextField(blank=True, null=True, help_text="Description de la voiture")
-    date_poste = models.DateTimeField(auto_now_add=True, help_text="Date de publication de l'annonce")
+    date_poste = models.DateField(auto_now_add=True, help_text="Date de publication de l'annonce")
 
     car_photo_1 = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
     car_photo_2 = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
@@ -218,7 +218,7 @@ class Demande(models.Model):
     phone = models.CharField(max_length=100, help_text="Phone", blank=True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, help_text="Service selectionner")
     date = models.DateTimeField(auto_now_add=True, help_text="Date de la demande")
-    date_desiree = models.DateTimeField(auto_now_add=False, blank=True, null=True, help_text="  (Date d'intervention souhaitée)")
+    date_desiree = models.DateField(auto_now_add=False, blank=True, null=True, help_text="  (Date d'intervention souhaitée)")
     details = models.TextField(blank=True, null=True, help_text="Details specifique")
     genre = models.CharField(
         null=True,
@@ -232,7 +232,10 @@ class Demande(models.Model):
     car_doc = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
 
     def __str__(self):
-        return f"{self.service} : {self.date_desiree}"
+        if self.member:
+            return f"{self.service} - {self.member}: {self.date_desiree}"
+        else:
+            return f"{self.service} - {self.first_name}, {self.last_name}: {self.date_desiree}"
 
 
 

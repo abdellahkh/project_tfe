@@ -1,0 +1,19 @@
+{% autoescape off %}
+Bonjour administrateur,
+
+Une demande a été soumise par
+{% if user.username %}
+    Utilisateur :
+    {{ user.username }},
+{% else %}
+    Informations sur l'utilisateur :
+            nom: {{ user.last_name }}     
+            prenom:  {{ user.first_name }} 
+            email:  {{ user.email }}
+            Tel:  {{ user.phone }}
+{% endif %}
+pour le service :     {{ service }}
+
+L'équipe Cars-Services.
+
+{% endautoescape %}

@@ -132,11 +132,13 @@ class VoitureSoumisse(models.Model):
         ('Automatique', 'Automatique'),
         ('Semi-automatique', 'Semi-automatique'),
     ]
-    
-    reserve = models.BooleanField(default=False, verbose_name="Réserver")
-    sold = models.BooleanField(default=False, verbose_name="Vendu")
-    marque = models.ForeignKey(Marque, on_delete=models.PROTECT, related_name='voitures_a_lachat', help_text="Marque de la voiture")
-    modele = models.ForeignKey(Modele, on_delete=models.CASCADE, help_text="Modèle de la voiture")
+    user_id = models.ForeignKey(Member, on_delete=models.SET_NULL, blank=True, null=True, help_text="Identifiant du membre qui a soumis la voiture")
+    first_name = models.CharField(blank=True, null=True,max_length=100, help_text="Prenom")
+    last_name = models.CharField(blank=True, null=True,max_length=100, help_text="Nom")
+    email = models.EmailField(blank=True, null=True,max_length=100, help_text="Email")
+    phone = models.CharField(max_length=100, help_text="Phone", blank=True, null=True)
+    marque = models.CharField(max_length=100, help_text="Marque", blank=True, null=True)
+    modele = models.CharField(max_length=100, help_text="Modele", blank=True, null=True)
     annee_fabrication = models.PositiveIntegerField(help_text="Année de fabrication")
     carburant = models.CharField(
         null=True,
@@ -211,6 +213,19 @@ class Demande(models.Model):
         ('Reparation, panne', 'Reparation, panne'),
         ('Carrosserie', 'Carrosserie')
     ]
+    STATUS_OPTIONS = [
+        ('Actif', 'Actif'),
+        ('Information', 'Information'),
+        ('Close', 'Close'),
+    ]
+    status = models.CharField(
+        null=True,
+        blank=True,
+        max_length=90,
+        choices=STATUS_OPTIONS,
+        help_text="Type de service",
+        default='Actif'
+    )
     member = models.ForeignKey(Member, on_delete=models.CASCADE,blank=True, null=True, help_text="Service selectionner")
     first_name = models.CharField(max_length=100,blank=True, null=True, help_text="Prenom")
     last_name = models.CharField(max_length=100, blank=True, null=True, help_text="Nom")
@@ -229,7 +244,7 @@ class Demande(models.Model):
     )
     startLocation = models.CharField(max_length=100, help_text="Commune depart", blank=True, null=True)
     endLocation = models.CharField(max_length=100, help_text="Commune arrivee", blank=True, null=True)
-    car_doc = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
+    car_doc = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True, null=True)
 
     def __str__(self):
         if self.member:

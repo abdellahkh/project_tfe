@@ -3,7 +3,7 @@
 {% block content %}
 <!-- Header -->
 <header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-5">
+    <div class="container px-4 px-lg-5 my-2">
         <div class="d-flex justify-content-center align-items-center text-white">
             <img src="/media/photos/site/cardealerLogo.png" alt="Logo" class="logo mr-3">
             <div class="text-center">
@@ -45,10 +45,10 @@
                             <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
                         </ul>
                         <div>
-                            <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}"
-                                id="contact">
+                            <a href="{% url 'contact_vehicule' voiture.id %}" class="btn btn-outline-dark me-2 m-2" role="button" id="contact">
                                 <i class="bi bi-chat-text me-1"></i>Contact
-                            </button>
+                            </a>
+                            
 
                             {% if user.is_authenticated %}
                             {% if voiture.reserve %}
@@ -57,10 +57,11 @@
                             </button>
 
                             {% else %}
-                            <button class="btn btn-outline-dark me-2 m-2" type="button" value="{{ voiture.id }}"
-                                id="add-cart">
-                                <i class="bi-cart-fill me-1">Réserver</i>
-                            </button>
+                            <form method="post" action="{% url 'checkout_session' voiture.id %}">
+                                {% csrf_token %}
+                                <input type="submit" value="Réserver" class="btn btn-outline-dark me-2 m-2">
+                            </form>
+                            
                             {% endif %}
 
                             {% else %}
@@ -262,7 +263,7 @@
 
 <br /><br />
 
-<script>
+<!-- <script>
     $(document).on('click', '#add-cart', function (e) {
         e.preventDefault();
         $.ajax({
@@ -282,6 +283,6 @@
             }
         });
     })
-</script>
+</script> -->
 
 {% endblock %}

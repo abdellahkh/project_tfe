@@ -91,6 +91,18 @@ class DemandeDeplacementMembre(forms.ModelForm):
 		self.fields['date_desiree'].label = 'Date'
 		
 
+class DemandeContactVoitureMembre(forms.ModelForm):
+
+    class Meta:
+        model = Demande
+        fields = ['details']
+
+    def __init__(self, *args, **kwargs):
+        super(DemandeContactVoitureMembre, self).__init__(*args, **kwargs)
+
+
+		
+
 class DemandeControlTechMembre(forms.ModelForm):
 
     class Meta:
@@ -142,35 +154,99 @@ class DemandeSortieDeFourriere(forms.ModelForm):
 
 
 class VenteVehicule(forms.ModelForm):
-    # Champs pour le modèle VoitureSoumisse
-    marque = forms.CharField()
-    modele = forms.CharField()
-    annee_fabrication = forms.IntegerField()
-    carburant = forms.CharField()
-    transmission = forms.CharField()
-    kilometrage = forms.IntegerField()
-    description = forms.CharField()
-    car_photo_1 = forms.ImageField()
-    prix = forms.DecimalField()
-
-    # Champs pour le modèle Demande
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    email = forms.EmailField()
-    phone = forms.CharField()
-    date_desiree = forms.DateField()
-    startLocation = forms.CharField()
-    endLocation = forms.CharField()
-    car_doc = forms.ImageField()
-    details = forms.CharField()
-
     class Meta:
         model = VoitureSoumisse
-        fields = ['marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage', 'description', 'car_photo_1', 'prix']
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'phone',
+            'marque',
+            'modele',
+            'annee_fabrication',
+            'carburant',
+            'transmission',
+            'kilometrage',
+            'cruise_control',
+            'direction_assistee',
+            'audio_interface',
+            'airbags',
+            'air_conditionne',
+            'siege_chauffant',
+            'alarm_system',
+            'parkassist',
+            'camera_recul',
+            'start_stop',
+            'essui_auto',
+            'car_play',
+            'description',
+            'car_photo_1',
+            'car_photo_2',
+            'car_photo_3',
+            'car_photo_4',
+            'car_photo_5',
+            'car_photo_6',
+            'car_photo_7',
+            'car_photo_8',
+            'car_photo_9',
+            'prix',
+            'car_doc',
+        ]
 
-    class Meta:
-        model = Demande
-        fields = ['first_name', 'last_name', 'email', 'phone', 'date_desiree', 'startLocation', 'endLocation', 'car_doc', 'details']
+    
+    car_doc = forms.ImageField()
+    details = forms.CharField(widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
         super(VenteVehicule, self).__init__(*args, **kwargs)
+        for field_name in ['first_name', 'last_name', 'email', 'phone', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission']:
+            self.fields[field_name].required = True
+        self.fields['car_doc'].required = False
+
+
+
+class VenteVehiculeMembre(forms.ModelForm):
+    class Meta:
+        model = VoitureSoumisse
+        fields = [
+            'marque',
+            'modele',
+            'annee_fabrication',
+            'carburant',
+            'transmission',
+            'kilometrage',
+            'cruise_control',
+            'direction_assistee',
+            'audio_interface',
+            'airbags',
+            'air_conditionne',
+            'siege_chauffant',
+            'alarm_system',
+            'parkassist',
+            'camera_recul',
+            'start_stop',
+            'essui_auto',
+            'car_play',
+            'description',
+            'car_photo_1',
+            'car_photo_2',
+            'car_photo_3',
+            'car_photo_4',
+            'car_photo_5',
+            'car_photo_6',
+            'car_photo_7',
+            'car_photo_8',
+            'car_photo_9',
+            'prix',
+            'car_doc',
+        ]
+
+    
+    car_doc = forms.ImageField()
+    details = forms.CharField(widget=forms.Textarea)
+
+    def __init__(self, *args, **kwargs):
+        super(VenteVehiculeMembre, self).__init__(*args, **kwargs)
+        for field_name in ['marque', 'modele', 'annee_fabrication', 'carburant', 'transmission']:
+            self.fields[field_name].required = True
+        self.fields['car_doc'].required = False

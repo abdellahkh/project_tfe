@@ -4,9 +4,9 @@
 
 <!-- Header-->
 <header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-5">
+    <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Profile</h1>
+            <h1 class="display-4 fw-bolder">Profil</h1>
         </div>
     </div>
 </header>
@@ -25,46 +25,45 @@
                 </div>
 
                 <fieldset class="form-group">
-                    <legend class="border-bottom mb-4">Modification du profile</legend>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="id_first_name">First Name:</label>
+                    <legend class="border-bottom mb-4">Modification du profil</legend>
+                    <div class="form-row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_first_name" class="form-label">Prénom :</label>
                             <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control" required>
-                            <div class="invalid-feedback">Please provide a valid first name.</div>
+                            <div class="invalid-feedback">Veuillez fournir un prénom valide.</div>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="id_last_name">Last Name:</label>
+                        <div class="col-md-6">
+                            <label for="id_last_name" class="form-label">Nom :</label>
                             <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control" required>
-                            <div class="invalid-feedback">Please provide a valid last name.</div>
+                            <div class="invalid-feedback">Veuillez fournir un nom valide.</div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="id_email">Email:</label>
+                    <div class="form-group mb-3">
+                        <label for="id_email" class="form-label">E-mail :</label>
                         <input type="email" name="email" value="{{ user.email }}" class="form-control" required>
-                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                        <div class="invalid-feedback">Veuillez fournir une adresse e-mail valide.</div>
                     </div>
-                    <div class="form-group">
-                        <label for="id_phone">Phone:</label>
+                    <div class="form-group mb-3">
+                        <label for="id_phone" class="form-label">Téléphone :</label>
                         <input type="text" name="phone" value="{{ user.phone }}" class="form-control">
                     </div>
-                    <div class="form-group">
-                        <label for="id_address">Address:</label>
+                    <div class="form-group mb-3">
+                        <label for="id_address" class="form-label">Adresse :</label>
                         <input type="text" name="address" value="{{ user.address }}" class="form-control">
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="id_postal">Postal Code:</label>
+                    <div class="form-row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_postal" class="form-label">Code Postal :</label>
                             <input type="number" name="postal" value="{{ user.postal }}" class="form-control">
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="id_ville">City:</label>
+                        <div class="col-md-6">
+                            <label for="id_ville" class="form-label">Ville :</label>
                             <input type="text" name="ville" value="{{ user.ville }}" class="form-control">
                         </div>
                     </div>
                 </fieldset>
-                <br/>
                 <div class="form-group">
-                    <button class="btn btn-outline-info" type="submit">Update</button>
+                    <button class="btn btn-outline-info" type="submit">Sauvegarder</button>
                 </div>
             </form>
             <br /><br />

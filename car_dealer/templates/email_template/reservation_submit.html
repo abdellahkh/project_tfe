@@ -1,0 +1,20 @@
+{% autoescape off %}
+Bonjour administrateur,
+
+Accompte a été versé pour la réservation d'une voiture.
+
+Informations sur l'utilisateur :
+    Nom: {{ user.last_name }}
+    Prénom: {{ user.first_name }}
+    Email: {{ user.email }}
+    Tel: 0{{ user.phone }}
+
+Informations sur la voiture : {{id}}
+    Marque: {{ marque }}
+    Modèle: {{ modele }}
+    Année: {{ annee }}
+
+Montant versé: {{ montant_accomte }}€
+
+L'équipe Cars-Services.
+{% endautoescape %}

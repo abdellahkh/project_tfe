@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-1">
+        <div class="text-center text-white">
+            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">{{ service.nom }}</h1>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <br/>
+    <div class="row justify-content-center">
+        <div class="card col-8 mb-4 text-center">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <br/>
+            
+                {% if service.nom == 'Déplacement de Véhicule Longue Distance' or service.nom == 'Déplacement de Véhicule Courte Distance' %}
+                    {% if not user.is_authenticated %}
+                        <div class="section">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="fw-bold mb-4">Bienvenue chez Cars-Services</i></h4>
+                                    <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
+                                    <p>Service demandé : <b>{{ service.nom }}</b></p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Prenom:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Nom:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.email }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Telephone:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+                    {% else %}
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="fw-bold mb-4">Bienvenue <i class="bi bi-person-fill me-1">{{ user.username }}</i></h4>
+                                    <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
+                                    <p>Service demandé : <b>{{ service.nom }}</b></p>
+                                </div>
+                            </div>
+                    {% endif %}
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.date_desiree.id_for_label }}" class="form-label">Date souhaitée :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.date_desiree }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.startLocation.id_for_label }}" class="form-label">Lieu de départ :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.startLocation }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.endLocation.id_for_label }}" class="form-label">Lieu d'arrivée :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.endLocation }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.details.id_for_label }}" class="form-label">Détails :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.details }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" class="btn btn-secondary">Envoyer</button>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        
+                {% elif service.nom == 'Service d\'Achat de Véhicule' %}
+                    {% if not user.is_authenticated %}
+                        <div class="section">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="fw-bold mb-4">Bienvenue chez Cars-Services</h4>
+                                    <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
+                                    <p>Service demandé : <b>{{ service.nom }}</b></p>
+                                </div>
+                            </div>
+                            <h4 class="row mx-3 mb-2">Qui êtes-vous?</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Prénom:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Nom:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.email }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Téléphone:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+                    {% else %}
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="fw-bold mb-4">Bienvenue <i class="bi bi-person-fill me-1">{{ user.username }}</i></h4>
+                                    <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
+                                    <p>Service demandé : <b>{{ service.nom }}</b></p>
+                                </div>
+                            </div>
+                    {% endif %}
+                            <h4 class="row mx-3 mb-2">Votre voiture</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.marque.id_for_label }}" class="form-label">Marque :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.marque }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.modele.id_for_label }}" class="form-label">Modèle :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.modele }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.annee_fabrication.id_for_label }}" class="form-label">Année Fabrication :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.annee_fabrication }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.carburant.id_for_label }}" class="form-label">Carburant :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.carburant }}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.transmission.id_for_label }}" class="form-label">Transmission :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.transmission }}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.kilometrage.id_for_label }}" class="form-label">Kilométrage :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.kilometrage }}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label">Remarque ou autre :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.description }}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.prix.id_for_label }}" class="form-label">Prix souhaité :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.prix }}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-3 text-end">
+                                    <label for="{{ form.car_doc.id_for_label }}" class="form-label">Carte grise :</label>
+                                </div>
+                                <div class="col-md-9 text-start">
+                                    {{ form.car_doc }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" class="btn btn-secondary">Envoyer</button>
+                                </div>
+                            </div>
+                        </div>
+                    
+                {% elif service.nom == 'Contact pour information voiture' %}
+                    {% if not user.is_authenticated %}
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="fw-bold mb-4">Bienvenue chez Cars-Services</h4>
+                                    <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
+                                    <p>Service demandé : <b>{{ service.nom }}</b></p>
+                                </div>
+                            </div>
+                            <h4 class="row mx-3 mb-2">Qui êtes-vous?</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Prénom:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Nom:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.email }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Téléphone:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+                    {% else %}
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="fw-bold mb-4">Bienvenue <i class="bi bi-person-fill me-1">{{ user.username }}</i></h4>
+                                    <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
+                                    <p>Service demandé : <b>{{ service.nom }}</b></p>
+                                </div>
+                            </div>
+                    {% endif %}
+                        <h4 class="row mx-3 mb-2">Quelle est votre question?</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-3 text-end">
+                                <label for="{{ form.details.id_for_label }}" class="form-label">Votre question :</label>
+                            </div>
+                            <div class="col-md-9 text-start">
+                                {{ form.details }}
+                            </div>
+                        </div>
+                        
+                        
+
+                        <div class="row mb-3">
+                            <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-secondary">Envoyer</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
+            <br/>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+                    

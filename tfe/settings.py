@@ -49,7 +49,7 @@ ROOT_URLCONF = 'tfe.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,3 +135,8 @@ EMAIL_USE_TLS = True
 PASSWORD_RESET_TIMEOUT = 14400
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+
+STRIPE_PUBLIC_KEY = 'pk_test_51OIGB3GIybC9ulKCHWMHWrWMZMmjTqqtI5cCdXxemZPAWJNCGRmiWE5tE6MO7mN9krgFDSQXHbtrsQ89pLRWTNwM00Omu5B0sE'
+STRIPE_SECRET_KEY = 'sk_test_51OIGB3GIybC9ulKCRh3apDYKMhaLwzqlJg2Ow72dDeLIZOmboSaoaWGApjEZSJo2XqFNNB55ILwz0udHjZaTcTHK00lwcdaePj'

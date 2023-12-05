@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-2">
+        <div class="d-flex justify-content-center align-items-center text-white">
+            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">Cars - Services</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Les meilleurs services d'accompagnement</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="container p-5 mb-6">
+    <div class="row px-5">
+        <!-- Element 1: Showroom (occupies 75% of the screen) -->
+        <div class="col-md-9 mb-4 text-center">
+            <h2 class="mb-4 display-4">Notre Showroom</h2>  
+            <div class="card">
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 justify-content-center">
+                        {% for voiture in voitures %}
+                            <div class="col mb-4">
+                                <div class="card h-100">
+                                    {% if voiture.sold %}
+                                        <div class="badge bg-danger text-white position-absolute"
+                                            style="top: 0.5rem; right: 0.5rem">Vendu !</div>
+                                    {% endif %}
+                                    {% if voiture.reserve %}
+                                        <div class="badge bg-warning text-dark position-absolute"
+                                            style="top: 0.5rem; right: 0.5rem">Réservé !</div>
+                                    {% endif %}
+                                    <!-- Product image-->
+                                    {% if voiture.car_photo_1.url %}
+                                        <img class="card-img-top" src="{{ voiture.car_photo_1.url }}"
+                                            alt="Car Image" />
+                                    {% endif %}
+                                    <!-- Product details-->
+                                    <div class="card-body p-3">
+                                        <div class="text-center">
+                                            <!-- Car name-->
+                                            <h6 class="card-title">{{ voiture.modele.nom }} - {{ voiture.annee_fabrication }}
+                                            </h6>
+                                            <!-- Car brand-->
+                                            <p class="card-text">{{ voiture.marque.nom }}</p>
+                                            <!-- Car price-->
+                                            <p class="text-muted">{{ voiture.prix }}.00€</p>
+                                        </div>
+                                    </div>
+                                    <!-- Product actions-->
+                                    <div class="card-footer p-3 border-top-0 bg-light">
+                                        <div class="text-center"><a class="btn btn-outline-dark mt-auto"
+                                                href="{% url 'voiture' voiture.id %}">Details</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

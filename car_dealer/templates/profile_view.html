@@ -131,16 +131,16 @@
         <!-- Section à gauche -->
         <div class="col-4">
             <div class="section">
-                <div class="row justify-content-center">
+                <div class="row justify-content-left">
                     <div class="col-8">
-                        <br /><br />
-                        <div class="media">
-                            <div class="media-body">
+                        <br />
+                        <div class="">
+                            <div class="">
                                 <h5 class="account-heading"> Administrateur : {{ user.username }}</h5>
                             </div>
                         </div>
                         <fieldset class="form-group">
-                            <div class="form-row">
+                            <div class="form-row my-4">
                                 <div class="form-group d-flex justify-content-between">
                                     <label for="id_first_name" class="me-2">Prénom :</label>
                                     <p>{{ user.first_name }}</p>
@@ -205,7 +205,7 @@
                     </ol>
                 </div>
                 {% endif %}
-                {% if voitureSoumisses %}
+                {% if toutesVoituresSoumise %}
                 <div class="section my-4">
                     <h4 class="my-2">Toutes les soummissions:</h4>
                     <ol class="list-group list-group my-4">
@@ -214,7 +214,7 @@
                             <div class="col-3">
                                 <li class="list-group-item">{{voitureSoumisse.marque}}</li>
                             </div>
-                            <div class="col-1">
+                            <div class="col-2">
                                 <li class="list-group-item">{{voitureSoumisse.modele}}</li>
                             </div>
                             <div class="col-2">
@@ -226,7 +226,7 @@
                             <div class="col-2">
                                 <li class="list-group-item">{{voitureSoumisse.transmission}}</li>
                             </div>
-                            <div class="col-2">
+                            <div class="col-1">
                                 <button class="btn btn-light" type="button" disabled>Ouvrir</button>
                             </div>
                         </div>

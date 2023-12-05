@@ -18,9 +18,20 @@ from car_dealer import models
 
 # Create your views here.
 def home(request):
-    voitures = Voiture.objects.all()
+    voitures = Voiture.objects.filter(sold=False)[:8]
     services = Service.objects.all()
     return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
+
+
+# def allVoitures(request, carburant):
+#     voitures = Voiture.objects.all()
+#     filtered_voitures = VoitureFilter
+
+
+#     return render(request, 'allVoitures.html',{'voitures': voitures})
+
+
+
 
 def activate(request, uidb64, token):
     # User = get_user_model()
@@ -40,6 +51,8 @@ def activate(request, uidb64, token):
         messages.error(request, "Le lien d\'activation n'est pas valide!")
 
     return redirect('home')
+
+
 
 
 def activateEmail(request, user, to_email):
@@ -449,9 +462,9 @@ def profile(request, username):
     user = get_user_model().objects.filter(username=username).first()
     demandes = Demande.objects.filter(member=user)
     voitureSoumisses = VoitureSoumisse.objects.filter(user_id=user) 
-    toutesDemandes = Demande.objects.all()
+    toutesDemandes = Demande.objects.filter(status="Actif")
     toutesVoituresSoumise = VoitureSoumisse.objects.all()
-    return render(request, "profile_view.html", {'user':user, 'demandes': demandes, 'voitureSoumisses':voitureSoumisses, 'toutesDemandes': toutesDemandes})
+    return render(request, "profile_view.html", {'user':user, 'demandes': demandes, 'voitureSoumisses':voitureSoumisses, 'toutesDemandes': toutesDemandes, 'toutesVoituresSoumise': toutesVoituresSoumise})
 
 
 

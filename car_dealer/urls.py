@@ -17,6 +17,9 @@ urlpatterns = [
     path('services/<int:service_id>', views.service, name='service_detail'),
     path('contact/<int:voiture_id>', views.contact_vehicule, name='contact_vehicule'),
 
+    path('dashboard/', views.dashboard, name='dashboard'),
+
+
     path('checkout/<int:voiture_id>', views.checkout, name='checkout'),
     path('checkout_session/<int:voiture_id>', views.checkout_session, name='checkout_session'),
 

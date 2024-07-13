@@ -9,46 +9,53 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
                 class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Acceuil</a>
-                </li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">A propos</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'services' %}">Nos Services</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Nos Voitures</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'service_detail' 6 %}">Vendre votre voiture</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Contactez-nous</a></li>
-            </ul>
-            <form class="d-flex">
-                {% if user.is_authenticated %}
-                <a class="btn btn-outline-dark me-2" href="{% url 'profile_view' user.username %}"><i class="bi-person-fill me-1">{{ user.username|slice:":6" }}{% if user.username|length > 6 %}...{% endif %}</i> </a>
-                <button class="btn btn-outline-dark me-2" type="submit">
-                    <a href="{% url 'logout' %}">
-                        Logout
-                    </a>
-                </button>
-                {% if user.is_superuser %}
-                <button class="btn btn-outline-dark me-2" type="submit">
-                    <a href="/admin/">
-                        admin
-                    </a>
-                </button>
-                {% endif %}
-                {% else %}
-                <button class="btn btn-outline-dark me-2" type="submit">
-                    <a href="{% url 'login' %}">
-                        Connexion
-                    </a>
-                </button>
-
-                <button class="btn btn-outline-dark" type="submit">
-                    <a href="{% url 'register' %}">
-                        Inscription
-                    </a>
-                </button>
-                {% endif %}
-            </form>
-
-        </div>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Acceuil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">A propos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'services' %}">Nos Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Nos Voitures</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'service_detail' 6 %}">Vendre votre voiture</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Contactez-nous</a></li>
+                    </ul>
+                    <form class="d-flex">
+                        {% if user.is_authenticated %}
+                            <a class="btn btn-outline-dark btn-sm me-2" href="{% url 'profile_view' user.username %}">
+                                <i class="bi-person-fill me-1">{{ user.username|slice:":6" }}{% if user.username|length > 6 %}...{% endif %}</i>
+                            </a>
+                            <button class="btn btn-outline-dark btn-sm me-2" type="submit">
+                                <a href="{% url 'logout' %}">
+                                    Logout
+                                </a>
+                            </button>
+                            {% if user.status == "vendeur" %}
+                                <button class="btn btn-outline-dark btn-sm me-2" type="submit">
+                                    <a href="/dashboard/">
+                                        Dashboard
+                                    </a>
+                                </button>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                                <button class="btn btn-outline-dark btn-sm me-2" type="submit">
+                                    <a href="/admin/">
+                                        admin
+                                    </a>
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            <button class="btn btn-outline-dark btn-sm me-2" type="submit">
+                                <a href="{% url 'login' %}">
+                                    Connexion
+                                </a>
+                            </button>
+                            <button class="btn btn-outline-dark btn-sm" type="submit">
+                                <a href="{% url 'register' %}">
+                                    Inscription
+                                </a>
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+                
     </div>
 </nav>

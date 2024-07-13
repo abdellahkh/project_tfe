@@ -41,6 +41,9 @@ def activate(request, uidb64, token):
 
     return redirect('home')
 
+def dashboard(request):
+    return render(request, 'dashboard/index.html', {})
+
 
 def activateEmail(request, user, to_email):
     mail_subject = "Activez votre compte."
@@ -54,7 +57,7 @@ def activateEmail(request, user, to_email):
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
     if email.send():
-        messages.success(request, f'Cher {user}, verifie votre boite de messagerie <b>{to_email}</b> et cliquez sur \
+        messages.success(request, f'Cher {user}, verifie votre boite de messagerie {to_email} et cliquez sur \
                         le lien d\'activation pour confirmer l\'inscription.')
     else:
         messages.error(request, f'Une erreur est survenue. Verifie l\'adresse: {to_email}.')
@@ -126,6 +129,7 @@ def register_user(request):
     form = SignUpForm()
     if request.method == "POST":
         form = SignUpForm(request.POST)
+        print(form)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
@@ -140,17 +144,28 @@ def register_user(request):
 
 def login_user(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Print user info for debugging
+        print(f"Tentative de connexion : Nom d'utilisateur : {username}, Mot de passe : {password}")
+        
+        if not username or not password:
+            messages.error(request, "Les champs nom d'utilisateur et mot de passe sont obligatoires.")
+            return redirect('login')
+        
         user = authenticate(request, username=username, password=password)
+        
+        # Print the result of the authentication
         if user is not None:
+            print(f"Utilisateur trouvé : {user}")
             login(request, user)
-            messages.success(request, ("Vous etes connecte..."))
+            messages.success(request, "Vous êtes connecté.")
             return redirect('home')
         else:
-            messages.success(request, ("Une erreur est survenue, veuillez reessayer..."))
+            print("Aucun utilisateur trouvé avec ces identifiants.")
+            messages.error(request, "Une erreur est survenue, veuillez réessayer.")
             return redirect('login')
-
     else:
         return render(request, 'login.html', {})
 

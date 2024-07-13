@@ -6,7 +6,8 @@ from django.contrib.auth.models import User, AbstractUser
 class Member(AbstractUser):
     STATUS = (
         ('normal', 'normal'),
-        ('client', 'client')
+        ('client', 'client'),
+        ('vendeur', 'vendeur')
     )
     status = models.CharField(max_length=100, choices=STATUS, default='normal')
     username = models.CharField(max_length=100, unique=True, help_text="username")
@@ -22,10 +23,6 @@ class Member(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-
-
 
 class Marque(models.Model):
     nom = models.CharField(max_length=100, unique=True, help_text="Nom de la marque")
@@ -53,14 +50,28 @@ class Voiture(models.Model):
         ('Hybride (Elec - Diesel)', 'Hybride (Elec - Diesel)'),
         ('Autres', 'Autres'),
     ]
+    
     TRANSMISSION_CHOICES = [
         ('Manuelle', 'Manuelle'),
         ('Automatique', 'Automatique'),
         ('Semi-automatique', 'Semi-automatique'),
     ]
     
-    reserve = models.BooleanField(default=False, verbose_name="Réserver")
-    sold = models.BooleanField(default=False, verbose_name="Vendu")
+    STATUS_CHOICES = [
+        ('reservé', 'Reservé'),
+        ('vendu', 'Vendu'),
+        ('standby', 'Standby'),
+    ]
+    
+    
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='standby',
+        help_text="Statut de la voiture"
+    )
+    
     marque = models.ForeignKey(Marque, on_delete=models.PROTECT, related_name='voitures', help_text="Marque de la voiture")
     modele = models.ForeignKey(Modele, on_delete=models.CASCADE, help_text="Modèle de la voiture")
     annee_fabrication = models.PositiveIntegerField(help_text="Année de fabrication")
@@ -79,18 +90,19 @@ class Voiture(models.Model):
         help_text="Type de transmission"
     )
     kilometrage = models.PositiveIntegerField(help_text="Kilométrage actuel")
-    cruise_control = models.BooleanField(default=False, verbose_name="Cruise Control")
-    direction_assistee = models.BooleanField(default=False, verbose_name="Direction assistée")
-    audio_interface = models.BooleanField(default=False, verbose_name="Audio Interface")
-    airbags = models.BooleanField(default=False, verbose_name="Airbags")
-    air_conditionne = models.BooleanField(default=False, verbose_name="Air Conditionné")
-    siege_chauffant = models.BooleanField(default=False, verbose_name="Siège Chauffant")
-    alarm_system = models.BooleanField(default=False, verbose_name="Alarm System")
-    parkassist = models.BooleanField(default=False, verbose_name="Park Assist")
-    camera_recul = models.BooleanField(default=False, verbose_name="Camera de Recul")
-    start_stop = models.BooleanField(default=False, verbose_name="Start Stop")
-    essui_auto = models.BooleanField(default=False, verbose_name="Essuie-glace Auto")
-    car_play = models.BooleanField(default=False, verbose_name="Car Play-System")
+
+    cruise_control = models.BooleanField(default=False, help_text="Contrôle de croisière")
+    direction_assistee = models.BooleanField(default=False, help_text="Direction assistée")
+    audio_interface = models.BooleanField(default=False, help_text="Interface audio")
+    airbags = models.BooleanField(default=False, help_text="Airbags")
+    air_conditionne = models.BooleanField(default=False, help_text="Climatisation")
+    siege_chauffant = models.BooleanField(default=False, help_text="Sièges chauffants")
+    alarm_system = models.BooleanField(default=False, help_text="Système d'alarme")
+    parkassist = models.BooleanField(default=False, help_text="Aide au stationnement")
+    camera_recul = models.BooleanField(default=False, help_text="Caméra de recul")
+    start_stop = models.BooleanField(default=False, help_text="Système start/stop")
+    essui_auto = models.BooleanField(default=False, help_text="Essuie-glace automatique")
+    car_play = models.BooleanField(default=False, help_text="Apple CarPlay")
     
     description = models.TextField(blank=True, null=True, help_text="Description de la voiture")
     date_poste = models.DateTimeField(auto_now_add=True, help_text="Date de publication de l'annonce")
@@ -106,14 +118,22 @@ class Voiture(models.Model):
     car_photo_9 = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True)
 
     prix = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix de la voiture")
+    prix_min = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix minimale de vente")
 
     class Meta:
         ordering = ['-date_poste']
 
     def __str__(self):
         return f"{self.marque} {self.modele} - {self.annee_fabrication}"
-    
 
+
+class Option(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    
+    def __str__(self):
+        return self.name
+
+    
 class VoitureSoumisse(models.Model):
     CARBURANT_CHOICES = [
         ('Diesel', 'Diesel'),
@@ -252,10 +272,6 @@ class Demande(models.Model):
         else:
             return f"{self.service} - {self.first_name}, {self.last_name}: {self.date_desiree}"
 
-
-
-        
-
 class Vente(models.Model):
     GENRE_CHOICES = [
         ('Vente', 'Vente'),
@@ -275,9 +291,3 @@ class Vente(models.Model):
     date = models.DateTimeField(auto_now_add=True, help_text="Date de la vente")
     montant_total = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True, help_text="Montant total de la vente")
     montant_acompte = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True, help_text="Montant de l'acompte")
-
-
-
-
-    
-

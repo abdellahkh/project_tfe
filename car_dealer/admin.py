@@ -2,13 +2,72 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from django.utils.html import format_html
 
-from .models import Marque, Modele, Voiture, ImageVoiture, Service, Review, Vente, Member, Demande, VoitureSoumisse
+from import_export import resources
+from import_export.fields import Field
+from .models import Modele, Marque, Voiture, ImageVoiture, Service, Review, Vente, Member, Demande, VoitureSoumisse
 
 admin.site.register(Member)
-#admin.site.register(Service)
 admin.site.register(Review)
 admin.site.register(Demande)
 
+@admin.register(Voiture)
+class VoitureAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = (
+        'status',
+        'marque',
+        'modele',
+        'annee_fabrication',
+        'carburant',
+        'transmission',
+        'kilometrage',
+        'prix',
+        'prix_min',
+        'date_poste',
+        'display_options'
+    )
+
+    def display_options(self, obj):
+        options = {
+            'Cruise Control': obj.cruise_control,
+            'Direction Assistée': obj.direction_assistee,
+            'Interface Audio': obj.audio_interface,
+            'Airbags': obj.airbags,
+            'Climatisation': obj.air_conditionne,
+            'Sièges Chauffants': obj.siege_chauffant,
+            'Système d\'Alarme': obj.alarm_system,
+            'Aide au Stationnement': obj.parkassist,
+            'Caméra de Recul': obj.camera_recul,
+            'Système Start/Stop': obj.start_stop,
+            'Essuie-glace Automatique': obj.essui_auto,
+            'Apple CarPlay': obj.car_play,
+        }
+
+        html = '<ul>'
+        for label, value in options.items():
+            html += f'<li>{label}: {"Oui" if value else "Non"}</li>'
+        html += '</ul>'
+
+        return format_html(html)
+
+    display_options.short_description = 'Options'
+
+    fieldsets = (
+        (None, {
+            'fields': ('status', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage', 'prix', 'prix_min')
+        }),
+        ('Options', {
+            'fields': ('cruise_control', 'direction_assistee', 'audio_interface', 'airbags', 'air_conditionne', 'siege_chauffant', 'alarm_system', 'parkassist', 'camera_recul', 'start_stop', 'essui_auto', 'car_play'),
+            'classes': ('collapse',),
+        }),
+        ('Images', {
+            'fields': ('car_photo_1', 'car_photo_2', 'car_photo_3', 'car_photo_4', 'car_photo_5', 'car_photo_6', 'car_photo_7', 'car_photo_8', 'car_photo_9')
+        }),
+        ('Description', {
+            'fields': ('description',)
+        }),
+    )
+
+    readonly_fields = ('date_poste',)
 
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ('id', 'nom', 'is_available', 'prix', 'description')
@@ -17,7 +76,6 @@ class ServiceAdmin(admin.ModelAdmin):
     readonly_fields = ('image',)
 
 admin.site.register(Service, ServiceAdmin)
-
 
 class ImageVoitureInline(admin.TabularInline):
     model = ImageVoiture
@@ -34,52 +92,18 @@ class ImageVoitureInline(admin.TabularInline):
 
     image_preview.short_description = "Aperçu de l'image"
 
-@admin.register(Voiture)
-class VoitureAdmin(admin.ModelAdmin):
-    list_display = ['marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage', 'prix', 'status']
-    list_filter = ['marque', 'modele', 'carburant', 'transmission', 'status']
-    search_fields = ['marque__name', 'modele__name', 'annee_fabrication', 'kilometrage']
-    ordering = ['-date_poste']
-    fieldsets = (
-        (None, {
-            'fields': ('status', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage')
-        }),
-        ('Caractéristiques', {
-            'fields': ('cruise_control', 'direction_assistee', 'audio_interface', 'airbags', 'air_conditionne', 
-                       'siege_chauffant', 'alarm_system', 'parkassist', 'camera_recul', 'start_stop', 
-                       'essui_auto', 'car_play')
-        }),
-        ('Description et Prix', {
-            'fields': ('description', 'prix', 'prix_min')
-        }),
-    )
-    inlines = [ImageVoitureInline]
-
-admin.site.register(ImageVoiture)
-
 @admin.register(Vente)
 class VenteAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('paid','user_id', 'demande_id', 'voiture_id', 'date', 'montant_total', 'montant_acompte')
-    
+    list_display = ('paid', 'user_id', 'demande_id', 'voiture_id', 'date', 'montant_total', 'montant_acompte')
 
 @admin.register(VoitureSoumisse)
-class VenteAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('date_poste','user_id', 'first_name', 'last_name', 'email', 'phone', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage', 'description', 'prix')
+class VoitureSoumisseAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('date_poste', 'user_id', 'first_name', 'last_name', 'email', 'phone', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage', 'description', 'prix')
 
-
-
-
-from import_export import resources
-from import_export.fields import Field
-from .models import Modele, Marque
-from import_export.admin import ImportExportModelAdmin
-from django.contrib import admin
-
-# Define a resource for the Marque model
 class MarqueResource(resources.ModelResource):
     class Meta:
         model = Marque
-        fields = ('id', 'nom')  # Specify the fields you want to include in import/export
+        fields = ('id', 'nom')
         export_order = ('id', 'nom')
 
 class ModeleResource(resources.ModelResource):
@@ -87,7 +111,7 @@ class ModeleResource(resources.ModelResource):
 
     class Meta:
         model = Modele
-        fields = ('id', 'nom', 'marque')  # Include marque for import/export
+        fields = ('id', 'nom', 'marque')
         export_order = ('id', 'nom', 'marque')
 
     def dehydrate_marque(self, modele):
@@ -102,20 +126,15 @@ class ModeleResource(resources.ModelResource):
             row['marque'] = None
         return super().import_row(row, instance_loader, **kwargs)
 
-
-
-# Admin configuration for the Marque model
 @admin.register(Marque)
 class MarqueAdmin(ImportExportModelAdmin):
     resource_class = MarqueResource
-    list_display = ('id', 'nom')  # Display the name of the brand in the admin list
-    search_fields = ('nom',)  # Add a search bar for the 'nom' field
+    list_display = ('id', 'nom')
+    search_fields = ('nom',)
 
-# Admin configuration for the Modele model
 @admin.register(Modele)
 class ModeleAdmin(ImportExportModelAdmin):
     resource_class = ModeleResource
-    list_display = ('nom', 'marque')  # Display the model name and the associated brand
-    list_filter = ('marque',)  # Add a filter by brand
-    search_fields = ('nom', 'marque__nom')  # Allow searching by model name and brand name
-
+    list_display = ('nom', 'marque')
+    list_filter = ('marque',)
+    search_fields = ('nom', 'marque__nom')

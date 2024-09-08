@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-2">
+        <div class="text-center text-white">
+            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">Détails de la Demande</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Voici les informations complètes sur la demande.</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    </br>
+    </br>
+    <div class="row justify-content-center">
+        <div class="card col-8 mb-4">
+            <div class="card-header">
+                <h3>Détails de la Demande</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Service:</strong> {{ demand.service }}</p>
+                <p><strong>Genre d'intervention:</strong> {{ demand.genre }}</p>
+                {% if demand.member %}
+                    <p><strong>Membre:</strong> {{ demand.member }}</p>
+                {% else %}
+                    <p><strong>Membre:</strong> Non spécifié</p>
+                    <p><strong>Prénom:</strong> {{ demand.first_name }}</p>
+                    <p><strong>Nom:</strong> {{ demand.last_name }}</p>
+                    <p><strong>Email:</strong> {{ demand.email }}</p>
+                    <p><strong>Téléphone:</strong> {{ demand.phone }}</p>
+                {% endif %}
+                {% if demand.voiture %}
+                    <p><strong>Voiture:</strong> {{ demand.voiture }}</p>
+                    <a href="{% url 'voiture' demand.voiture.id %}" class="btn btn-primary">Ouvrir</a>
+                {% endif %}
+                <p><strong>Date de la demande:</strong> {{ demand.date }}</p>
+                {% if demand.date_desiree %}
+                    <p><strong>Date souhaitée:</strong> {{ demand.date_desiree }}</p>
+                {% endif %}
+                <p><strong>Détails:</strong> {{ demand.details }}</p>
+                {% if demand.startLocation %}
+                    <p><strong>Lieu de départ:</strong> {{ demand.startLocation }}</p>
+                {% endif %}
+                {% if demand.endLocation %}
+                    <p><strong>Lieu d'arrivée:</strong> {{ demand.endLocation }}</p>
+                {% endif %}
+                {% if demand.car_doc %}
+                    <p><strong>Document de la voiture:</strong></p>
+                    <img src="{{ demand.car_doc.url }}" alt="Document de la voiture" class="img-fluid">
+                {% else %}
+                    <p><strong>Document de la voiture:</strong> Aucun document disponible</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

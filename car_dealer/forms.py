@@ -95,10 +95,18 @@ class DemandeContactVoitureMembre(forms.ModelForm):
 
     class Meta:
         model = Demande
-        fields = ['details']
+        fields = ['first_name', 'last_name', 'email', 'phone', 'details']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'details': forms.Textarea(attrs={'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(DemandeContactVoitureMembre, self).__init__(*args, **kwargs)
+
 
 
 		

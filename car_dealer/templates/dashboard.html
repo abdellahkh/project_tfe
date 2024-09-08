@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-2">
+        <div class="text-center text-white">
+            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">Vendeur Dashboard</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Bienvenue {{ user.username }}</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    </br>
+    </br>
+    <div class="row justify-content-center">
+        <div class="card col-12 mb-4">
+            <div class="card-header">
+                <h1>Dashboard</h1>
+                <!-- Formulaire de filtrage -->
+                <form method="GET" class="mb-3" id="filter-form">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="service">Service</label>
+                            <select id="service" name="service" class="form-select">
+                                <option value="">Tous</option>
+                                {% for service in demande_services %}
+                                    <option value="{{ service.id }}" {% if service.id|stringformat:"s" == service_filter %}selected{% endif %}>{{ service }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="status">Statut</label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="">Tous</option>
+                                {% for status in demande_status %}
+                                    <option value="{{ status }}" {% if status == status_filter %}selected{% endif %}>{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">Filtrer</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Genre</th>
+                            <th>Status</th>
+                            <th>Demandeur</th>
+                            <th>Détails</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for demande in allRequest %}
+                            <tr>
+                                <td>{{ demande.service }}</td>
+                                <td>{{ demande.genre }}</td>
+                                <td>{{ demande.status }}</td>
+                                <td>
+                                    {% if demande.member %}
+                                        {{ demande.member }}
+                                    {% else %}
+                                        {{ demande.first_name }} {{ demande.last_name }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ demande.details }}</td>
+                                <td>
+                                    <a href="{% url 'demande_details' demande.id %}" class="btn btn-primary">Ouvrir</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">Aucune demande trouvée.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pour permettre la sélection d'un seul filtre à la fois -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('filter-form');
+    const serviceSelect = document.getElementById('service');
+    const genreSelect = document.getElementById('genre');
+    const statusSelect = document.getElementById('status');
+    
+    function updateFilterState() {
+        const serviceValue = serviceSelect.value;
+        const genreValue = genreSelect.value;
+        const statusValue = statusSelect.value;
+        
+        // Si un filtre est sélectionné, désactiver les autres
+        if (serviceValue || genreValue || statusValue) {
+            serviceSelect.disabled = !!(genreValue || statusValue);
+            genreSelect.disabled = !!(serviceValue || statusValue);
+            statusSelect.disabled = !!(serviceValue || genreValue);
+        } else {
+            // Réactiver tous les filtres si aucun filtre n'est sélectionné
+            serviceSelect.disabled = false;
+            genreSelect.disabled = false;
+            statusSelect.disabled = false;
+        }
+    }
+    
+    // Ajouter un événement de changement pour chaque sélecteur
+    serviceSelect.addEventListener('change', updateFilterState);
+    genreSelect.addEventListener('change', updateFilterState);
+    statusSelect.addEventListener('change', updateFilterState);
+    
+    // Initial call to set the state based on current filter values
+    updateFilterState();
+});
+</script>
+
+{% endblock %}

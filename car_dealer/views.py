@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Service, Voiture, Member, Demande, VoitureSoumisse
+from .models import ImageVoiture, Service, Voiture, Member, Demande, VoitureSoumisse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,8 +18,9 @@ from car_dealer import models
 
 # Create your views here.
 def home(request):
-    voitures = Voiture.objects.all()
+    voitures = Voiture.objects.all().prefetch_related('images')
     services = Service.objects.all()
+    
     return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
 
 def activate(request, uidb64, token):
@@ -41,6 +42,42 @@ def activate(request, uidb64, token):
 
     return redirect('home')
 
+def dashboard(request):
+    # Récupérer les options pour les filtres
+    demande_genres = [genre[0] for genre in Demande.GENRE_INTERVENTION]
+    demande_status = [status[0] for status in Demande.STATUS_OPTIONS]
+    demande_services = Service.objects.all()  # Supposons que tu as un modèle Service
+
+    # Appliquer les filtres en fonction des paramètres GET
+    genre_filter = request.GET.get('genre', '')
+    status_filter = request.GET.get('status', '')
+    service_filter = request.GET.get('service', '')
+
+    allRequest = Demande.objects.all()
+
+    if genre_filter:
+        allRequest = allRequest.filter(genre=genre_filter)
+    if status_filter:
+        allRequest = allRequest.filter(status=status_filter)
+    if service_filter:
+        allRequest = allRequest.filter(service=service_filter)
+
+    return render(request, 'dashboard.html', {
+        'allRequest': allRequest,
+        'demande_genres': demande_genres,
+        'demande_status': demande_status,
+        'demande_services': demande_services,
+        'genre_filter': genre_filter,
+        'status_filter': status_filter,
+        'service_filter': service_filter,
+    })
+
+
+
+    
+def demandeDetails(request, demande_id):
+    demand = Demande.objects.get(id=demande_id)
+    return render(request, 'demandDetail.html', {'demand' : demand})
 
 def activateEmail(request, user, to_email):
     mail_subject = "Activez votre compte."
@@ -54,7 +91,7 @@ def activateEmail(request, user, to_email):
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
     if email.send():
-        messages.success(request, f'Cher {user}, verifie votre boite de messagerie <b>{to_email}</b> et cliquez sur \
+        messages.success(request, f'Cher {user}, verifie votre boite de messagerie {to_email} et cliquez sur \
                         le lien d\'activation pour confirmer l\'inscription.')
     else:
         messages.error(request, f'Une erreur est survenue. Verifie l\'adresse: {to_email}.')
@@ -126,6 +163,7 @@ def register_user(request):
     form = SignUpForm()
     if request.method == "POST":
         form = SignUpForm(request.POST)
+        print(form)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
@@ -140,17 +178,28 @@ def register_user(request):
 
 def login_user(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Print user info for debugging
+        print(f"Tentative de connexion : Nom d'utilisateur : {username}, Mot de passe : {password}")
+        
+        if not username or not password:
+            messages.error(request, "Les champs nom d'utilisateur et mot de passe sont obligatoires.")
+            return redirect('login')
+        
         user = authenticate(request, username=username, password=password)
+        
+        # Print the result of the authentication
         if user is not None:
+            print(f"Utilisateur trouvé : {user}")
             login(request, user)
-            messages.success(request, ("Vous etes connecte..."))
+            messages.success(request, "Vous êtes connecté.")
             return redirect('home')
         else:
-            messages.success(request, ("Une erreur est survenue, veuillez reessayer..."))
+            print("Aucun utilisateur trouvé avec ces identifiants.")
+            messages.error(request, "Une erreur est survenue, veuillez réessayer.")
             return redirect('login')
-
     else:
         return render(request, 'login.html', {})
 
@@ -169,8 +218,8 @@ def allServices(request):
     return render(request, 'allServices.html', { 'services': services })
 
 def voiture(request, pk):
-    voiture = Voiture.objects.get(id=pk)
-    return render(request, 'voiture.html' ,{'voiture' : voiture})
+    voiture = Voiture.objects.prefetch_related('images').get(id=pk)
+    return render(request, 'voiture.html', {'voiture': voiture})
 
 
 def service(request, service_id):
@@ -401,48 +450,43 @@ def service(request, service_id):
 
     return render(request, 'formulaire/service_demande.html', {'form': form, 'submitted': submitted, 'service': service})
 
+
+
+
 def contact_vehicule(request, voiture_id):
-    voiture = Voiture.objects.get(id = voiture_id)
+    voiture = Voiture.objects.prefetch_related('images').get(id=voiture_id)
     service_nom = 'Contact pour information voiture'
     mail_to = 'etu.abkh@gmail.com'
-    service = Service.objects.get(id=9)
-    if request.user.is_authenticated:
-            if request.method == 'POST':
-                form = DemandeContactVoitureMembre(request.POST)
-                form.instance.member = request.user
-                if form.is_valid():
-                    form.save()
-                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
-                    return redirect('home')
-                else:
-                    print(form.errors)
-                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
+    service = Service.objects.get(nom=service_nom)
+
+    if request.method == 'POST':
+        form = DemandeContactVoitureMembre(request.POST)
+        if request.user.is_authenticated:
+            form.instance.member = request.user
+        form.instance.service = service
+        form.instance.voiture = voiture
+        form.instance.genre = "Info"
+        if form.is_valid():
+            if request.user.is_authenticated:
+                serviceEmailToAdminFromMembre(request, request.user, service_nom, form, mail_to, None)
+                form.save()
             else:
-                form = DemandeContactVoitureMembre()
-                if 'submitted' in request.GET:
-                    submitted = True
+                user = {
+                    'first_name': form.cleaned_data['first_name'],
+                    'last_name': form.cleaned_data['last_name'],
+                    'phone': form.cleaned_data['phone'],
+                    'email': form.cleaned_data['email'],
+                }
+                serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                form.save()
+            return redirect('home')
+        else:
+            messages.error(request, "Hmm, une erreur s'est produite. Veuillez réessayer plus tard.")
     else:
-            if request.method == 'POST':
-                form = DemandeContactVoitureMembre(request.POST)
-                form.instance.member = request.user.id
-                if form.is_valid():
-                    user = {
-                        'first_name': form.cleaned_data['first_name'],
-                        'last_name': form.cleaned_data['last_name'],
-                        'phone': form.cleaned_data['phone'],
-                        'email': form.cleaned_data['email'],
-                    }
-                    form.save()
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
-                    return redirect('home')
-                else:
-                    print(form.errors)
-                    messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
-            else:
-                form = DemandeContactVoitureMembre()
-                if 'submitted' in request.GET:
-                    submitted = True
-    return render(request, 'formulaire/service_demande.html', {'voiture': voiture, 'service': service})
+        form = DemandeContactVoitureMembre()
+
+    return render(request, 'formulaire/contact_vehicule.html', {'voiture': voiture, 'service': service, 'form': form})
+
 
 
 def profile(request, username):

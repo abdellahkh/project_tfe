@@ -27,7 +27,14 @@
                 <p><strong>Service:</strong> {{ demand.service }}</p>
                 <p><strong>Genre d'intervention:</strong> {{ demand.genre }}</p>
                 {% if demand.member %}
-                    <p><strong>Membre:</strong> {{ demand.member }}</p>
+                <div class="row">
+                    <div class="col-md-4"> 
+                      <p><strong>Membre:</strong> {{ demand.member }}</p> 
+                    </div>
+                    <div class="col-md-8">
+                      <a href="{% url 'profile_view' demand.member %}" class="btn btn-primary">Info</a>
+                    </div>
+                  </div>
                 {% else %}
                     <p><strong>Membre:</strong> Non spécifié</p>
                     <p><strong>Prénom:</strong> {{ demand.first_name }}</p>
@@ -36,8 +43,14 @@
                     <p><strong>Téléphone:</strong> {{ demand.phone }}</p>
                 {% endif %}
                 {% if demand.voiture %}
+                <div class="row">
+                    <div class="col-md-4"> 
                     <p><strong>Voiture:</strong> {{ demand.voiture }}</p>
-                    <a href="{% url 'voiture' demand.voiture.id %}" class="btn btn-primary">Ouvrir</a>
+                    </div>
+                    <div class="col-md-8">
+                        <a href="{% url 'voiture' demand.voiture.id %}" class="btn btn-primary">Ouvrir</a>
+                    </div>
+                    
                 {% endif %}
                 <p><strong>Date de la demande:</strong> {{ demand.date }}</p>
                 {% if demand.date_desiree %}
@@ -53,9 +66,8 @@
                 {% if demand.car_doc %}
                     <p><strong>Document de la voiture:</strong></p>
                     <img src="{{ demand.car_doc.url }}" alt="Document de la voiture" class="img-fluid">
-                {% else %}
-                    <p><strong>Document de la voiture:</strong> Aucun document disponible</p>
                 {% endif %}
+               
             </div>
         </div>
     </div>

@@ -13,7 +13,8 @@
 
 {% if not user.is_superuser %}
 <div class="container">
-    <div class="row d-flex align-items-stretch"> <!-- Utilisation des classes d-flex et align-items-stretch pour que les sections aient la même hauteur -->
+    <div class="row d-flex align-items-stretch">
+        <!-- Utilisation des classes d-flex et align-items-stretch pour que les sections aient la même hauteur -->
         <!-- Section à gauche -->
         <div class="col-4">
             <div class="section">
@@ -35,7 +36,7 @@
                                     <label for="id_last_name">Nom :</label>
                                     <p>{{ user.last_name }}</p>
                                 </div>
-        
+
                                 <div class="form-group d-flex justify-content-between">
                                     <label for="id_email">E-mail :</label>
                                     <p>{{ user.email }}</p>
@@ -44,7 +45,7 @@
                                     <label for="id_phone">Téléphone :</label>
                                     <p>0{{ user.phone }}</p>
                                 </div>
-        
+
                                 <div class="form-group  d-flex justify-content-between">
                                     <label for="id_address">Adresse : </label>
                                     <p>{{ user.address }}</p>
@@ -53,7 +54,7 @@
                                     <label for="id_postal">Code Postal :</label>
                                     <p>{{ user.postal }}</p>
                                 </div>
-        
+
                                 <div class="form-group  d-flex justify-content-between">
                                     <label for="id_ville">Ville :</label>
                                     <p>{{ user.ville }}</p>
@@ -64,7 +65,7 @@
                         <div class="form-group">
                             <a href="{% url 'profile_edit' user.username %}" class="btn btn-outline-info">Modifier</a>
                         </div>
-        
+
                         <br /><br />
                     </div>
                 </div>
@@ -79,12 +80,43 @@
                     <h4>Toutes vos demandes:</h4>
                     <ol class="list-group list-group my-4">
                         {% for demande in demandes %}
-                        <div class="row justify-content-evenly">
-                            <div class="col-8">
+                        <div class="row justify-content-evenly align-items-center">
+                            <div class="col-md-4">
                                 <li class="list-group-item">{{demande.service}}</li>
                             </div>
-                            <div class="col-4">
-                                <li class="list-group-item">{{demande.date_desiree}}</li>
+                            <div class="col-md-4">
+                                <li class="list-group-item">{{demande.date}}</li>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#demandeModal{{ demande.id }}">
+                                    Info
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="demandeModal{{ demande.id }}" tabindex="-1"
+                            aria-labelledby="demandeModalLabel{{ demande.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="demandeModalLabel{{ demande.id }}">Détails de la
+                                            demande</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Service:</strong> {{ demande.service }}</p>
+                                        <p><strong>Date:</strong> {{ demande.date }}</p>
+                                        <p><strong>Statut:</strong> {{ demande.status }}</p>
+                                        <p><strong>Genre:</strong> {{ demande.genre }}</p>
+                                        <p><strong>Détails:</strong> {{ demande.details }}</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Fermer</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
@@ -117,7 +149,7 @@
                             </div>
                         </div>
                         {% endfor %}
-        
+
                     </ol>
                 </div>
                 {% endif %}
@@ -125,9 +157,10 @@
         </div>
     </div>
 </div>
-{% else  %}
+{% else %}
 <div class="container">
-    <div class="row d-flex align-items-stretch"> <!-- Utilisation des classes d-flex et align-items-stretch pour que les sections aient la même hauteur -->
+    <div class="row d-flex align-items-stretch">
+        <!-- Utilisation des classes d-flex et align-items-stretch pour que les sections aient la même hauteur -->
         <!-- Section à gauche -->
         <div class="col-4">
             <div class="section">
@@ -149,7 +182,7 @@
                                     <label for="id_last_name">Nom :</label>
                                     <p>{{ user.last_name }}</p>
                                 </div>
-        
+
                                 <div class="form-group d-flex justify-content-between">
                                     <label for="id_email">E-mail :</label>
                                     <p>{{ user.email }}</p>
@@ -158,7 +191,7 @@
                                     <label for="id_phone">Téléphone :</label>
                                     <p>0{{ user.phone }}</p>
                                 </div>
-        
+
                                 <div class="form-group  d-flex justify-content-between">
                                     <label for="id_address">Adresse : </label>
                                     <p>{{ user.address }}</p>
@@ -167,7 +200,7 @@
                                     <label for="id_postal">Code Postal :</label>
                                     <p>{{ user.postal }}</p>
                                 </div>
-        
+
                                 <div class="form-group  d-flex justify-content-between">
                                     <label for="id_ville">Ville :</label>
                                     <p>{{ user.ville }}</p>
@@ -178,7 +211,7 @@
                         <div class="form-group">
                             <a href="{% url 'profile_edit' user.username %}" class="btn btn-outline-info">Modifier</a>
                         </div>
-        
+
                         <br /><br />
                     </div>
                 </div>
@@ -188,17 +221,17 @@
         <!-- Section à droite -->
         <div class="col-8">
             <div class="section">
-                {% if toutesDemandes %}
+                {% if demandes %}
                 <div class="section my-4">
                     <h4>Toutes les demandes:</h4>
                     <ol class="list-group list-group my-4">
-                        {% for demande in toutesDemandes %}
+                        {% for demande in demandes %}
                         <div class="row justify-content-evenly">
                             <div class="col-8">
                                 <li class="list-group-item">{{demande.service}}</li>
                             </div>
                             <div class="col-4">
-                                <li class="list-group-item">{{demande.date_desiree}}</li>
+                                <li class="list-group-item">{{demande.date}}</li>
                             </div>
                         </div>
                         {% endfor %}
@@ -231,7 +264,7 @@
                             </div>
                         </div>
                         {% endfor %}
-        
+
                     </ol>
                 </div>
                 {% endif %}
@@ -240,4 +273,14 @@
     </div>
 </div>
 {% endif %}
+<!-- <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true"></div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            afficher ici les details
+        </div>
+    </div>
+</div> -->
 {% endblock %}

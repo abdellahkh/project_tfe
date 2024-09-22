@@ -8,7 +8,6 @@ from .models import Modele, Marque, Voiture, ImageVoiture, Service, Review, Vent
 
 admin.site.register(Member)
 admin.site.register(Review)
-admin.site.register(Demande)
 
 @admin.register(Voiture)
 class VoitureAdmin(ImportExportModelAdmin, admin.ModelAdmin):
@@ -138,3 +137,23 @@ class ModeleAdmin(ImportExportModelAdmin):
     list_display = ('nom', 'marque')
     list_filter = ('marque',)
     search_fields = ('nom', 'marque__nom')
+
+
+class DemandeAdmin(admin.ModelAdmin):
+    list_display = ('service', 'client', 'date_desiree', 'status', 'genre')  # Champs à afficher dans la liste
+    search_fields = ('member__user__first_name', 'member__user__last_name', 'first_name', 'last_name', 'email', 'service__nom')  # Champs de recherche
+    list_filter = ('status', 'genre', 'service', 'date_desiree')  # Filtres
+    readonly_fields = ('date',)  # Champs en lecture seule
+
+    def client(self, obj):  # Fonction pour afficher le client (membre ou non-membre)
+        if obj.member:
+            return obj.member
+        else:
+            return f"{obj.first_name} {obj.last_name}"
+
+    # Champs à afficher dans le formulaire d'édition
+    fields = ('status', 'member', 'first_name', 'last_name', 'email', 'phone', 'service', 
+              'voiture', 'date', 'date_desiree', 'details', 'genre', 'startLocation', 
+              'endLocation', 'car_doc')
+
+admin.site.register(Demande, DemandeAdmin)

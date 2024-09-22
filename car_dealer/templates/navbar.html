@@ -20,6 +20,12 @@
                     </ul>
                     <form class="d-flex">
                         {% if user.is_authenticated %}
+                            <form class="d-flex">
+                                <button class="btn btn-outline-dark" type="submit">
+                                    <i class="bi-cart-fill me-1"></i>
+                                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                                </button>
+                            </form>
                             <a class="btn btn-outline-dark btn-sm me-2" href="{% url 'profile_view' user.username %}">
                                 <i class="bi-person-fill me-1">{{ user.username|slice:":6" }}{% if user.username|length > 6 %}...{% endif %}</i>
                             </a>

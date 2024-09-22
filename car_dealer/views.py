@@ -53,8 +53,10 @@ def dashboard(request):
     status_filter = request.GET.get('status', '')
     service_filter = request.GET.get('service', '')
 
-    allRequest = Demande.objects.all()
+    # Récupérer toutes les demandes, ordonnées du plus récent au plus ancien
+    allRequest = Demande.objects.all().order_by('-date')
 
+    # Appliquer les filtres si nécessaire
     if genre_filter:
         allRequest = allRequest.filter(genre=genre_filter)
     if status_filter:
@@ -71,6 +73,7 @@ def dashboard(request):
         'status_filter': status_filter,
         'service_filter': service_filter,
     })
+
 
 
 
@@ -216,6 +219,39 @@ def about(request):
 def allServices(request):
     services = Service.objects.all()
     return render(request, 'allServices.html', { 'services': services })
+
+def allVoitures(request):
+    voitures = Voiture.objects.all()
+
+    # Filtrage par marque, carburant et transmission
+    marque = request.GET.get('marque')
+    carburant = request.GET.get('carburant')
+    transmission = request.GET.get('transmission')
+
+    if marque:
+        voitures = voitures.filter(marque__nom=marque)
+
+    if carburant:
+        voitures = voitures.filter(carburant=carburant)
+
+    if transmission:
+        voitures = voitures.filter(transmission=transmission)
+
+    # Récupération des marques, carburants et transmissions distincts
+    marques_disponibles = Voiture.objects.values_list('marque__nom', flat=True).distinct()
+    carburants_disponibles = Voiture.objects.values_list('carburant', flat=True).distinct()
+    transmissions_disponibles = Voiture.objects.values_list('transmission', flat=True).distinct()
+
+    return render(request, 'allVoitures.html', {
+        'voitures': voitures,
+        'marques_disponibles': marques_disponibles,
+        'carburants_disponibles': carburants_disponibles,
+        'transmissions_disponibles': transmissions_disponibles,
+    })
+
+
+def saleAddCar(request):
+    return render (request, 'dashboardAddVoiture.html')
 
 def voiture(request, pk):
     voiture = Voiture.objects.prefetch_related('images').get(id=pk)
@@ -491,10 +527,10 @@ def contact_vehicule(request, voiture_id):
 
 def profile(request, username):
     user = get_user_model().objects.filter(username=username).first()
-    demandes = Demande.objects.filter(member=user)
-    voitureSoumisses = VoitureSoumisse.objects.filter(user_id=user) 
-    toutesDemandes = Demande.objects.all()
-    toutesVoituresSoumise = VoitureSoumisse.objects.all()
+    demandes = Demande.objects.filter(member=user).order_by('-date')  
+    voitureSoumisses = VoitureSoumisse.objects.filter(user_id=user)
+    toutesDemandes = Demande.objects.all().order_by('-date')  
+    toutesVoituresSoumise = VoitureSoumisse.objects.all()  
     return render(request, "profile_view.html", {'user':user, 'demandes': demandes, 'voitureSoumisses':voitureSoumisses, 'toutesDemandes': toutesDemandes})
 
 

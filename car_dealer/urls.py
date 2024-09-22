@@ -12,7 +12,11 @@ urlpatterns = [
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
     path('about/', views.about, name='about'),
     path('services/', views.allServices, name='services'),
+
     path('voiture/<int:pk>', views.voiture, name='voiture'),
+    path('voitures/', views.allVoitures, name='voitures'),
+    path('sale_add_car/', views.saleAddCar, name='saleAddCar'),
+
     path('vendre/', views.vendre, name='vendre'),
     path('services/<int:service_id>', views.service, name='service_detail'),
     path('contact/<int:voiture_id>', views.contact_vehicule, name='contact_vehicule'),
@@ -26,4 +30,5 @@ urlpatterns = [
 
     path('pay_success', views.pay_success, name='pay_success'),
     path('pay_cancel', views.pay_cancel, name='pay_cancel'),
+    
 ]

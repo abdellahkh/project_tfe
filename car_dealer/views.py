@@ -19,7 +19,7 @@ from car_dealer import models
 # Create your views here.
 def home(request):
     voitures = Voiture.objects.all().prefetch_related('images')
-    services = Service.objects.all()
+    services = Service.objects.filter(is_available=True)
     
     return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
 

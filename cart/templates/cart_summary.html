@@ -12,27 +12,28 @@
 </header>
 
 <div class="container mt-5">
-  <table class="table">
+  <table class="table table-striped">
     <thead>
       <tr>
-        <th scope="col"></th> 
+        <th scope="col"></th>
         <th scope="col">Voiture</th>
-        <th scope="col" class="text-end">Prix</th> 
+        <th scope="col" class="text-end">Prix</th>
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
       {% if cart_voitures %}
       {% for voiture in cart_voitures %}
       <tr>
-        <td class="align-middle"> 
+        <td class="align-middle">
           {% if voiture.images.all %}
-          <img src="{{ voiture.images.first.image.url }}" class="img-fluid" style="max-width: 100px;" alt="..."> 
+          <img src="{{ voiture.images.first.image.url }}" class="img-fluid" style="max-width: 100px;" alt="...">
           {% endif %}
         </td>
         <td class="align-middle">
-          <span class="fw-bold">{{ voiture.marque.nom }}</span> 
+          <span class="fw-bold">{{ voiture.marque.nom }}</span>
           <span> - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}</span>
-          <ul class="list-unstyled small"> 
+          <ul class="list-unstyled small">
             <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
             <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
             <li><b>Carburant:</b> {{ voiture.carburant }}</li>
@@ -40,49 +41,79 @@
             <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
           </ul>
         </td>
-        <td class="align-middle text-end">{{ voiture.prix }}.00€</td> 
+        <td class="align-middle text-end">{{ voiture.prix }}.00€</td>
         <td class="align-middle text-end">
-          <button type="button" data-index="{{voiture.id}}" class="btn btn-secondary delete-product" >retirer</button>
+          <button type="button" data-index="{{voiture.id}}" class="btn btn-danger delete-product">Retirer</button>
         </td>
-        
       </tr>
       {% endfor %}
       {% else %}
-      <tr> 
-        <td colspan="3" class="text-center">Votre panier est vide.</td>
+      <tr>
+        <td colspan="4" class="text-center">Votre panier est vide.</td>
       </tr>
       {% endif %}
     </tbody>
     <tfoot>
-      <tr>
-        <td colspan="2" class="text-end fw-bold">Total :</td>
-        <td class="text-end fw-bold">
-          
+      <tr class="table-active">
+        <td colspan="4">
+          <table class="table table-borderless mb-0">
+            <thead>
+              <tr>
+                <th class="text-end fw-bold"></th>
+                <th class="text-end fw-bold">Total</th>
+                <th class="text-end"><span class="badge bg-secondary">TVA (21%)</span></th>
+                <th class="text-end"><span class="badge bg-secondary">HTVA</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-end fw-bold">Total :</td>
+                <td class="text-end fw-bold">{{ totaltvac |floatformat:2 }}€</td>
+                <td class="text-end">{{ tot_tva |floatformat:2 }}€</td>
+                <td class="text-end">{{ total_htva |floatformat:2 }}€</td>
+              </tr>
+              <tr>
+                <td class="text-end fw-bold">Accompte (10%) :</td>
+                <td class="text-end fw-bold">{{ total_10pourcent_tvac |floatformat:2 }}€</td>
+                <td class="text-end">{{ tva_total_10pourcent |floatformat:2 }}€</td>
+                <td class="text-end">{{ accompte_htva |floatformat:2 }}€</td>
+              </tr>
+              <tr>
+                <td class="text-end fw-bold">Solde restant :</td>
+                <td class="text-end fw-bold">{{ sold_restant_tvac |floatformat:2 }}€</td>
+                <td class="text-end">{{ tva_sold_restant |floatformat:2 }}€</td>
+                <td class="text-end">{{ sold_restant_htva |floatformat:2 }}€</td>
+              </tr>
+            </tbody>
+          </table>
         </td>
       </tr>
     </tfoot>
   </table>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button class="btn btn-outline-dark me-2">Déjà réservée</button>
+  </div>
 </div>
-<script>
-  $(document).on('click', '.delete-product', function(e){
-      e.preventDefault();
-      $.ajax({
-          type: 'POST',
-          url: '{% url 'cart_delete' %}',
-          data: {
-                    voiture_id: $(this).data('index'),
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                    action: 'post'
-                },
-          success: function (json) {
-            location.reload();
-          },
-          error: function (xhr, errmsg, err) {
 
-          }
-      });
+<script>
+  $(document).on('click', '.delete-product', function (e) {
+    e.preventDefault();
+    $.ajax({
+      type: 'POST',
+      url: '{% url 'cart_delete' %}',
+      data: {
+        voiture_id: $(this).data('index'),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        action: 'post'
+      },
+      success: function (json) {
+        location.reload();
+      },
+      error: function (xhr, errmsg, err) {
+        // Gestion des erreurs 
+      }
+    });
   });
 </script>
-
 
 {% endblock %}

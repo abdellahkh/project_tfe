@@ -105,7 +105,7 @@
                             <button class="btn btn-outline-dark me-2" disabled>Déjà réservée</button>
                             {% else %}
                             <button type="button" class="btn btn-outline-dark me-2" id="add-cart"
-                                value="{{ voiture.id }}">Ajouter au panier</button>
+                                value="{{ voiture.id }}">Ajouter à la sélection</button>
                             {% endif %}
                             {% else %}
                             <button class="btn btn-outline-dark me-2" disabled>Réserver</button>
@@ -294,6 +294,7 @@
                 },
                 success: function (json) {
                     document.getElementById('cart_quantity').textContent = json.qty;
+                    location.reload();
                 },
                 error: function (xhr, errmsg, err) {
                     console.log(xhr.status + ": " + xhr.responseText);

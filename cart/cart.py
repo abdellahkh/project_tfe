@@ -1,4 +1,5 @@
 from car_dealer.models import Voiture
+from decimal import Decimal
 
 
 class Cart():
@@ -38,4 +39,34 @@ class Cart():
             del self.cart[voiture_id]
         
         self.session.modified = True
+
+    def cart_total(self):
+        voiture_ids = self.cart.keys()
+        voitures = Voiture.objects.filter(id__in=voiture_ids)
+        quantities = self.cart
+        totaltvac = 0
+        total_10pourcent_tvac = 0 
+        sold_restant_tvac = 0
+        tot_tva = 0
+        tva_total_10pourcent = 0
+        total_htva = 0
+        tva_sold_restant = 0
+        accompte_htva = 0
+        sold_restant_htva = 0
+        for key, value in quantities.items():
+            key= int(key)
+            for voiture in voitures:
+                if voiture.id == key:
+                    totaltvac += voiture.prix
+                    total_10pourcent_tvac += Decimal(voiture.prix) * Decimal('0.1')  # Utiliser Decimal pour les calculs décimaux
+                    tot_tva += Decimal(voiture.prix) * Decimal('0.21')
+        sold_restant_tvac = totaltvac - total_10pourcent_tvac
+        total_10pourcent_tvac = total_10pourcent_tvac 
+        total_htva = totaltvac - tot_tva
+        tva_total_10pourcent = total_10pourcent_tvac * Decimal('0.21')
+        tva_sold_restant = sold_restant_tvac * Decimal('0.21')
+        accompte_htva = total_10pourcent_tvac - tva_total_10pourcent
+        sold_restant_htva = sold_restant_tvac - tva_sold_restant
+        return totaltvac, total_10pourcent_tvac, sold_restant_tvac, tot_tva, tva_total_10pourcent, total_htva, tva_sold_restant, accompte_htva, sold_restant_htva
+
         

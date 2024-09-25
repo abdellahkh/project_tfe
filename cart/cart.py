@@ -1,3 +1,5 @@
+from car_dealer.models import Voiture
+
 
 class Cart():
     def __init__(self, request):
@@ -20,4 +22,20 @@ class Cart():
 
         self.session.modified = True
 
+        
+    def __len__(self):
+        return len(self.cart)
+    
+    def get_prods(self):
+        voiture_ids = self.cart.keys()
+        voitures = Voiture.objects.filter(id__in=voiture_ids)
+
+        return voitures
+    
+    def delete(self, voiture):
+        voiture_id = str(voiture)
+        if voiture_id in self.cart:
+            del self.cart[voiture_id]
+        
+        self.session.modified = True
         

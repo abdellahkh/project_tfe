@@ -2,15 +2,87 @@
 
 {% block content %}
 
-<!-- Header-->
 <header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Panier</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Voici le contenu</p>
-        </div>
+  <div class="container px-4 px-lg-5 my-5">
+    <div class="text-center text-white">
+      <h1 class="display-4 fw-bolder">Panier</h1>
+      <p class="lead fw-normal text-white-50 mb-0">Votre panier</p>
     </div>
+  </div>
 </header>
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+<div class="container mt-5">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col"></th> 
+        <th scope="col">Voiture</th>
+        <th scope="col" class="text-end">Prix</th> 
+      </tr>
+    </thead>
+    <tbody>
+      {% if cart_voitures %}
+      {% for voiture in cart_voitures %}
+      <tr>
+        <td class="align-middle"> 
+          {% if voiture.images.all %}
+          <img src="{{ voiture.images.first.image.url }}" class="img-fluid" style="max-width: 100px;" alt="..."> 
+          {% endif %}
+        </td>
+        <td class="align-middle">
+          <span class="fw-bold">{{ voiture.marque.nom }}</span> 
+          <span> - {{ voiture.modele.nom }} {{ voiture.annee_fabrication }}</span>
+          <ul class="list-unstyled small"> 
+            <li><b>Modèle:</b> {{ voiture.modele.nom }}</li>
+            <li><b>Année:</b> {{ voiture.annee_fabrication }}</li>
+            <li><b>Carburant:</b> {{ voiture.carburant }}</li>
+            <li><b>Transmission:</b> {{ voiture.transmission }}</li>
+            <li><b>Kilométrage:</b> {{ voiture.kilometrage }} km</li>
+          </ul>
+        </td>
+        <td class="align-middle text-end">{{ voiture.prix }}.00€</td> 
+        <td class="align-middle text-end">
+          <button type="button" data-index="{{voiture.id}}" class="btn btn-secondary delete-product" >retirer</button>
+        </td>
+        
+      </tr>
+      {% endfor %}
+      {% else %}
+      <tr> 
+        <td colspan="3" class="text-center">Votre panier est vide.</td>
+      </tr>
+      {% endif %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" class="text-end fw-bold">Total :</td>
+        <td class="text-end fw-bold">
+          
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+<script>
+  $(document).on('click', '.delete-product', function(e){
+      e.preventDefault();
+      $.ajax({
+          type: 'POST',
+          url: '{% url 'cart_delete' %}',
+          data: {
+                    voiture_id: $(this).data('index'),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    action: 'post'
+                },
+          success: function (json) {
+            location.reload();
+          },
+          error: function (xhr, errmsg, err) {
+
+          }
+      });
+  });
+</script>
+
 
 {% endblock %}

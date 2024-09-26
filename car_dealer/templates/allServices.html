@@ -1,50 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Header -->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
             <h1 class="display-4 fw-bolder">Nos Services</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Services</p>
+            <p class="lead fw-normal text-white-50 mb-0">Découvrez nos services automobiles</p> 
         </div>
     </div>
 </header>
-{% if services %}
-{% for service in services %}
-{% if service.is_available %}
-<section id="{{ service.nom }}" class="{{ service.nom }}">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-10 mt-4 mb-4 pb-2">
 
-                <div class="card mb-4">
-                    <div class="row g-0 align-items-center">
-                        {% if service.image %}
-                        <div class="col-md-3 text-center">
-                            <img src="{{ service.image.url }}" alt="{{ service.nom }}" class="img-fluid"
-                                style="max-height:100%;">
-                        </div>
-                        {% endif %}
-                        <div class="col-md-9">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ service.nom }}</h5>
-                                <p class="card-text">{{ service.description }}</p>
-                                <a href="{% url 'service_detail' service.id %}"  class="btn btn-primary">Demandez</a>
-                            </div>
-                        </div>
-                    </div>
+<section class="container py-5"> 
+    <div class="row">
+        {% if services %}
+        {% for service in services %}
+        {% if service.is_available %}
+        <div class="col-lg-4 col-md-6 mb-4"> 
+            <div class="card h-100 shadow d-flex flex-column">  
+                {% if service.image %}
+                <img src="{{ service.image.url }}" alt="{{ service.nom }}" class="card-img-top" style="max-height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body flex-grow-1"> <div class="d-flex flex-column h-100"> 
+                    <h5 class="card-title">{{ service.nom }}</h5>
+                    <p class="card-text">{{ service.description }}</p>
+                </div></div>
+                <div class="card-footer"> 
+                    <a href="{% url 'service_detail' service.id %}" class="btn btn-primary">Demander</a> 
                 </div>
-
             </div>
         </div>
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center"> 
+            <p>Aucun service disponible pour le moment.</p>
+        </div>
+        {% endif %}
     </div>
 </section>
-{% endif %}
-{% endfor %}
-{% else %}
-<p>Aucun service disponible pour le moment.</p>
-{% endif %}
-
 
 {% endblock %}

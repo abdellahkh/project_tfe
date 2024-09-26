@@ -83,13 +83,24 @@ class VoitureAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     inlines = [ImageVoitureInline]
 
 
+from django.utils.html import format_html
+
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nom', 'is_available', 'prix', 'description')
+    list_display = ('id', 'nom', 'is_available', 'prix', 'description', 'image_tag')
     list_filter = ('is_available',)
     search_fields = ('nom',)
-    readonly_fields = ('image',)
+    
+    fields = ('is_available', 'image', 'nom', 'description', 'prix')  # Champs du formulaire
+
+    def image_tag(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="50" height="50" />'.format(obj.image.url))
+        return None
+    image_tag.short_description = 'Image'
 
 admin.site.register(Service, ServiceAdmin)
+
+
 
 class ImageVoitureInline(admin.TabularInline):
     model = ImageVoiture

@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- Header-->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
@@ -11,276 +10,132 @@
     </div>
 </header>
 
-{% if not user.is_superuser %}
-<div class="container">
+<div class="container py-5"> 
     <div class="row d-flex align-items-stretch">
-        <!-- Utilisation des classes d-flex et align-items-stretch pour que les sections aient la même hauteur -->
-        <!-- Section à gauche -->
-        <div class="col-4">
-            <div class="section">
-                <div class="row justify-content-center">
-                    <div class="col-8">
-                        <br /><br />
-                        <div class="media">
-                            <div class="media-body">
-                                <h2 class="account-heading">{{ user.username }}</h2>
-                            </div>
+        <div class="col-md-4">
+            <div class="card shadow mb-4"> 
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">
+                        {% if not user.is_superuser %}
+                            {{ user.username }}
+                        {% else %}
+                            Administrateur : {{ user.username }}
+                        {% endif %}
+                    </h2>
+                    <div class="row">
+                        <div class="col-6">
+                            <p><strong>Prénom :</strong></p>
+                            <p><strong>Nom :</strong></p>
+                            <p><strong>E-mail :</strong></p>
+                            <p><strong>Téléphone :</strong></p>
                         </div>
-                        <fieldset class="form-group">
-                            <div class="form-row">
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_first_name" class="me-2">Prénom :</label>
-                                    <p>{{ user.first_name }}</p>
-                                </div>
-                                <div class="form-group  d-flex justify-content-between">
-                                    <label for="id_last_name">Nom :</label>
-                                    <p>{{ user.last_name }}</p>
-                                </div>
-
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_email">E-mail :</label>
-                                    <p>{{ user.email }}</p>
-                                </div>
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_phone">Téléphone :</label>
-                                    <p>0{{ user.phone }}</p>
-                                </div>
-
-                                <div class="form-group  d-flex justify-content-between">
-                                    <label for="id_address">Adresse : </label>
-                                    <p>{{ user.address }}</p>
-                                </div>
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_postal">Code Postal :</label>
-                                    <p>{{ user.postal }}</p>
-                                </div>
-
-                                <div class="form-group  d-flex justify-content-between">
-                                    <label for="id_ville">Ville :</label>
-                                    <p>{{ user.ville }}</p>
-                                </div>
-                            </div>
-                        </fieldset>
-                        <br />
-                        <div class="form-group">
-                            <a href="{% url 'profile_edit' user.username %}" class="btn btn-outline-info">Modifier</a>
+                        <div class="col-6">
+                            <p>{{ user.first_name }}</p>
+                            <p>{{ user.last_name }}</p>
+                            <p>{{ user.email }}</p>
+                            <p>0{{ user.phone }}</p> 
                         </div>
-
-                        <br /><br />
+                    </div>
+                    <hr> 
+                    <div class="row">
+                        <div class="col-6">
+                            <p><strong>Adresse :</strong></p>
+                            <p><strong>Code Postal :</strong></p>
+                            <p><strong>Ville :</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <p>{{ user.address }}</p>
+                            <p>{{ user.postal }}</p>
+                            <p>{{ user.ville }}</p>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <a href="{% url 'profile_edit' user.username %}" class="btn btn-outline-info">Modifier</a>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Section à droite -->
-        <div class="col-8">
-            <div class="section">
-                {% if demandes %}
-                <div class="section my-4">
-                    <h4>Toutes vos demandes:</h4>
-                    <ol class="list-group list-group my-4">
-                        {% for demande in demandes %}
-                        <div class="row justify-content-evenly align-items-center">
-                            <div class="col-md-4">
-                                <li class="list-group-item">{{demande.service}}</li>
+        <div class="col-md-8">
+            {% if demandes %}
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h4>Toutes vos demandes :</h4>
+                </div>
+                <ul class="list-group list-group-flush"> 
+                    {% for demande in demandes %}
+                    <li class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                {{ demande.service }} - {{ demande.date }}
                             </div>
-                            <div class="col-md-4">
-                                <li class="list-group-item">{{demande.date}}</li>
-                            </div>
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#demandeModal{{ demande.id }}">
+                            <div class="col-md-4 text-end">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demandeModal{{ demande.id }}">
                                     Info
                                 </button>
                             </div>
                         </div>
-
-                        <div class="modal fade" id="demandeModal{{ demande.id }}" tabindex="-1"
-                            aria-labelledby="demandeModalLabel{{ demande.id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="demandeModalLabel{{ demande.id }}">Détails de la
-                                            demande</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p><strong>Service:</strong> {{ demande.service }}</p>
-                                        <p><strong>Date:</strong> {{ demande.date }}</p>
-                                        <p><strong>Statut:</strong> {{ demande.status }}</p>
-                                        <p><strong>Genre:</strong> {{ demande.genre }}</p>
-                                        <p><strong>Détails:</strong> {{ demande.details }}</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Fermer</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </ol>
-                </div>
-                {% endif %}
-                {% if voitureSoumisses %}
-                <div class="section my-4">
-                    <h4 class="my-2">Toutes vos soummissions:</h4>
-                    <ol class="list-group list-group my-4">
-                        {% for voitureSoumisse in voitureSoumisses %}
-                        <div class="row ">
-                            <div class="col-3">
-                                <li class="list-group-item">{{voitureSoumisse.marque}}</li>
-                            </div>
-                            <div class="col-1">
-                                <li class="list-group-item">{{voitureSoumisse.modele}}</li>
-                            </div>
-                            <div class="col-2">
-                                <li class="list-group-item">{{voitureSoumisse.annee_fabrication}}</li>
-                            </div>
-                            <div class="col-2">
-                                <li class="list-group-item">{{voitureSoumisse.carburant}}</li>
-                            </div>
-                            <div class="col-2">
-                                <li class="list-group-item">{{voitureSoumisse.transmission}}</li>
-                            </div>
-                            <div class="col-2">
-                                <button class="btn btn-light" type="button" disabled>Ouvrir</button>
-                            </div>
-                        </div>
-                        {% endfor %}
-
-                    </ol>
-                </div>
-                {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
+            {% endif %}
+
+            {% if voitureSoumisses %}
+            <div class="card shadow">
+                <div class="card-header">
+                    <h4>Toutes vos soumissions :</h4>
+                </div>
+                <ul class="list-group list-group-flush"> 
+                    {% for voitureSoumisse in voitureSoumisses %} 
+                    <li class="list-group-item">
+                        {{ voitureSoumisse.marque }} {{ voitureSoumisse.modele }} - {{ voitureSoumisse.annee_fabrication }} - {{ voitureSoumisse.carburant }} - {{ voitureSoumisse.transmission }}
+                        <button class="btn btn-light float-end" type="button" disabled>Ouvrir</button> 
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
-{% else %}
-<div class="container">
-    <div class="row d-flex align-items-stretch">
-        <!-- Utilisation des classes d-flex et align-items-stretch pour que les sections aient la même hauteur -->
-        <!-- Section à gauche -->
-        <div class="col-4">
-            <div class="section">
-                <div class="row justify-content-center">
-                    <div class="col-8">
-                        <br /><br />
-                        <div class="media">
-                            <div class="media-body">
-                                <h5 class="account-heading"> Administrateur : {{ user.username }}</h5>
-                            </div>
-                        </div>
-                        <fieldset class="form-group">
-                            <div class="form-row">
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_first_name" class="me-2">Prénom :</label>
-                                    <p>{{ user.first_name }}</p>
-                                </div>
-                                <div class="form-group  d-flex justify-content-between">
-                                    <label for="id_last_name">Nom :</label>
-                                    <p>{{ user.last_name }}</p>
-                                </div>
 
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_email">E-mail :</label>
-                                    <p>{{ user.email }}</p>
-                                </div>
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_phone">Téléphone :</label>
-                                    <p>0{{ user.phone }}</p>
-                                </div>
-
-                                <div class="form-group  d-flex justify-content-between">
-                                    <label for="id_address">Adresse : </label>
-                                    <p>{{ user.address }}</p>
-                                </div>
-                                <div class="form-group d-flex justify-content-between">
-                                    <label for="id_postal">Code Postal :</label>
-                                    <p>{{ user.postal }}</p>
-                                </div>
-
-                                <div class="form-group  d-flex justify-content-between">
-                                    <label for="id_ville">Ville :</label>
-                                    <p>{{ user.ville }}</p>
-                                </div>
-                            </div>
-                        </fieldset>
-                        <br />
-                        <div class="form-group">
-                            <a href="{% url 'profile_edit' user.username %}" class="btn btn-outline-info">Modifier</a>
-                        </div>
-
-                        <br /><br />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section à droite -->
-        <div class="col-8">
-            <div class="section">
-                {% if demandes %}
-                <div class="section my-4">
-                    <h4>Toutes les demandes:</h4>
-                    <ol class="list-group list-group my-4">
-                        {% for demande in demandes %}
-                        <div class="row justify-content-evenly">
-                            <div class="col-8">
-                                <li class="list-group-item">{{demande.service}}</li>
-                            </div>
-                            <div class="col-4">
-                                <li class="list-group-item">{{demande.date}}</li>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </ol>
-                </div>
-                {% endif %}
-                {% if voitureSoumisses %}
-                <div class="section my-4">
-                    <h4 class="my-2">Toutes les soummissions:</h4>
-                    <ol class="list-group list-group my-4">
-                        {% for voitureSoumisse in toutesVoituresSoumise %}
-                        <div class="row ">
-                            <div class="col-3">
-                                <li class="list-group-item">{{voitureSoumisse.marque}}</li>
-                            </div>
-                            <div class="col-1">
-                                <li class="list-group-item">{{voitureSoumisse.modele}}</li>
-                            </div>
-                            <div class="col-2">
-                                <li class="list-group-item">{{voitureSoumisse.annee_fabrication}}</li>
-                            </div>
-                            <div class="col-2">
-                                <li class="list-group-item">{{voitureSoumisse.carburant}}</li>
-                            </div>
-                            <div class="col-2">
-                                <li class="list-group-item">{{voitureSoumisse.transmission}}</li>
-                            </div>
-                            <div class="col-2">
-                                <button class="btn btn-light" type="button" disabled>Ouvrir</button>
-                            </div>
-                        </div>
-                        {% endfor %}
-
-                    </ol>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-<!-- <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true"></div>
+{% for demande in demandes %}
+<div class="modal fade" id="demandeModal{{ demande.id }}" tabindex="-1" aria-labelledby="demandeModalLabel{{ demande.id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
+                <h5 class="modal-title" id="demandeModalLabel{{ demande.id }}">Détails de la demande</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            afficher ici les details
+            <div class="modal-body">
+                <dl class="row"> 
+                    <dt class="col-sm-3">Service :</dt>
+                    <dd class="col-sm-9">{{ demande.service }}</dd>
+
+                    <dt class="col-sm-3">Date :</dt>
+                    <dd class="col-sm-9">{{ demande.date }}</dd>
+
+                    <dt class="col-sm-3">Genre :</dt>
+                    <dd class="col-sm-9">{{ demande.genre }}</dd>
+
+                    <dt class="col-sm-3">Détails :</dt>
+                    <dd class="col-sm-9">{{ demande.details }}</dd>
+
+                    {% if demande.voiture %}
+                    <dt class="col-sm-3">Voiture :</dt>
+                    <dd class="col-sm-9">
+                        {{ demande.voiture }}
+                        <a href="{% url 'voiture' demande.voiture.id %}" class="btn btn-primary btn-sm">Voir</a> 
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
         </div>
     </div>
-</div> -->
+</div>
+{% endfor %}
+
 {% endblock %}

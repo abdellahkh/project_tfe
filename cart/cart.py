@@ -40,6 +40,10 @@ class Cart():
         
         self.session.modified = True
 
+    def clear(self):
+        self.cart.clear()  
+        self.session.modified = True
+
     def cart_total(self):
         voiture_ids = self.cart.keys()
         voitures = Voiture.objects.filter(id__in=voiture_ids)

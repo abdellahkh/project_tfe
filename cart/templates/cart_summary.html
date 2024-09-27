@@ -91,9 +91,57 @@
     </tfoot>
   </table>
   <div class="d-grid gap-2 d-md-flex mb-4 justify-content-md-end">
-    <button class="btn btn-outline-dark me-2">Payer l'accompte pour réserver</button>
+    <div class="col-md-4 text-end">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paiementModal">
+        Payer l'accompte pour réserver
+      </button>
+</div>
+
+<div class="modal fade" id="paiementModal" tabindex="-1" aria-labelledby="paiementModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="paiementModalLabel">Détails</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <dl class="row"> 
+                <dt class="col-sm-3">Montant total :</dt>
+                <dd class="col-sm-9">{{ totaltvac |floatformat:2 }}€</dd>
+        
+                <dt class="col-sm-3">Accompte :</dt>
+                <dd class="col-sm-9">{{ total_10pourcent_tvac |floatformat:2 }}€</dd>
+        
+                <dt class="col-sm-3">Reste :</dt>
+                <dd class="col-sm-9">{{ sold_restant_tvac |floatformat:2 }}€</dd>
+            </dl>
+            <hr> 
+            <dl class="row">  
+                <div class="col-sm-6"> 
+                    <dt>Accompte à payer :</dt>
+                    <dd>{{ total_10pourcent_tvac |floatformat:2 }}€</dd> 
+                </div>
+                <div class="col-sm-6"> 
+                    <dd style="background-color: bisque;"> 
+                        <small style="font-style: italic; font-size: smaller;"> 
+                            Dès réception de votre acompte, vous recevrez un email de confirmation. Nous vous contacterons ensuite par téléphone afin de convenir des modalités de la prestation et finaliser la vente.
+                        </small>
+                    </dd>
+                </div>
+            </dl>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="confirmPayerBtn">PAYER</button>  {# Lien vers la vue de paiement #}
+          </div>
+      </div>
   </div>
 </div>
+
+<script>
+  document.getElementById('confirmPayerBtn').addEventListener('click', function() {
+      window.location.href = "{% url 'checkout_session' %}"; 
+  });
+</script>
 
 <script>
   $(document).on('click', '.delete-product', function (e) {

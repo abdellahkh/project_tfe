@@ -287,7 +287,7 @@ class Vente(models.Model):
         choices=GENRE_CHOICES,
         help_text="Type de service"
     )
-    paid = models.BooleanField(default=False, verbose_name="Payé")
+    paid = models.BooleanField(default=False, verbose_name="Payé") 
     user_id = models.ForeignKey(Member, on_delete=models.CASCADE, help_text="Identifiant du User")
     demande_id = models.ForeignKey(Demande, blank=True, null=True, on_delete=models.CASCADE, help_text="Identifiant du Service")
     voiture_id = models.ForeignKey(Voiture, blank=True, null=True,  on_delete=models.CASCADE, help_text="Identifiant de la voiture")

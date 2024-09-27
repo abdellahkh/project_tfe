@@ -23,12 +23,4 @@ urlpatterns = [
 
     path('dashboard/', views.dashboard, name='dashboard'),
     path('demande/<int:demande_id>', views.demandeDetails, name='demande_details'),
-
-
-    path('checkout/<int:voiture_id>', views.checkout, name='checkout'),
-    path('checkout_session/<int:voiture_id>', views.checkout_session, name='checkout_session'),
-
-    path('pay_success', views.pay_success, name='pay_success'),
-    path('pay_cancel', views.pay_cancel, name='pay_cancel'),
-    
 ]

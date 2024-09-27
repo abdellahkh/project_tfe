@@ -107,10 +107,10 @@
                         <div class="col mb-4">
                             <div class="card h-100 position-relative">
                                 <!-- Badges "Vendu" et "Réservé" -->
-                                {% if voiture.reserve %}
+                                {% if voiture.status == 'reservé' %}
                                 <div class="badge bg-warning text-dark">Réservé !</div>
                                 {% endif %}
-                                {% if voiture.sold %}
+                                {% if voiture.status == 'vendu' %}
                                 <div class="badge bg-danger text-white">Vendu !</div>
                                 {% endif %}
                                 

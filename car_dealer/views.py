@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import ImageVoiture, Service, Voiture, Member, Demande, VoitureSoumisse
+from .models import ImageVoiture, Service, Vente, Voiture, Member, Demande, VoitureSoumisse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,7 +18,7 @@ from car_dealer import models
 
 # Create your views here.
 def home(request):
-    voitures = Voiture.objects.all().prefetch_related('images')
+    voitures = Voiture.objects.all().prefetch_related('images').order_by('-date_poste')[:9]
     services = Service.objects.filter(is_available=True)
     
     return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
@@ -43,6 +43,7 @@ def activate(request, uidb64, token):
     return redirect('home')
 
 def dashboard(request):
+    ventes = Vente.objects.all()
     # Récupérer les options pour les filtres
     demande_genres = [genre[0] for genre in Demande.GENRE_INTERVENTION]
     demande_status = [status[0] for status in Demande.STATUS_OPTIONS]
@@ -72,6 +73,7 @@ def dashboard(request):
         'genre_filter': genre_filter,
         'status_filter': status_filter,
         'service_filter': service_filter,
+        'ventes': ventes 
     })
 
 
@@ -266,7 +268,7 @@ def service(request, service_id):
     form = None
     mail_to = 'etu.abkh@gmail.com'
     if service.nom in ['Déplacement de Véhicule Longue Distance', 'Déplacement de Véhicule Courte Distance']:
-        
+        # messages.success(request,'ok we are deplacement')
         if request.user.is_authenticated:
             if request.method == 'POST':
                 
@@ -308,6 +310,7 @@ def service(request, service_id):
 
     elif service.nom in ['Passage au controle technique de vente', 'Passage au controle technique annuel']:
         mail_to = 'etu.abkh@gmail.com'
+        
         if request.user.is_authenticated:
             if request.method == 'POST':
                 form = DemandeControlTechMembre(request.POST)
@@ -315,13 +318,14 @@ def service(request, service_id):
                 form.instance.member = request.user
                 if form.is_valid():
                     form.save()
-                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to, None)
+                    # serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to, None)
                     return redirect('home')
                 else:
                     print(form.errors)
                     messages.error(request, 'Hmm une erreur s\'est produite, veuillez réessayer plus tard')
             else:
-                form = DemandeControlTechMembre()
+                
+                form = DemandeControlTechMembre() # => ce formulaire ne s'affiche pas dans mon html
                 if 'submitted' in request.GET:
                     submitted = True
         else:
@@ -337,7 +341,7 @@ def service(request, service_id):
                         'phone': form.cleaned_data['phone'],
                         'email': form.cleaned_data['email'],
                     }
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to, None)
+                    # serviceEmailToAdmin(request, user, service_nom, form, mail_to, None)
                     return redirect('home')
                 else:
                     print(form.errors)

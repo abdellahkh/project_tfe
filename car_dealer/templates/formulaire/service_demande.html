@@ -217,7 +217,68 @@
                             </div>
                         </div>
                     </div>
+                    {% elif service.nom == 'Passage au controle technique de vente' or service.nom == 'Passage au controle technique annuel' %}
+                    <div class="section">
+                        <div class="row mb-3 align-items-center"> 
+                            <div class="col-md-3 text-end">
+                                <label for="{{ form.date_desiree.id_for_label }}" class="form-label">Date :</label>
+                            </div>
+                            <div class="col-md-9 text-start">
+                                {{ form.date_desiree }}
+                                <a href="#" class="text-muted" data-bs-toggle="collapse" data-bs-target="#dateHint">
+                                    <i class="bi bi-info-circle-fill"></i> 
+                                </a>
+                                <div id="dateHint" class="collapse">
+                                    <small class="form-text text-muted"> 
+                                        Date à laquelle vous souhaiteriez passer le véhicule au contrôle technique. 
+                                        Notez qu'il faut en général prévoir un créneau de 2 ou 3 jours autour de la date indiquée.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center"> 
+                            <div class="col-md-3 text-end">
+                                <label for="{{ form.startLocation.id_for_label }}" class="form-label">Lieu de départ :</label> 
+                            </div>
+                            <div class="col-md-9 text-start">
+                                {{ form.startLocation }}
+                                <a href="#" class="text-muted" data-bs-toggle="collapse" data-bs-target="#lieuHint">
+                                    <i class="bi bi-info-circle-fill"></i> 
+                                </a>
+                                <div id="lieuHint" class="collapse">
+                                    <small class="form-text text-muted"> 
+                                        Veuillez spécifier dans les Remarques si le lieu spécifié est votre domicile ou votre lieu de travail.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center"> 
+                            <div class="col-md-3 text-end">
+                                <label for="{{ form.endLocation.id_for_label }}" class="form-label">Lieu d'arrivée :</label> 
+                            </div>
+                            <div class="col-md-9 text-start">
+                                {{ form.endLocation }}
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center"> 
+                            <div class="col-md-3 text-end">
+                                <label for="{{ form.car_doc.id_for_label }}" class="form-label">Document du véhicule :</label> 
+                            </div>
+                            <div class="col-md-9 text-start">
+                                {{ form.car_doc }}
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center"> 
+                            <div class="col-md-3 text-end">
+                                <label for="{{ form.details.id_for_label }}" class="form-label">Remarques :</label> 
+                            </div>
+                            <div class="col-md-9 text-start">
+                                {{ form.details }}
+                            </div>
+                        </div>
+                    </div>
                     {% endif %}
+                    
                 </div>
 
             </form>

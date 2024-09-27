@@ -1,8 +1,16 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from .cart import Cart
-from car_dealer.models import Voiture
+from car_dealer.models import Voiture, Vente
 from django.http import JsonResponse
 from django.contrib import messages
+import stripe 
+from django.conf import settings
+from django.views.generic import TemplateView
+from django.http import JsonResponse
+from django.views import View
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def cart_summary(request):
@@ -22,7 +30,6 @@ def cart_add(request):
         cart.add(voiture=voiture)
 
         cart_quantity = cart.__len__()
-        # response = JsonResponse({'Voiture ID:': voiture.id})
         response = JsonResponse({'qty': cart_quantity})
         messages.success(request,("Véhicule ajouté à votre sélection..."))
         return response
@@ -42,3 +49,72 @@ def cart_delete(request):
 
 def cart_update(request):
     pass
+
+
+############################### to here ############################### 
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+def checkout(request, voiture_id):
+    return render(request, 'checkout.html', {})
+
+class CheckoutSessionView(View):
+    def get(self, request, *args, **kwargs):
+        cart = Cart(request)
+        #  Calcul du montant total de l'acompte (10%) pour toutes les voitures du panier
+        totaltvac, total_10pourcent_tvac, _, _, _, _, _, _, _ = cart.cart_total()  
+        montant_accomte = int(float(total_10pourcent_tvac) * 100)  
+
+        YOUR_DOMAIN = 'http://127.0.0.1:8000'
+
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'eur',
+                        'product_data': {
+                            'name': f"Accompte de 10% pour votre sélection de véhicules", 
+                        },
+                        'unit_amount': montant_accomte,  
+                    },
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url=YOUR_DOMAIN + '/cart/pay_success',
+            cancel_url=YOUR_DOMAIN + '/pay_cancel',
+        )
+        return redirect(session.url, code=303)
+    
+    
+
+
+def pay_success(request):
+    cart = Cart(request)
+    messages.success(request, 'Paiement reusii')
+    # Récupération des informations du panier
+    voiture_ids = cart.cart.keys()
+    voitures = Voiture.objects.filter(id__in=voiture_ids)
+    totaltvac, total_10pourcent_tvac, _, _, _, _, _, _, _ = cart.cart_total()
+
+    
+    for voiture in voitures:
+        Vente.objects.create(
+            genre='Vente',
+            paid=False,  
+            user_id=request.user,  
+            voiture_id=voiture,
+            montant_total=voiture.prix,
+            montant_acompte=total_10pourcent_tvac,
+        )
+    for voiture in voitures:
+        voiture.status = 'reservé'  
+        voiture.save() 
+
+    cart.clear()  
+
+    return render(request, 'success.html')
+
+def pay_cancel(request):
+    return render(request, 'cancel.html')

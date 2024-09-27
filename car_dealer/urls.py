@@ -23,4 +23,5 @@ urlpatterns = [
 
     path('dashboard/', views.dashboard, name='dashboard'),
     path('demande/<int:demande_id>', views.demandeDetails, name='demande_details'),
+    path('vente/<int:vente_id>', views.vente_details, name='vente_details'),
 ]

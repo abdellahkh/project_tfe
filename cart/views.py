@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse
 from .cart import Cart
 from car_dealer.models import Voiture, Vente
 from django.http import JsonResponse
@@ -102,7 +103,7 @@ def pay_success(request):
     for voiture in voitures:
         Vente.objects.create(
             genre='Vente',
-            paid=False,  
+            paid='partially',  
             user_id=request.user,  
             voiture_id=voiture,
             montant_total=voiture.prix,
@@ -114,7 +115,7 @@ def pay_success(request):
 
     cart.clear()  
 
-    return render(request, 'success.html')
+    return redirect(reverse('profile_view', kwargs={'username': request.user.username}))
 
 def pay_cancel(request):
     return render(request, 'cancel.html')

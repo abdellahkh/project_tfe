@@ -275,6 +275,8 @@ class Demande(models.Model):
         else:
             return f"{self.service} - {self.first_name}, {self.last_name}: {self.date_desiree}"
 
+from django.db import models
+
 class Vente(models.Model):
     GENRE_CHOICES = [
         ('Vente', 'Vente'),
@@ -287,10 +289,37 @@ class Vente(models.Model):
         choices=GENRE_CHOICES,
         help_text="Type de service"
     )
-    paid = models.BooleanField(default=False, verbose_name="Payé") 
+
+    PAIEMENT_CHOICES = [
+        ('yes', 'Oui'),
+        ('no', 'Non'),
+        ('partially', 'Partiellement'),
+    ]
+    paid = models.CharField(
+        max_length=10,
+        choices=PAIEMENT_CHOICES,
+        default='no', 
+        verbose_name="Payé"
+    )
+
     user_id = models.ForeignKey(Member, on_delete=models.CASCADE, help_text="Identifiant du User")
     demande_id = models.ForeignKey(Demande, blank=True, null=True, on_delete=models.CASCADE, help_text="Identifiant du Service")
-    voiture_id = models.ForeignKey(Voiture, blank=True, null=True,  on_delete=models.CASCADE, help_text="Identifiant de la voiture")
+    voiture_id = models.ForeignKey(Voiture, blank=True, null=True, on_delete=models.CASCADE, help_text="Identifiant de la voiture")
     date = models.DateTimeField(auto_now_add=True, help_text="Date de la vente")
     montant_total = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True, help_text="Montant total de la vente")
     montant_acompte = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True, help_text="Montant de l'acompte")
+    montant_restant = models.DecimalField(
+        max_digits=10, 
+        decimal_places=0, 
+        blank=True, 
+        null=True, 
+        help_text="Montant restant à payer"
+    )
+
+    def save(self, *args, **kwargs):
+        if self.montant_total and self.montant_acompte:
+            self.montant_restant = self.montant_total - self.montant_acompte
+        else:
+            self.montant_restant = None  
+
+        super().save(*args, **kwargs)  

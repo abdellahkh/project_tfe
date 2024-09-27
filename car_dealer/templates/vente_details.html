@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-2">
+        <div class="text-center text-white">
+            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">Détails de la Vente</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Voici les informations complètes sur la vente.</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h3>Détails de la vente</h3>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Client :</dt>
+                        <dd class="col-sm-8">
+                            <a href="{% url 'profile_view' vente.user_id.username %}">{{ vente.user_id }}</a>
+                        </dd>
+
+                        <dt class="col-sm-4">Véhicule :</dt>
+                        <dd class="col-sm-8">
+                            <a href="{% url 'voiture' vente.voiture_id.id %}">{{ vente.voiture_id }}</a>
+                        </dd>
+
+                        <dt class="col-sm-4">Montant total :</dt>
+                        <dd class="col-sm-8">{{ vente.montant_total }}€</dd>
+
+                        <dt class="col-sm-4">Accompte :</dt>
+                        <dd class="col-sm-8">{{ vente.montant_acompte }}€</dd>
+
+                        <dt class="col-sm-4">Montant restant :</dt>
+                        <dd class="col-sm-8">{{ vente.montant_restant }}€</dd>
+
+                        <dt class="col-sm-4">Payé :</dt>
+                        <dd class="col-sm-8">
+                            {% if vente.paid == 'yes' %}
+                            Oui <span class="badge bg-success">&#10003;</span>
+                            {% elif vente.paid == 'partially' %}
+                            Partiellement <span class="badge bg-warning text-dark">&#9888;</span>
+                            {% else %}
+                            Non <span class="badge bg-danger">&#10005;</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+                <div class="card-body">
+                    {% if vente.paid == 'yes' %}
+                        <a href="" class="btn btn-primary" disabled>Véhicule payer completement</a>
+                    {% elif vente.paid == 'partially' %}
+                        <a href="" class="btn btn-primary">Generer demande de paiement</a>
+                    {% else %}
+                        <a href="" class="btn btn-primary">Generer demande de paiement</a>
+                    {% endif %}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

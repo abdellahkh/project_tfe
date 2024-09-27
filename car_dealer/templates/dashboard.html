@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- Header -->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
@@ -15,62 +14,53 @@
     </div>
 </header>
 
-<div class="container">
-    </br>
-    </br>
-    <div class="row justify-content-center">
-        <div class="row justify-content-center"></div>
-            <div class="card-body col-12 mb-4">
-                <button>
-                    <!-- <a href="{% url 'saleAddCar' %}" class="btn btn-primary">Ajouter un véhicule</a> -->
-                    <a href="/admin/car_dealer/voiture/add/" class="btn btn-primary">Ajouter un véhicule</a>
-                </button>
-            </div>
-        </div>
-        <div class="card col-6 mb-4">
-            <div class="card-header">
-                <h1>Dashboard</h1>
-                <!-- Formulaire de filtrage -->
-                <form method="GET" class="mb-3" id="filter-form">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="service">Service</label>
-                            <select id="service" name="service" class="form-select">
-                                <option value="">Tous</option>
-                                {% for service in demande_services %}
+<div class="container my-5"> 
+    <div class="row">
+        <div class="col-md-6 mb-4"> 
+            <div class="card h-100 shadow">
+                <div class="card-header">
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/car_dealer/voiture/add/" class="btn btn-primary mb-3">Ajouter un véhicule</a>
+                    <form method="GET" class="mb-3" id="filter-form">
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label for="service">Service</label>
+                                <select id="service" name="service" class="form-select">
+                                    <option value="">Tous</option>
+                                    {% for service in demande_services %}
                                     <option value="{{ service.id }}" {% if service.id|stringformat:"s" == service_filter %}selected{% endif %}>{{ service }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label for="status">Statut</label>
-                            <select id="status" name="status" class="form-select">
-                                <option value="">Tous</option>
-                                {% for status in demande_status %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label for="status">Statut</label>
+                                <select id="status" name="status" class="form-select">
+                                    <option value="">Tous</option>
+                                    {% for status in demande_status %}
                                     <option value="{{ status }}" {% if status == status_filter %}selected{% endif %}>{{ status }}</option>
-                                {% endfor %}
-                            </select>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">Filtrer</button>
+                            </div>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary">Filtrer</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Service</th>
-                            <th>Genre</th>
-                            <th>Demandeur</th>
-                            <th>Détails</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for demande in allRequest %}
+                    </form>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Genre</th>
+                                <th>Demandeur</th>
+                                <th>Détails</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for demande in allRequest %}
                             <tr>
                                 <td>{{ demande.service }}</td>
                                 <td>{{ demande.genre }}</td>
@@ -86,61 +76,61 @@
                                     <a href="{% url 'demande_details' demande.id %}" class="btn btn-primary">Ouvrir</a>
                                 </td>
                             </tr>
-                        {% empty %}
+                            {% empty %}
                             <tr>
                                 <td colspan="6">Aucune demande trouvée.</td>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="card col-6 mb-4">
-            <div class="card-header">
-                <h3>Ventes - Reservations</h3>
-            </div>
-            {% for vente in ventes %}
-                {{vente.voiture_id}} - {{vente.user_id}} - {{vente.montant_total}} - {{ vente.montant_acompte}}
-            {% endfor %}
 
+        <div class="col-md-6 mb-4"> 
+            <div class="card h-100 shadow">
+                <div class="card-header">
+                    <h3>Ventes - Réservations</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Véhicule</th>
+                                <th>Client</th>
+                                <th>Total</th>
+                                <th>Accompte</th>
+                                <th>Reste</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vente in ventes %}
+                            <tr>
+                                <td>{{ vente.voiture_id }}</td>
+                                <td>{{ vente.user_id }}</td>
+                                <td>{{ vente.montant_total }}€</td>
+                                <td>{{ vente.montant_acompte }}€ </td>
+                                <td>{{ vente.montant_restant }}€</td>
+                                <td>
+                                    <a href="{% url 'vente_details' vente.id %}" class="btn btn-primary">Ouvrir</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6">Aucune demande trouvée.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- JavaScript pour permettre la sélection d'un seul filtre à la fois -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('filter-form');
-    const serviceSelect = document.getElementById('service');
-    const genreSelect = document.getElementById('genre');
-    const statusSelect = document.getElementById('status');
-    
-    function updateFilterState() {
-        const serviceValue = serviceSelect.value;
-        const genreValue = genreSelect.value;
-        const statusValue = statusSelect.value;
-        
-        // Si un filtre est sélectionné, désactiver les autres
-        if (serviceValue || genreValue || statusValue) {
-            serviceSelect.disabled = !!(genreValue || statusValue);
-            genreSelect.disabled = !!(serviceValue || statusValue);
-            statusSelect.disabled = !!(serviceValue || genreValue);
-        } else {
-            // Réactiver tous les filtres si aucun filtre n'est sélectionné
-            serviceSelect.disabled = false;
-            genreSelect.disabled = false;
-            statusSelect.disabled = false;
-        }
-    }
-    
-    // Ajouter un événement de changement pour chaque sélecteur
-    serviceSelect.addEventListener('change', updateFilterState);
-    genreSelect.addEventListener('change', updateFilterState);
-    statusSelect.addEventListener('change', updateFilterState);
-    
-    // Initial call to set the state based on current filter values
-    updateFilterState();
-});
+// ... (votre JavaScript existant) ...
 </script>
 
 {% endblock %}

@@ -607,7 +607,9 @@ def vendre(request):
     return render(request, 'formulaire/vendre.html', {})
 
 
-    
+def vente_details(request, vente_id):
+    vente = Vente.objects.get(id=vente_id)
+    return render(request, "vente_details.html", {"vente": vente})  
 
 
 

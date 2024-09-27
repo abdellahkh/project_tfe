@@ -56,29 +56,58 @@
             </div>
         </div>
         <div class="col-md-8">
-            {% if demandes %}
+            
             <div class="card shadow mb-4">
                 <div class="card-header">
                     <h4>Toutes vos demandes :</h4>
                 </div>
                 <ul class="list-group list-group-flush"> 
-                    {% for demande in demandes %}
-                    <li class="list-group-item">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                {{ demande.service }} - {{ demande.date }}
+                    {% if demandes %}
+                        {% for demande in demandes %}
+                        <li class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    {{ demande.service }} - {{ demande.date }}
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demandeModal{{ demande.id }}">
+                                        Info
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-4 text-end">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demandeModal{{ demande.id }}">
-                                    Info
-                                </button>
-                            </div>
-                        </div>
-                    </li>
-                    {% endfor %}
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <p>Aucune demande</p>
+                    {% endif %}
                 </ul>
             </div>
-            {% endif %}
+            <div class="card shadow mb-4"></div>
+                <div class="card-header">
+                    <h4>Votre/Vos achat(s) :</h4>
+                </div>
+                <ul class="list-group list-group-flush"> 
+                    {% if ventes %}
+                        {% for vente in ventes %}
+                        <li class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    {{ vente.voiture_id }} 
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demandeModal{{ demande.id }}">
+                                        Info
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <p>Aucune demande</p>
+                    {% endif %}
+                </ul>
+            </div>
+            
 
             {% if voitureSoumisses %}
             <div class="card shadow">
@@ -100,6 +129,44 @@
 </div>
 
 {% for demande in demandes %}
+<div class="modal fade" id="demandeModal{{ demande.id }}" tabindex="-1" aria-labelledby="demandeModalLabel{{ demande.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="demandeModalLabel{{ demande.id }}">Détails de la demande</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row"> 
+                    <dt class="col-sm-3">Service :</dt>
+                    <dd class="col-sm-9">{{ demande.service }}</dd>
+
+                    <dt class="col-sm-3">Date :</dt>
+                    <dd class="col-sm-9">{{ demande.date }}</dd>
+
+                    <dt class="col-sm-3">Genre :</dt>
+                    <dd class="col-sm-9">{{ demande.genre }}</dd>
+
+                    <dt class="col-sm-3">Détails :</dt>
+                    <dd class="col-sm-9">{{ demande.details }}</dd>
+
+                    {% if demande.voiture %}
+                    <dt class="col-sm-3">Voiture :</dt>
+                    <dd class="col-sm-9">
+                        {{ demande.voiture }}
+                        <a href="{% url 'voiture' demande.voiture.id %}" class="btn btn-primary btn-sm">Voir</a> 
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% for vente in ventes %}
 <div class="modal fade" id="demandeModal{{ demande.id }}" tabindex="-1" aria-labelledby="demandeModalLabel{{ demande.id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

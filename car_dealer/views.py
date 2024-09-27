@@ -18,7 +18,7 @@ from car_dealer import models
 
 # Create your views here.
 def home(request):
-    voitures = Voiture.objects.all().prefetch_related('images').order_by('-date_poste')[:9]
+    voitures = Voiture.objects.all().prefetch_related('images').order_by('-date_poste')[:6]
     services = Service.objects.filter(is_available=True)
     
     return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
@@ -240,9 +240,9 @@ def allVoitures(request):
         voitures = voitures.filter(transmission=transmission)
 
     # Récupération des marques, carburants et transmissions distincts
-    marques_disponibles = Voiture.objects.values_list('marque__nom', flat=True).distinct()
-    carburants_disponibles = Voiture.objects.values_list('carburant', flat=True).distinct()
-    transmissions_disponibles = Voiture.objects.values_list('transmission', flat=True).distinct()
+    marques_disponibles = Voiture.objects.order_by('marque__nom').values_list('marque__nom', flat=True).distinct()
+    carburants_disponibles = Voiture.objects.order_by('carburant').values_list('carburant', flat=True).distinct()
+    transmissions_disponibles = Voiture.objects.order_by('transmission').values_list('transmission', flat=True).distinct()
 
     return render(request, 'allVoitures.html', {
         'voitures': voitures,
@@ -534,8 +534,8 @@ def profile(request, username):
     demandes = Demande.objects.filter(member=user).order_by('-date')  
     voitureSoumisses = VoitureSoumisse.objects.filter(user_id=user)
     toutesDemandes = Demande.objects.all().order_by('-date')  
-    toutesVoituresSoumise = VoitureSoumisse.objects.all()  
-    return render(request, "profile_view.html", {'user':user, 'demandes': demandes, 'voitureSoumisses':voitureSoumisses, 'toutesDemandes': toutesDemandes})
+    ventes = Vente.objects.filter(user_id=user) 
+    return render(request, "profile_view.html", {'user':user, 'demandes': demandes, 'voitureSoumisses':voitureSoumisses, 'toutesDemandes': toutesDemandes, "ventes": ventes})
 
 
 

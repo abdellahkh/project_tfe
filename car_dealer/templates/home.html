@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <style>
     .card {
         position: relative;
@@ -24,7 +23,7 @@
         font-size: 0.8rem;
     }
 
-    .carousel-image, .fixed-image-size {
+    .fixed-image-size {
         width: 100%;
         height: 200px;
         object-fit: cover;
@@ -81,7 +80,6 @@
     }
 </style>
 
-<!-- Header-->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-2">
         <div class="d-flex justify-content-center align-items-center text-white">
@@ -94,38 +92,32 @@
     </div>
 </header>
 
-<!-- Section-->
 <section class="container-fluid p-5 mb-6">
     <div class="row px-5">
-        <!-- Element 1: Showroom (75% of the screen) -->
         <div class="col-md-9 mb-4">
             <h2 class="section-title text-center">Notre Showroom</h2>
             <div class="card">
                 <div class="card-body">
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 justify-content-center">
+                    <div class="row row-cols-1 row-cols-md-3 g-4"> 
                         {% for voiture in voitures %}
-                        <div class="col mb-4">
+                        <div class="col"> 
                             <div class="card h-100 position-relative">
-                                <!-- Badges "Vendu" et "Réservé" -->
                                 {% if voiture.status == 'reservé' %}
                                 <div class="badge bg-warning text-dark">Réservé !</div>
                                 {% endif %}
                                 {% if voiture.status == 'vendu' %}
                                 <div class="badge bg-danger text-white">Vendu !</div>
                                 {% endif %}
-                                
-                                <!-- Product image-->
+
                                 {% if voiture.images.all %}
                                 <img src="{{ voiture.images.first.image.url }}" class="fixed-image-size" alt="{{ voiture.modele.nom }}">
                                 {% endif %}
-                                
-                                <!-- Product details-->
+
                                 <div class="card-body text-center">
                                     <h6>{{ voiture.marque.nom }}- {{ voiture.modele.nom }} - {{ voiture.annee_fabrication }}</h6>
                                     <h5 class="text-muted">{{ voiture.prix }}.00€</h5>
                                 </div>
-                                
-                                <!-- Product actions-->
+
                                 <div class="card-footer text-center">
                                     <a class="btn btn-outline-dark mt-auto" href="{% url 'voiture' voiture.id %}">Détails</a>
                                 </div>
@@ -137,7 +129,6 @@
             </div>
         </div>
 
-        <!-- Element 2: Services (25% of the screen) -->
         <div class="col-md-3">
             <h2 class="section-title text-center">Services</h2>
             <div class="card">

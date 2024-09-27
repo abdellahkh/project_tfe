@@ -275,8 +275,6 @@ class Demande(models.Model):
         else:
             return f"{self.service} - {self.first_name}, {self.last_name}: {self.date_desiree}"
 
-from django.db import models
-
 class Vente(models.Model):
     GENRE_CHOICES = [
         ('Vente', 'Vente'),

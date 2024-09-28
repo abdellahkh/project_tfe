@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
-from .models import ImageVoiture, Service, Vente, Voiture, Member, Demande, VoitureSoumisse
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
+from .models import ImageVoiture, Notes, Service, Vente, Voiture, Member, Demande, VoitureSoumisse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -12,7 +13,7 @@ from django import forms
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
-
+from django.views import View
 from car_dealer import models
 
 
@@ -609,8 +610,29 @@ def vendre(request):
 
 def vente_details(request, vente_id):
     vente = Vente.objects.get(id=vente_id)
-    return render(request, "vente_details.html", {"vente": vente})  
+    notes = Notes.objects.filter(vente_id = vente_id).order_by('-date')
+    return render(request, "vente_details.html", {"vente": vente, "notes" : notes})  
 
+def vente_payer(request, vente_id):
+    vente = Vente.objects.get(id=vente_id)
+    vente.voiture_id.status = 'ready'
+    vente.voiture_id.save()  
+    return redirect('dashboard')
+
+
+def ajouter_note(request, vente_id):
+    vente = get_object_or_404(Vente, pk=vente_id)
+
+    if request.method == 'POST':
+        contenu = request.POST.get('contenu')
+        Notes.objects.create(
+            user_id=request.user,  # Assuming you have request.user available
+            vente_id=vente,
+            contenu=contenu
+        )
+        return redirect('vente_details', vente_id=vente.id)  # Redirect back to the vente details page
+
+    return redirect('vente_details', vente_id=vente.id)
 
 
 
@@ -633,45 +655,44 @@ def checkout(request, voiture_id):
     voitureDetail=models.Voiture.objects.get(id=voiture_id)
     return render(request, 'checkout.html', {'voiture':voitureDetail})
 
-def checkout_session(request, voiture_id):
-    mail_to = 'etu.abkh@gmail.com'
-    user = request.user
-    service_nom = "Vente"
-    product = Voiture.objects.get(id=voiture_id)
-    YOUR_DOMAIN = 'http://127.0.0.1:8002'
-    montant_accomte = int(float(product.prix)*100*0.1)
-    session = stripe.checkout.Session.create(
+class CheckoutSessionRest(View):
+    def get(self, request, *args, **kwargs):
+        vente_id = kwargs.get('vente_id')
+        vente = models.Vente.objects.get(id=vente_id)  
+        YOUR_DOMAIN = 'http://127.0.0.1:8000'
+
+        session = stripe.checkout.Session.create(
             payment_method_types=['card'],
-            line_items=[
-                {
-                    'price_data': {
-                        'currency': 'eur',
-                        'product_data': {
-                            'name': f"L'accomte à payer est de 10% du prix de la voiture {product.marque} {product.modele}\n\n{product.annee_fabrication}",
-                        },
-                        'unit_amount': montant_accomte,  
+            line_items=[{
+                'price_data': {
+                    'currency': 'eur',
+                    'product_data': {
+                        'name': vente.voiture_id.marque,  
                     },
-                    'quantity': 1,
+                    'unit_amount': int(vente.montant_restant * 100),  
                 },
-            ],
+                'quantity': 1,
+            }],
             mode='payment',
             success_url=YOUR_DOMAIN + '/pay_success',
-            cancel_url=YOUR_DOMAIN + '/pay_cancel',
-            metadata={
-                'voiture_id': str(product.id),
-                'marque': product.marque,
-                'modele': product.modele,
-                'annee': str(product.annee_fabrication),
-            },
+            cancel_url=YOUR_DOMAIN + '/cancel',
         )
-    montant_accomte = montant_accomte/100
-    venteEmailToAdminFromMembre(request, user, service_nom, product, mail_to, montant_accomte)
-    
-    return redirect(session.url, code=303)
+
+        # Stocker l'ID de la vente dans la session
+        request.session['vente_id'] = vente_id
+
+        return redirect(session.url, code=303)
+
 
 
 def pay_success(request):
-    return render(request, 'success.html')
+    vente_id = request.session.get('vente_id')  
+    vente = Vente.objects.get(id=vente_id)
 
-def pay_cancel(request):
-    return render(request, 'cancel.html')
+    vente.paid = 'yes'
+    vente.voiture_id.status = 'vendu'
+
+    vente.save()
+    vente.voiture_id.save()
+
+    return redirect(reverse('profile_view', kwargs={'username': request.user.username}))

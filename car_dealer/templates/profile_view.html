@@ -82,30 +82,41 @@
                     {% endif %}
                 </ul>
             </div>
-            <div class="card shadow mb-4"></div>
+            <div class="card shadow mb-4">
                 <div class="card-header">
-                    <h4>Votre/Vos achat(s) :</h4>
+                    <h4>Vos achats :</h4> 
                 </div>
-                <ul class="list-group list-group-flush"> 
+                <div class="card-body"> 
                     {% if ventes %}
-                        {% for vente in ventes %}
-                        <li class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    {{ vente.voiture_id }} 
+                        <ul class="list-group list-group-flush">
+                            {% for vente in ventes %}
+                            <li class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-5">
+                                        {{ vente.voiture_id }} 
+                                    </div>
+                                    <div class="col-md-4">
+                                        {% if vente.paid == 'yes' %}
+                                            <span class="badge bg-success">Payé</span> 
+                                        {% elif vente.paid == 'partially' %}
+                                            <span class="badge bg-warning text-dark">Accompte versé</span> 
+                                        {% else %}
+                                            <span class="badge bg-danger">Non payé</span> 
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#venteModal{{ vente.id }}">
+                                            Détails
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-md-4 text-end">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demandeModal{{ demande.id }}">
-                                        Info
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                        {% endfor %}
+                            </li>
+                            {% endfor %}
+                        </ul>
                     {% else %}
-                        <p>Aucune demande</p>
+                        <p class="text-center">Aucune vente</p> 
                     {% endif %}
-                </ul>
+                </div>
             </div>
             
 
@@ -167,33 +178,48 @@
 </div>
 {% endfor %}
 {% for vente in ventes %}
-<div class="modal fade" id="demandeModal{{ demande.id }}" tabindex="-1" aria-labelledby="demandeModalLabel{{ demande.id }}" aria-hidden="true">
+<div class="modal fade" id="venteModal{{ vente.id }}" tabindex="-1" aria-labelledby="venteModalLabel{{ vente.id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="demandeModalLabel{{ demande.id }}">Détails de la demande</h5>
+                <h5 class="modal-title" id="demandeModalLabel{{ vente.id }}">Détails de la vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <dl class="row"> 
-                    <dt class="col-sm-3">Service :</dt>
-                    <dd class="col-sm-9">{{ demande.service }}</dd>
+                <dl class="row">
+                    {% if vente.paid == 'partially' %} 
+                        {% if vente.voiture_id.status == 'reservé' %}
+                            <p>Ce véhicule est réservé et est en cours de préparation</p>
+                            <dt class="col-sm-3">Véhicule :</dt>
+                            <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
+                            <dt class="col-sm-3">Total :</dt>
+                            <dd class="col-sm-9">{{ vente.montant_total }}€</dd>
+                            <dt class="col-sm-3">Accompte :</dt>
+                            <dd class="col-sm-9">{{ vente.montant_acompte }}€</dd>
+                            <dt class="col-sm-3">Reste :</dt>
+                            <dd class="col-sm-9">{{ vente.montant_restant }}€</dd>
+                        {% endif %}
+                        {% if vente.voiture_id.status == 'ready' %}
+                            <p>Ce véhicule est prêt.</p>
+                            <dt class="col-sm-3">Véhicule :</dt>
+                            <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
+                            <dt class="col-sm-3">Total :</dt>
+                            <dd class="col-sm-9">{{ vente.montant_total }}€</dd>
+                            <dt class="col-sm-3">Accompte :</dt>
+                            <dd class="col-sm-9">{{ vente.montant_acompte }}€</dd>
+                            <dt class="col-sm-3">Reste :</dt>
+                            <dd class="col-sm-9">{{ vente.montant_restant }}€</dd>
 
-                    <dt class="col-sm-3">Date :</dt>
-                    <dd class="col-sm-9">{{ demande.date }}</dd>
-
-                    <dt class="col-sm-3">Genre :</dt>
-                    <dd class="col-sm-9">{{ demande.genre }}</dd>
-
-                    <dt class="col-sm-3">Détails :</dt>
-                    <dd class="col-sm-9">{{ demande.details }}</dd>
-
-                    {% if demande.voiture %}
-                    <dt class="col-sm-3">Voiture :</dt>
-                    <dd class="col-sm-9">
-                        {{ demande.voiture }}
-                        <a href="{% url 'voiture' demande.voiture.id %}" class="btn btn-primary btn-sm">Voir</a> 
-                    </dd>
+                            <button type="button" class="btn btn-secondary me-2" id="confirmPayerBtn" data-vente-id="{{ vente.id }}">
+                                Payer le restant {{ vente.montant_restant }}€
+                            </button> 
+                              
+                        {% endif %}
+                    {% endif %}
+                    {% if vente.paid == 'yes' %} 
+                        <p>Ce véhicule est payé, vous pouvez cliquer sur le lien ci-dessous pour obtenir la facture</p>
+                        <dt class="col-sm-3">Véhicule :</dt>
+                        <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
                     {% endif %}
                 </dl>
             </div>
@@ -204,5 +230,14 @@
     </div>
 </div>
 {% endfor %}
+
+
+
+<script>
+    document.getElementById('confirmPayerBtn').addEventListener('click', function() {
+        var venteId = this.getAttribute('data-vente-id');
+        window.location.href = `/checkout/${venteId}/`;
+    });
+</script>
 
 {% endblock %}

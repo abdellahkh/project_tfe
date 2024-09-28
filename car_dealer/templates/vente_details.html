@@ -25,44 +25,74 @@
                     <dl class="row">
                         <dt class="col-sm-4">Client :</dt>
                         <dd class="col-sm-8">
-                            <a href="{% url 'profile_view' vente.user_id.username %}">{{ vente.user_id }}</a>
+                            <a href="{% url 'profile_view' vente.user_id.username %}">{{ vente.user_id.username }}</a> 
                         </dd>
 
                         <dt class="col-sm-4">Véhicule :</dt>
                         <dd class="col-sm-8">
-                            <a href="{% url 'voiture' vente.voiture_id.id %}">{{ vente.voiture_id }}</a>
+                            <a href="{% url 'voiture' vente.voiture_id.id %}">{{ vente.voiture_id.modele.nom }}</a> 
                         </dd>
 
                         <dt class="col-sm-4">Montant total :</dt>
-                        <dd class="col-sm-8">{{ vente.montant_total }}€</dd>
+                        <dd class="col-sm-8">{{ vente.montant_total }} €</dd> 
 
                         <dt class="col-sm-4">Accompte :</dt>
-                        <dd class="col-sm-8">{{ vente.montant_acompte }}€</dd>
+                        <dd class="col-sm-8">{{ vente.montant_acompte }} €</dd> 
 
                         <dt class="col-sm-4">Montant restant :</dt>
-                        <dd class="col-sm-8">{{ vente.montant_restant }}€</dd>
+                        <dd class="col-sm-8">{{ vente.montant_restant }} €</dd> 
 
                         <dt class="col-sm-4">Payé :</dt>
                         <dd class="col-sm-8">
                             {% if vente.paid == 'yes' %}
-                            Oui <span class="badge bg-success">&#10003;</span>
+                                Oui <span class="badge bg-success">&#10003;</span>
                             {% elif vente.paid == 'partially' %}
-                            Partiellement <span class="badge bg-warning text-dark">&#9888;</span>
+                                Partiellement <span class="badge bg-warning text-dark">&#9888;</span>
                             {% else %}
-                            Non <span class="badge bg-danger">&#10005;</span>
+                                Non <span class="badge bg-danger">&#10005;</span>
                             {% endif %}
                         </dd>
                     </dl>
                 </div>
+
+                <div class="card-body">
+                    <h4>Notes</h4> 
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Utilisateur</th>
+                                <th>Contenu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for note in notes %}
+                                <tr>
+                                    <td>{{ note.date }}</td>
+                                    <td>{{ note.user_id }}</td>
+                                    <td>{{ note.contenu }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-body">
+                    <h5>Ajouter une note</h5>
+                    <form method="post" action="{% url 'ajouter_note' vente.id %}">  {% csrf_token %} 
+                        <div class="mb-3">
+                            <textarea class="form-control" name="contenu" rows="3" placeholder="Entrez votre note ici"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ajouter Note</button>
+                    </form>
+                </div>
+
                 <div class="card-body">
                     {% if vente.paid == 'yes' %}
-                        <a href="" class="btn btn-primary" disabled>Véhicule payer completement</a>
+                        <a class="btn btn-primary" disabled>Véhicule payé complètement</a> 
                     {% elif vente.paid == 'partially' %}
-                        <a href="" class="btn btn-primary">Generer demande de paiement</a>
-                    {% else %}
-                        <a href="" class="btn btn-primary">Generer demande de paiement</a>
+                        <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary">Générer demande de paiement</a> 
                     {% endif %}
-                    
                 </div>
             </div>
         </div>

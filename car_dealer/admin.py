@@ -4,7 +4,7 @@ from django.utils.html import format_html
 
 from import_export import resources
 from import_export.fields import Field
-from .models import Modele, Marque, Voiture, ImageVoiture, Service, Review, Vente, Member, Demande, VoitureSoumisse
+from .models import Modele, Marque, Notes, Voiture, ImageVoiture, Service, Review, Vente, Member, Demande, VoitureSoumisse
 
 admin.site.register(Member)
 admin.site.register(Review)
@@ -183,3 +183,13 @@ class DemandeAdmin(admin.ModelAdmin):
               'endLocation', 'car_doc')
 
 admin.site.register(Demande, DemandeAdmin)
+
+
+class NotesAdmin(admin.ModelAdmin):
+    list_display = ('user_id', 'demande_id', 'vente_id', 'date', 'contenu')  # Fields to display in the list
+    list_filter = ('user_id', 'demande_id', 'vente_id', 'date')  # Add filters for easier searching
+    search_fields = ('contenu',)  # Allow searching by note content
+
+    # You can customize further with fields like raw_id_fields for better foreign key selection
+
+admin.site.register(Notes, NotesAdmin) 

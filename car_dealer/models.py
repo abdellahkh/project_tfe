@@ -60,6 +60,7 @@ class Voiture(models.Model):
     STATUS_CHOICES = [
         ('standby', 'Standby'),
         ('avendre' ,'A vendre'),
+        ('ready', 'Ready'),
         ('reservé', 'Reservé'),
         ('transit' ,'transit'),
         ('vendu', 'Vendu'),
@@ -112,11 +113,15 @@ class Voiture(models.Model):
     prix = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix de la voiture")
     prix_min = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix minimale de vente")
 
+    favoris = models.ManyToManyField(Member, related_name='voitures_favorites', blank=True)
+
     class Meta:
         ordering = ['-date_poste']
 
     def __str__(self):
         return f"{self.marque} {self.modele} - {self.annee_fabrication}"
+    
+
     
 class ImageVoiture(models.Model):
     voiture = models.ForeignKey(Voiture, on_delete=models.CASCADE, related_name='images')
@@ -321,3 +326,15 @@ class Vente(models.Model):
             self.montant_restant = None  
 
         super().save(*args, **kwargs)  
+
+
+class Notes(models.Model):
+    user_id = models.ForeignKey(Member, on_delete=models.CASCADE, help_text="Utilisateur qui a ajouté la note")
+    demande_id = models.ForeignKey(Demande, on_delete=models.CASCADE,null=True, blank=True, help_text="Demande lié à la note")
+    vente_id = models.ForeignKey(Vente, on_delete=models.CASCADE, null=True, blank=True, help_text="Vente lié à la note")
+
+    date = models.DateTimeField(auto_now_add=True, null= True, help_text="Date de la note")
+    contenu = models.TextField(blank=True, null=True, help_text="Contenu de la note")
+
+    def __str__(self):
+        return f"Note de {self.user_id} - {self.contenu} ({self.date})"

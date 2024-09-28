@@ -24,4 +24,11 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('demande/<int:demande_id>', views.demandeDetails, name='demande_details'),
     path('vente/<int:vente_id>', views.vente_details, name='vente_details'),
+    path('vente_p/<int:vente_id>', views.vente_payer, name='vente_payer'),
+    path('checkout/', views.checkout, name='checkout'),  
+
+    path('checkout/<int:vente_id>/', views.CheckoutSessionRest.as_view(), name='checkout_session_rest'),
+    path('pay_success/', views.pay_success, name='pay_success'),
+    path('vente/<int:vente_id>/ajouter_note/', views.ajouter_note, name='ajouter_note'),
+    
 ]

@@ -64,6 +64,7 @@ class Voiture(models.Model):
         ('reservé', 'Reservé'),
         ('transit' ,'transit'),
         ('vendu', 'Vendu'),
+        ('livré', 'Livré'),
     ]
     
     

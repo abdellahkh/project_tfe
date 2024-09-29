@@ -105,7 +105,7 @@
                                 {% if voiture.status == 'reservé' or voiture.status == 'ready' %}
                                 <div class="badge bg-warning text-dark">Réservé !</div>
                                 {% endif %}
-                                {% if voiture.status == 'vendu' %}
+                                {% if voiture.status == 'vendu' or voiture.status == "livré" %}
                                 <div class="badge bg-danger text-white">Vendu !</div>
                                 {% endif %}
 

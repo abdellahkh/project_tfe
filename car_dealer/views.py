@@ -83,7 +83,8 @@ def dashboard(request):
     
 def demandeDetails(request, demande_id):
     demand = Demande.objects.get(id=demande_id)
-    return render(request, 'demandDetail.html', {'demand' : demand})
+    notes = Notes.objects.filter(demande_id = demande_id).order_by('-date')
+    return render(request, 'demandDetail.html', {'demand' : demand, 'notes': notes})
 
 def activateEmail(request, user, to_email):
     mail_subject = "Activez votre compte."
@@ -278,7 +279,7 @@ def service(request, service_id):
                 form.instance.member = request.user
                 if form.is_valid():
                     form.save()
-                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to, None)
+                    # serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to, None)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -299,7 +300,7 @@ def service(request, service_id):
                         'phone': form.cleaned_data['phone'],
                         'email': form.cleaned_data['email'],
                     }
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to, None)
+                    # serviceEmailToAdmin(request, user, service_nom, form, mail_to, None)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -360,7 +361,7 @@ def service(request, service_id):
                 form.instance.member = request.user
                 if form.is_valid():
                     form.save()
-                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to, None)
+                    # serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to, None)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -383,7 +384,7 @@ def service(request, service_id):
                         'email': form.cleaned_data['email'],
                     }
                     form.save()
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to, voiture)
+                    # serviceEmailToAdmin(request, user, service_nom, form, mail_to, voiture)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -409,7 +410,7 @@ def service(request, service_id):
                         'transmission': form.cleaned_data['transmission'],
                         'prix': form.cleaned_data['prix'],
                     }
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to, voiture)
+                    # serviceEmailToAdmin(request, user, service_nom, form, mail_to, voiture)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -438,7 +439,7 @@ def service(request, service_id):
                         'prix': form.cleaned_data['prix'],
                     }
                     form.save()
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to, voiture)
+                    # serviceEmailToAdmin(request, user, service_nom, form, mail_to, voiture)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -456,7 +457,7 @@ def service(request, service_id):
                 form.instance.member = request.user
                 if form.is_valid():
                     form.save()
-                    serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
+                    # serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -478,7 +479,7 @@ def service(request, service_id):
                         'email': form.cleaned_data['email'],
                     }
                     form.save()
-                    serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                    # serviceEmailToAdmin(request, user, service_nom, form, mail_to)
                     return redirect('home')
                 else:
                     print(form.errors)
@@ -509,7 +510,7 @@ def contact_vehicule(request, voiture_id):
         form.instance.genre = "Info"
         if form.is_valid():
             if request.user.is_authenticated:
-                serviceEmailToAdminFromMembre(request, request.user, service_nom, form, mail_to, None)
+                # serviceEmailToAdminFromMembre(request, request.user, service_nom, form, mail_to, None)
                 form.save()
             else:
                 user = {
@@ -518,7 +519,7 @@ def contact_vehicule(request, voiture_id):
                     'phone': form.cleaned_data['phone'],
                     'email': form.cleaned_data['email'],
                 }
-                serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                # serviceEmailToAdmin(request, user, service_nom, form, mail_to)
                 form.save()
             return redirect('home')
         else:
@@ -575,7 +576,7 @@ def vendre(request):
             form.instance.service = service
             if form.is_valid():
                 form.save()
-                serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
+                # serviceEmailToAdminFromMembre(request, user, service_nom, form, mail_to)
                 return redirect('home')
             else:
                 print(form.errors)
@@ -596,7 +597,7 @@ def vendre(request):
                     'phone': form.cleaned_data['phone'],
                     'email': form.cleaned_data['email'],
                 }
-                serviceEmailToAdmin(request, user, service_nom, form, mail_to)
+                # serviceEmailToAdmin(request, user, service_nom, form, mail_to)
                 return redirect('home')
             else:
                 print(form.errors)
@@ -610,8 +611,13 @@ def vendre(request):
 
 def vente_details(request, vente_id):
     vente = Vente.objects.get(id=vente_id)
-    notes = Notes.objects.filter(vente_id = vente_id).order_by('-date')
-    return render(request, "vente_details.html", {"vente": vente, "notes" : notes})  
+    notes = Notes.objects.filter(vente_id=vente_id).order_by('-date')
+    notesDemande = []  # Initialize notesDemande as an empty list
+
+    if vente.demande_id:
+        notesDemande = Notes.objects.filter(demande_id=vente.demande_id).order_by('-date')
+
+    return render(request, "vente_details.html", {"vente": vente, "notes": notes, "notesDemande": notesDemande})
 
 def vente_payer(request, vente_id):
     vente = Vente.objects.get(id=vente_id)
@@ -633,6 +639,77 @@ def ajouter_note(request, vente_id):
         return redirect('vente_details', vente_id=vente.id)  # Redirect back to the vente details page
 
     return redirect('vente_details', vente_id=vente.id)
+
+def ajouter_note_demande(request, demande_id):
+    demande = get_object_or_404(Demande, pk=demande_id)
+
+    if request.method == 'POST':
+        contenu = request.POST.get('contenu')
+        Notes.objects.create(
+            user_id=request.user,  
+            demande_id=demande,
+            contenu=contenu
+        )
+        return redirect('demande_details', demande_id=demande.id)  #
+
+    return redirect('demande_details', demande_id=demande.id)
+
+def startVente(request, demande_id):
+    demande = get_object_or_404(Demande, pk=demande_id)
+    prix = request.POST.get('contenu')
+    
+    try:
+        prix = float(prix)  
+        prix_min = float(demande.voiture.prix_min)  
+
+        if prix >= prix_min:
+            Vente.objects.create(
+                genre='Vente',
+                paid='no',
+                demande_id=demande,
+                user_id=demande.member,
+                voiture_id=demande.voiture,
+                montant_total=prix,
+                montant_acompte=prix * 0.1,
+            )
+            demande.status = 'En preparation' 
+            demande.save()
+            return redirect('home')  
+        else:
+            messages.error(request, 'Prix trop bas, le prix min est ' + str(prix_min))  # Add request object and convert prix_min to string
+            return redirect('demande_details', demande_id=demande.id)  # Redirect back to demand details
+
+    except ValueError:
+        messages.error(request, 'Veuillez entrer un prix valide.')
+        return redirect('demande_details', demande_id=demande.id)
+
+
+def startVenteService(request, demande_id):
+    demande = get_object_or_404(Demande, pk=demande_id)
+    prix = request.POST.get('contenu')
+
+    try:
+        prix = float(prix)  # Convert prix to a float
+
+        if prix > 0:  # Add validation to ensure the price is positive
+            Vente.objects.create(
+                genre='Service',
+                paid='no',
+                demande_id=demande,
+                user_id=demande.member,
+                montant_total=prix,
+            )
+            demande.status = 'En preparation'
+            demande.save()
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Le prix doit être supérieur à zéro.')
+            return redirect('demande_details', demande_id=demande.id)
+
+    except ValueError:
+        messages.error(request, 'Veuillez entrer un prix valide.')
+        return redirect('demande_details', demande_id=demande.id)
+
 
 
 
@@ -658,30 +735,56 @@ def checkout(request, voiture_id):
 class CheckoutSessionRest(View):
     def get(self, request, *args, **kwargs):
         vente_id = kwargs.get('vente_id')
-        vente = models.Vente.objects.get(id=vente_id)  
+        vente = models.Vente.objects.get(id=vente_id)
+        
+        # Check the type of payment: 'acompte' or 'reste'
+        amount_type = request.GET.get('type', 'reste')  # Default to 'reste' if not provided
         YOUR_DOMAIN = 'http://127.0.0.1:8000'
-
-        session = stripe.checkout.Session.create(
+        # Determine the amount to pay based on the payment type
+        if amount_type == 'acompte':
+            amount_to_pay = vente.montant_acompte
+            session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
                     'currency': 'eur',
                     'product_data': {
-                        'name': vente.voiture_id.marque,  
+                        'name': vente.voiture_id.marque,
                     },
-                    'unit_amount': int(vente.montant_restant * 100),  
+                    'unit_amount': int(amount_to_pay * 100),  # Stripe expects amount in cents
                 },
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=YOUR_DOMAIN + '/pay_success',
+            success_url=YOUR_DOMAIN + '/pay_success_accompte',
             cancel_url=YOUR_DOMAIN + '/cancel',
         )
+        else:
+            amount_to_pay = vente.montant_restant
+            
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': 'eur',
+                        'product_data': {
+                            'name': vente.voiture_id.marque,
+                        },
+                        'unit_amount': int(amount_to_pay * 100),  # Stripe expects amount in cents
+                    },
+                    'quantity': 1,
+                }],
+                mode='payment',
+                success_url=YOUR_DOMAIN + '/pay_success',
+                cancel_url=YOUR_DOMAIN + '/cancel',
+        )
 
-        # Stocker l'ID de la vente dans la session
+        # Store the sale ID in the session
         request.session['vente_id'] = vente_id
 
         return redirect(session.url, code=303)
+
+
 
 
 
@@ -696,3 +799,30 @@ def pay_success(request):
     vente.voiture_id.save()
 
     return redirect(reverse('profile_view', kwargs={'username': request.user.username}))
+
+
+
+def pay_success_accompte(request):
+    vente_id = request.session.get('vente_id')  
+    vente = Vente.objects.get(id=vente_id)
+
+    vente.paid = 'partially'
+    vente.voiture_id.status = 'reservé'
+
+    vente.save()
+    vente.voiture_id.save()
+
+    return redirect(reverse('profile_view', kwargs={'username': request.user.username}))
+
+
+
+def car_delivery(request, voiture_id, demande_id):
+    voiture = get_object_or_404(Voiture, pk=voiture_id)
+    voiture.status = 'livré'
+    voiture.save()
+
+    demande = get_object_or_404(Demande, pk = demande_id)
+    demande.status = 'Close'
+    demande.save()
+    return redirect('dashboard')
+

@@ -35,8 +35,6 @@ class SignUpForm(UserCreationForm):
 		self.fields['password2'].label = ''
 		self.fields['password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
 
-
-
 class UserUpdateForm(forms.ModelForm):
 	email = forms.EmailField()
 
@@ -72,10 +70,7 @@ class DemandeDeplacement(forms.ModelForm):
         self.fields['email'].required = True
         self.fields['phone'].required = True
         self.fields['date_desiree'].required = True
-		
 
-		
-	
 class DemandeDeplacementMembre(forms.ModelForm):
 
 	class Meta:
@@ -90,7 +85,6 @@ class DemandeDeplacementMembre(forms.ModelForm):
 
 		self.fields['date_desiree'].label = 'Date'
 		
-
 class DemandeContactVoitureMembre(forms.ModelForm):
 
     class Meta:
@@ -106,10 +100,6 @@ class DemandeContactVoitureMembre(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DemandeContactVoitureMembre, self).__init__(*args, **kwargs)
-
-
-
-		
 
 class DemandeControlTechMembre(forms.ModelForm):
 
@@ -137,7 +127,6 @@ class DemandeControlTech(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DemandeControlTech, self).__init__(*args, **kwargs)
 		
-
 class DemandeSortieDeFourriereMembre(forms.ModelForm):
 
 	class Meta:
@@ -159,7 +148,6 @@ class DemandeSortieDeFourriere(forms.ModelForm):
 		super(DemandeSortieDeFourriere, self).__init__(*args, **kwargs)
 
 		self.fields['date_desiree'].label = 'Date'
-
 
 class VenteVehicule(forms.ModelForm):
     class Meta:
@@ -210,8 +198,6 @@ class VenteVehicule(forms.ModelForm):
         for field_name in ['first_name', 'last_name', 'email', 'phone', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission']:
             self.fields[field_name].required = True
         self.fields['car_doc'].required = False
-
-
 
 class VenteVehiculeMembre(forms.ModelForm):
     class Meta:

@@ -14,7 +14,7 @@
     </div>
 </header>
 
-<div class="container my-5">
+<div class="m-5">
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card h-100 shadow">
@@ -100,15 +100,48 @@
                                 <th>Véhicule</th>
                                 <th>Client</th>
                                 <th>Total</th>
+                                <th>Etat paiement</th>
+                                <th>Etat véhicule</th>
                                 <th></th> 
                             </tr>
                         </thead>
                         <tbody>
                             {% for vente in ventes %}
                             <tr>
-                                <td>{{ vente.voiture_id }}</td>
+                                <td>
+                                    {% if vente.voiture_id %}
+                                        {{ vente.voiture_id }}
+                                    {% else %}
+                                        {{ vente.demande_id.service }}
+                                    {% endif %}
+                                </td>
                                 <td>{{ vente.user_id }}</td>
                                 <td>{{ vente.montant_total }}€</td>
+                                <td>
+                                    {% if vente.paid == 'partially' %}
+                                        Accompte payé
+                                    {% endif %}
+                                    {% if vente.paid == 'yes' %}
+                                        Solde total payé
+                                    {% endif %}
+                                    {% if vente.paid == 'no' %}
+                                        Impayé
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if vente.voiture_id.status == 'ready' %}
+                                        Prêt à livrer
+                                    {% endif %}
+                                    {% if vente.voiture_id.status == 'vendu' %}
+                                        Véhicule vendu en cours de livraison
+                                    {% endif %}
+                                    {% if vente.voiture_id.status == 'reservé' %}
+                                        Véhicule réservé
+                                    {% endif %}
+                                    {% if vente.voiture_id.status == 'livré' %}
+                                        Véhicule livré
+                                    {% endif %}
+                                </td>
                                 <td>
                                     <a href="{% url 'vente_details' vente.id %}" class="btn btn-primary">Ouvrir</a>
                                 </td>
@@ -125,8 +158,6 @@
     </div>
 </div>
 
-<script>
-// ... (votre JavaScript existant) ...
-</script>
+
 
 {% endblock %}

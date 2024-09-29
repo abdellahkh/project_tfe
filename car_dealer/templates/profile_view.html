@@ -92,10 +92,10 @@
                             {% for vente in ventes %}
                             <li class="list-group-item">
                                 <div class="row align-items-center">
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         {{ vente.voiture_id }} 
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         {% if vente.paid == 'yes' %}
                                             <span class="badge bg-success">Payé</span> 
                                         {% elif vente.paid == 'partially' %}
@@ -104,11 +104,37 @@
                                             <span class="badge bg-danger">Non payé</span> 
                                         {% endif %}
                                     </div>
-                                    <div class="col-md-3 text-end">
+                                    <div class="col-md-3">
+                                        {% if vente.paid == 'partially'  %}
+                                            {% if vente.voiture_id.status == 'reservé' %}
+                                                En cours de préparation
+                                            {% endif %}
+                                            {% if vente.voiture_id.status == 'ready' %}
+                                                Véhicule prêt
+                                            {% endif %}                                            
+                                        {% endif %}
+                                        {% if vente.paid == 'yes'  %}
+                                            {% if vente.voiture_id.status == 'vendu' %}
+                                                en cours de livraison
+                                            {% endif %}
+                                            {% if vente.voiture_id.status == 'livré' %}
+                                                Véhicule livré
+                                            {% endif %}                                                                                                                                 
+                                        {% endif %}
+                                    </div>
+                                    {% if vente.paid == 'no' %}
+                                    <div class="col-md-2 text-end">
                                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#venteModal{{ vente.id }}">
                                             Détails
                                         </button>
                                     </div>
+                                    {% else %}
+                                    <div class="col-md-2 text-end">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#venteModal{{ vente.id }}">
+                                            Détails
+                                        </button>
+                                    </div>
+                                    {% endif %}
                                 </div>
                             </li>
                             {% endfor %}
@@ -182,7 +208,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="demandeModalLabel{{ vente.id }}">Détails de la vente</h5>
+                <h5 class="modal-title" id="venteModalLabel{{ vente.id }}">Détails de la vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -206,18 +232,27 @@
                             <dt class="col-sm-3">Total :</dt>
                             <dd class="col-sm-9">{{ vente.montant_total }}€</dd>
                             <dt class="col-sm-3">Accompte :</dt>
-                            <dd class="col-sm-9">{{ vente.montant_acompte }}€</dd>
+                            <dd class="col-sm-9">{{ vente.montant_acompte }}€ (Reçu)</dd>
                             <dt class="col-sm-3">Reste :</dt>
                             <dd class="col-sm-9">{{ vente.montant_restant }}€</dd>
 
-                            <button type="button" class="btn btn-secondary me-2" id="confirmPayerBtn" data-vente-id="{{ vente.id }}">
+                            <button type="button" class="btn btn-secondary me-2 confirmPayerBtn" data-vente-id="{{ vente.id }}" data-type="reste">
                                 Payer le restant {{ vente.montant_restant }}€
                             </button> 
-                              
                         {% endif %}
                     {% endif %}
+                    {% if vente.paid == 'no' %} 
+                        <p>Vous devez payer l'acompte pour réserver ce véhicule.</p>
+                        <dt class="col-sm-3">Véhicule :</dt>
+                        <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
+                        <dt class="col-sm-3">Accompte :</dt>
+                        <dd class="col-sm-9">{{ vente.montant_acompte }}€</dd>
+                        <button type="button" class="btn btn-secondary me-2 confirmPayerBtn" data-vente-id="{{ vente.id }}" data-type="acompte">
+                            Payer l'acompte {{ vente.montant_acompte }}€
+                        </button> 
+                    {% endif %}
                     {% if vente.paid == 'yes' %} 
-                        <p>Ce véhicule est payé, vous pouvez cliquer sur le lien ci-dessous pour obtenir la facture</p>
+                        <p>Ce véhicule est entièrement payé, vous pouvez cliquer sur le lien ci-dessous pour obtenir la facture.</p>
                         <dt class="col-sm-3">Véhicule :</dt>
                         <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
                     {% endif %}
@@ -231,13 +266,15 @@
 </div>
 {% endfor %}
 
-
-
 <script>
-    document.getElementById('confirmPayerBtn').addEventListener('click', function() {
-        var venteId = this.getAttribute('data-vente-id');
-        window.location.href = `/checkout/${venteId}/`;
+    document.querySelectorAll('.confirmPayerBtn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var venteId = this.getAttribute('data-vente-id');
+            var type = this.getAttribute('data-type'); // either 'acompte' or 'reste'
+            window.location.href = `/checkout/${venteId}/?type=${type}`;
+        });
     });
 </script>
+
 
 {% endblock %}

@@ -79,7 +79,7 @@
                         {% if voiture.status == 'reservé' %}
                         <span class="badge bg-warning text-dark card-badge">Réservé !</span>
                         {% endif %}
-                        {% if voiture.status == 'vendu' %}
+                        {% if voiture.status == 'vendu' or voiture.status == "livré" %}
                         <span class="badge bg-danger text-white card-badge">Vendu !</span>
                         {% endif %}
                         {% if voiture.images.all %}

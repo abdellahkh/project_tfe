@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- Header -->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
@@ -25,33 +24,33 @@
             </div>
             <div class="card-body">
                 <p><strong>Service:</strong> {{ demand.service }}</p>
-                <p><strong>Genre d'intervention:</strong> {{ demand.genre }}</p>
                 {% if demand.member %}
                 <div class="row">
                     <div class="col-md-4"> 
-                      <p><strong>Membre:</strong> {{ demand.member }}</p> 
+                        <p><strong>Membre:</strong> {{ demand.member }}</p> 
                     </div>
                     <div class="col-md-8">
-                      <a href="{% url 'profile_view' demand.member %}" class="btn btn-primary">Info</a>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#memberModal">Info</button> 
                     </div>
-                  </div>
+                </div>
                 {% else %}
-                    <p><strong>Membre:</strong> Non spécifié</p>
                     <p><strong>Prénom:</strong> {{ demand.first_name }}</p>
                     <p><strong>Nom:</strong> {{ demand.last_name }}</p>
                     <p><strong>Email:</strong> {{ demand.email }}</p>
                     <p><strong>Téléphone:</strong> {{ demand.phone }}</p>
                 {% endif %}
+
                 {% if demand.voiture %}
                 <div class="row">
                     <div class="col-md-4"> 
-                    <p><strong>Voiture:</strong> {{ demand.voiture }}</p>
+                        <p><strong>Voiture:</strong> {{ demand.voiture }}</p>
                     </div>
                     <div class="col-md-8">
                         <a href="{% url 'voiture' demand.voiture.id %}" class="btn btn-primary">Ouvrir</a>
                     </div>
-                    
+                </div>
                 {% endif %}
+
                 <p><strong>Date de la demande:</strong> {{ demand.date }}</p>
                 {% if demand.date_desiree %}
                     <p><strong>Date souhaitée:</strong> {{ demand.date_desiree }}</p>
@@ -67,7 +66,87 @@
                     <p><strong>Document de la voiture:</strong></p>
                     <img src="{{ demand.car_doc.url }}" alt="Document de la voiture" class="img-fluid">
                 {% endif %}
-               
+                
+            </div>
+            
+            <div class="card-body">
+                <h5>Notes</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Utilisateur</th>
+                            <th>Contenu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in notes %}
+                            <tr>
+                                <td>{{ note.date }}</td>
+                                <td>{{ note.user_id }}</td>
+                                <td>{{ note.contenu }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body">
+                <h5>Ajouter une note</h5>
+                <form method="post" action="{% url 'ajouter_note_demande' demand.id %}"> {% csrf_token %} 
+                    <div class="mb-3">
+                        <textarea class="form-control" name="contenu" rows="3" placeholder="Entrez votre note ici"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter Note</button>
+                </form>
+            </div>
+            
+            {% if demand.status == 'Actif' %}
+                {% if demand.member %}
+                    {% if demand.voiture_id %}
+                        <div class="card-body">
+                            <h5>Créer vente</h5>
+                            <form method="post" action="{% url 'start_vente' demand.id %}"> {% csrf_token %} 
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" name="contenu" placeholder="Entrez le prix ici"> 
+                                </div>
+                                <button type="submit" class="btn btn-primary">Créer Vente</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="card-body">
+                            <h5>Créer vente</h5>
+                            <form method="post" action="{% url 'startVenteService' demand.id %}"> {% csrf_token %} 
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" name="contenu" placeholder="Entrez le prix ici"> 
+                                </div>
+                                <button type="submit" class="btn btn-primary">Créer Vente</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="memberModalLabel">Informations du membre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if demand.member %}
+                    <p><strong>Nom d'utilisateur :</strong> {{ demand.member.username }}</p>
+                    <p><strong>Email :</strong> {{ demand.member.email }}</p>
+                    <p><strong>Téléphone :</strong> {{ demand.member.phone }}</p> 
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>

@@ -27,21 +27,22 @@
                         <dd class="col-sm-8">
                             <a href="{% url 'profile_view' vente.user_id.username %}">{{ vente.user_id.username }}</a> 
                         </dd>
-
+                        {% if vente.voiture_id %}
                         <dt class="col-sm-4">Véhicule :</dt>
                         <dd class="col-sm-8">
                             <a href="{% url 'voiture' vente.voiture_id.id %}">{{ vente.voiture_id.modele.nom }}</a> 
                         </dd>
-
+                        {% endif%}
                         <dt class="col-sm-4">Montant total :</dt>
                         <dd class="col-sm-8">{{ vente.montant_total }} €</dd> 
-
+                        {% if vente.montant_acompte %}
                         <dt class="col-sm-4">Accompte :</dt>
                         <dd class="col-sm-8">{{ vente.montant_acompte }} €</dd> 
-
+                        {% endif%}
+                        {% if vente.montant_restant %}
                         <dt class="col-sm-4">Montant restant :</dt>
                         <dd class="col-sm-8">{{ vente.montant_restant }} €</dd> 
-
+                        {% endif%}
                         <dt class="col-sm-4">Payé :</dt>
                         <dd class="col-sm-8">
                             {% if vente.paid == 'yes' %}
@@ -73,6 +74,13 @@
                                     <td>{{ note.contenu }}</td>
                                 </tr>
                             {% endfor %}
+                            {% for note in notesDemande %}
+                                <tr>
+                                    <td>{{ note.date }}</td>
+                                    <td>{{ note.user_id }}</td>
+                                    <td>{{ note.contenu }}</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -89,7 +97,11 @@
 
                 <div class="card-body">
                     {% if vente.paid == 'yes' %}
-                        <a class="btn btn-primary" disabled>Véhicule payé complètement</a> 
+                        {% if vente.voiture_id.status == 'livré' %}
+                        <a class="btn btn-primary" disabled >Véhicule livré</a> 
+                        {% else %}
+                            <a href="{% url 'car_delivery' vente.voiture_id.id vente.demande_id.id %}" class="btn btn-primary">Reception par client</a> 
+                        {% endif %}
                     {% elif vente.paid == 'partially' %}
                         <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary">Générer demande de paiement</a> 
                     {% endif %}

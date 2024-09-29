@@ -5,35 +5,63 @@ from .models import Member, Demande
 from django.contrib.auth import get_user_model
 from django.forms import ModelForm
 
+
+
 class SignUpForm(UserCreationForm):
-	email = forms.EmailField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Email Address'}))
-	first_name = forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'First Name'}))
-	last_name = forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Last Name'}))
-	address = forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Rue et numero'}))
-	postal_code = forms.IntegerField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Code Postal'}))
-	phone = forms.IntegerField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Phone', 'required': False}), required=False)
+    email = forms.EmailField(
+        label="", 
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Adresse Email'})
+    )
+    first_name = forms.CharField(
+        label="", 
+        max_length=100, 
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Prénom'})
+    )
+    last_name = forms.CharField(
+        label="", 
+        max_length=100, 
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Nom'})
+    )
+    address = forms.CharField(
+        label="", 
+        max_length=100, 
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Adresse (Rue et Numéro)'})
+    )
+    postal = forms.IntegerField(
+        label="", 
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Code Postal'})
+    )
+    ville = forms.CharField(
+        label="", 
+        max_length=100, 
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ville'})
+    )
+    phone = forms.CharField(
+        label="", 
+        max_length=15,  # Changement en string pour plus de flexibilité
+        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Téléphone'}),
+        required=False
+    )
 
-	class Meta:
-		model = Member
-		fields = ('username', 'first_name', 'last_name', 'email','phone' ,'address','postal_code', 'password1', 'password2')
+    class Meta:
+        model = Member
+        fields = ('username', 'first_name', 'last_name', 'email', 'phone', 'address', 'postal', 'ville', 'password1', 'password2')
+    def clean_postal_code(self):
+        postal = self.cleaned_data.get('postal')
+        try:
+            postal = int(postal)  # Convertir en entier
+        except (ValueError, TypeError):
+            raise forms.ValidationError("Veuillez entrer un code postal valide.")
+        return postal
 
-	def __init__(self, *args, **kwargs):
-		super(SignUpForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(SignUpForm, self).__init__(*args, **kwargs)
+        for fieldname in ['username', 'password1', 'password2']:
+            self.fields[fieldname].widget.attrs['class'] = 'form-control'
+            self.fields[fieldname].label = ''
+            self.fields[fieldname].help_text = None
+            self.fields[fieldname].widget.attrs['placeholder'] = fieldname.capitalize()
 
-		self.fields['username'].widget.attrs['class'] = 'form-control'
-		self.fields['username'].widget.attrs['placeholder'] = 'UserName'
-		self.fields['username'].label = ''
-		self.fields['username'].help_text = '<span class="form-text text-muted"><small></small></span>'
-
-		self.fields['password1'].widget.attrs['class'] = 'form-control'
-		self.fields['password1'].widget.attrs['placeholder'] = 'Password'
-		self.fields['password1'].label = ''
-		self.fields['password1'].help_text = '<ul class="form-text text-muted small"><li>Your password can\'t be too similar to your other personal information.</li><li>Your password must contain at least 8 characters.</li><li>Your password can\'t be a commonly used password.</li><li>Your password can\'t be entirely numeric.</li></ul>'
-
-		self.fields['password2'].widget.attrs['class'] = 'form-control'
-		self.fields['password2'].widget.attrs['placeholder'] = 'Confirm Password'
-		self.fields['password2'].label = ''
-		self.fields['password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
 
 class UserUpdateForm(forms.ModelForm):
 	email = forms.EmailField()
@@ -71,19 +99,22 @@ class DemandeDeplacement(forms.ModelForm):
         self.fields['phone'].required = True
         self.fields['date_desiree'].required = True
 
-class DemandeDeplacementMembre(forms.ModelForm):
 
-	class Meta:
-		model = Demande
-		fields = ['date_desiree', 'startLocation', 'endLocation', 'details',]
-		widgets = {
-            'date_desiree': forms.DateInput(attrs={'type': 'date'}),
+class DemandeDeplacementMembre(forms.ModelForm):
+    class Meta:
+        model = Demande
+        fields = ['date_desiree', 'startLocation', 'endLocation', 'details']
+        widgets = {
+            'date_desiree': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'required': 'true'}),
+            'startLocation': forms.TextInput(attrs={'class': 'form-control', 'required': 'true'}),
+            'endLocation': forms.TextInput(attrs={'class': 'form-control', 'required': 'true'}),
+            'details': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'required': 'true'}),
         }
 
-	def __init__(self, *args, **kwargs):
-		super(DemandeDeplacementMembre, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(DemandeDeplacementMembre, self).__init__(*args, **kwargs)
+        self.fields['date_desiree'].label = 'Date'
 
-		self.fields['date_desiree'].label = 'Date'
 		
 class DemandeContactVoitureMembre(forms.ModelForm):
 

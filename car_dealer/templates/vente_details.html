@@ -100,7 +100,11 @@
                         {% if vente.voiture_id.status == 'livré' %}
                         <a class="btn btn-primary" disabled >Véhicule livré</a> 
                         {% else %}
+                            {% if vente.demande_id %}
                             <a href="{% url 'car_delivery' vente.voiture_id.id vente.demande_id.id %}" class="btn btn-primary">Reception par client</a> 
+                            {% else %}
+                            <a href="{% url 'car_deliveryDirect' vente.voiture_id.id  %}" class="btn btn-primary">Reception par client</a> 
+                            {% endif %}
                         {% endif %}
                     {% elif vente.paid == 'partially' %}
                         <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary">Générer demande de paiement</a> 

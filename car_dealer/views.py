@@ -167,48 +167,53 @@ def venteEmailToAdminFromMembre(request, user, serviceNom, product, to_email, mo
 
 
 def register_user(request):
-    form = SignUpForm()
     if request.method == "POST":
         form = SignUpForm(request.POST)
-        print(form)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False
+            user.is_active = False  
             user.save()
             activateEmail(request, user, form.cleaned_data.get('email'))
+            messages.success(request, "Inscription réussie! Un email d'activation vous a été envoyé.")
             return redirect('home')
         else:
-            messages.success(request, ("Ooops, une erreur s'est produite"))
-            return redirect('register')
+            messages.error(request, "Des erreurs sont survenues lors de l'inscription. Veuillez vérifier les champs.")
     else:
-        return render(request, 'register.html', {'form': form})
+        form = SignUpForm()
+
+    return render(request, 'register.html', {'form': form})
+
+
 
 def login_user(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
         
-        # Print user info for debugging
-        print(f"Tentative de connexion : Nom d'utilisateur : {username}, Mot de passe : {password}")
-        
+        # Vérification des champs vides
         if not username or not password:
             messages.error(request, "Les champs nom d'utilisateur et mot de passe sont obligatoires.")
             return redirect('login')
-        
+
+        # Vérification de l'existence de l'utilisateur
+        try:
+            user = Member.objects.get(username=username)  # Utilisation de Member au lieu de User
+        except Member.DoesNotExist:
+            messages.error(request, "Ce nom d'utilisateur n'existe pas.")
+            return redirect('login')
+
+        # Authentification de l'utilisateur
         user = authenticate(request, username=username, password=password)
-        
-        # Print the result of the authentication
         if user is not None:
-            print(f"Utilisateur trouvé : {user}")
             login(request, user)
             messages.success(request, "Vous êtes connecté.")
             return redirect('home')
         else:
-            print("Aucun utilisateur trouvé avec ces identifiants.")
-            messages.error(request, "Une erreur est survenue, veuillez réessayer.")
+            messages.error(request, "Le mot de passe est incorrect.")
             return redirect('login')
     else:
         return render(request, 'login.html', {})
+
 
 def logout_user(request):
     logout(request)
@@ -270,7 +275,6 @@ def service(request, service_id):
     form = None
     mail_to = 'etu.abkh@gmail.com'
     if service.nom in ['Déplacement de Véhicule Longue Distance', 'Déplacement de Véhicule Courte Distance']:
-        # messages.success(request,'ok we are deplacement')
         if request.user.is_authenticated:
             if request.method == 'POST':
                 
@@ -737,64 +741,43 @@ class CheckoutSessionRest(View):
         vente_id = kwargs.get('vente_id')
         vente = models.Vente.objects.get(id=vente_id)
 
-        marque = ''
-
-        if vente.voiture_id:
-            marque = vente.voiture_id.marque
-        else:
-            marque = 'Service'
-        
+        marque = vente.voiture_id.marque if vente.voiture_id else 'Service'
         amount_type = request.GET.get('type', 'reste')  
         YOUR_DOMAIN = 'http://127.0.0.1:8000'
+
+        amount_to_pay = 0  # Initialiser amount_to_pay
+
         if amount_type == 'acompte':
             if vente.montant_acompte:
                 amount_to_pay = vente.montant_acompte
             else:
-                amount_to_pay = vente.montant_total
-                session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[{
-                    'price_data': {
-                        'currency': 'eur',
-                        'product_data': {
-                            'name': marque,
-                        },
-                        'unit_amount': int(amount_to_pay * 100),  
-                    },
-                    'quantity': 1,
-                }],
-                mode='payment',
-                success_url=YOUR_DOMAIN + '/pay_success_accompte',
-                cancel_url=YOUR_DOMAIN + '/cancel',
-            )
-        else:
+                amount_to_pay = vente.montant_total  # Assurez-vous de gérer ce cas
+
+        else:  # Si amount_type n'est pas 'acompte'
             amount_to_pay = vente.montant_restant
-            
-            session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[{
-                    'price_data': {
-                        'currency': 'eur',
-                        'product_data': {
-                            'name': marque,
-                        },
-                        'unit_amount': int(amount_to_pay * 100),  # Stripe expects amount in cents
+
+        # Créez la session Stripe pour les deux cas
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'eur',
+                    'product_data': {
+                        'name': marque,
                     },
-                    'quantity': 1,
-                }],
-                mode='payment',
-                success_url=YOUR_DOMAIN + '/pay_success',
-                cancel_url=YOUR_DOMAIN + '/cancel',
+                    'unit_amount': int(amount_to_pay * 100),  # Stripe attends le montant en cents
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=YOUR_DOMAIN + ('/pay_success_accompte' if amount_type == 'acompte' else '/pay_success'),
+            cancel_url=YOUR_DOMAIN + '/cancel',
         )
 
-        # Store the sale ID in the session
+        # Stockez l'ID de la vente dans la session
         request.session['vente_id'] = vente_id
 
         return redirect(session.url, code=303)
-
-
-
-
 
 def pay_success(request):
     vente_id = request.session.get('vente_id')  
@@ -807,8 +790,6 @@ def pay_success(request):
     vente.voiture_id.save()
 
     return redirect(reverse('profile_view', kwargs={'username': request.user.username}))
-
-
 
 def pay_success_accompte(request):
     vente_id = request.session.get('vente_id')  
@@ -836,3 +817,9 @@ def car_delivery(request, voiture_id, demande_id):
     demande.save()
     return redirect('dashboard')
 
+def car_deliveryDirect(request, voiture_id):
+    voiture = get_object_or_404(Voiture, pk=voiture_id)
+    voiture.status = 'livré'
+    voiture.save()
+
+    return redirect('dashboard')

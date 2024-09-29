@@ -18,15 +18,15 @@
     <div class="row justify-content-center">
         <div class="card col-8 mb-4 text-center">
             {% if form.errors %}
-    <div class="alert alert-danger">
-        <strong>Erreur:</strong> Il y a des erreurs dans le formulaire.
-        <ul>
-            {% for field, errors in form.errors.items %}
-                <li>{{ field }}: {{ errors.0 }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
+                <div class="alert alert-danger">
+                    <strong>Erreur:</strong> Il y a des erreurs dans le formulaire.
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            <li>{{ field }}: {{ errors.0 }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
             
             <form action="" method="POST">
                 {% csrf_token %}
@@ -37,7 +37,7 @@
                         <div class="row">
                             <div class="col">
                                 <h4 class="fw-bold mb-4">Bienvenue chez Cars-Services</i></h4>
-                                <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
+                                <!-- <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p> -->
                                 <p>Service demandé : <b>{{ service.nom }}</b></p>
                             </div>
                         </div>
@@ -79,59 +79,76 @@
                     {% else %}
                         <div class="row">
                             <div class="col">
-                                <h4 class="fw-bold mb-4">Bienvenue <i class="bi bi-person-fill me-1">{{ user.username }}</i>
+                                <h4 class="fw-bold mb-4">Bienvenue {{ user.username }} <i class="bi bi-person-fill me-1"></i>
                                 </h4>
                                 <p>Veuillez compléter le formulaire ci-dessous. Nous vous recontacterons sous peu.</p>
-                                <p>Service demandé : <b>{{ service.nom }}</b></p>
+                                <b>{{ service.nom }}</b></p>
                             </div>
                         </div>
                     {% endif %}
                 </div>
                 
                     {% if service.nom == 'Déplacement de Véhicule Longue Distance' or service.nom == 'Déplacement de Véhicule Courte Distance' %}
-                    <div class="section">
-                        <div class="row mb-3">
-                            <div class="col-md-3 text-end">
-                                <label for="{{ form.date_desiree.id_for_label }}" class="form-label">Date souhaitée :</label>
-                            </div>
-                            <div class="col-md-9 text-start">
-                                {{ form.date_desiree }}
-                            </div>
-                        </div>
+                    
                         
-                        <div class="row mb-3">
-                            <div class="col-md-3 text-end">
-                                <label for="{{ form.startLocation.id_for_label }}" class="form-label">Lieu de départ :</label>
-                            </div>
-                            <div class="col-md-9 text-start">
-                                {{ form.startLocation }}
-                            </div>
-                        </div>
+                    <form action="" method="POST" class="p-4">
+                        {% csrf_token %}
                         
-                        <div class="row mb-3">
-                            <div class="col-md-3 text-end">
-                                <label for="{{ form.endLocation.id_for_label }}" class="form-label">Lieu d'arrivée :</label>
+                        <div class="section">
+                            <!-- Instructions utilisateur -->
+                            <div class="mb-3 text-start">
+                                <p><strong>Veuillez indiquer :</strong></p>
+                                <ul>
+                                    <li>La date à laquelle vous souhaitez déplacer votre véhicule</li>
+                                    <li>La localité de départ, c'est-à-dire le point de départ de prise en charge</li>
+                                    <li>La localité du lieu où celui-ci devra être déposé</li>
+                                    <li>Indiquer dans "Détails" toutes remarques ou spécifications concernant le véhicule ou le mode de transport.</li>
+                                </ul>
+                                <p>Nous vous contacterons par téléphone ou par e-mail pour convenir du prix et des modalités du processus.</p>
                             </div>
-                            <div class="col-md-9 text-start">
-                                {{ form.endLocation }}
+                    
+                            <!-- Champ Date -->
+                            <div class="row mb-3 align-items-center">
+                                <label for="{{ form.date_desiree.id_for_label }}" class="col-md-3 col-form-label">Date</label>
+                                <div class="col-md-9">
+                                    {{ form.date_desiree }}
+                                </div>
+                            </div>
+                    
+                            <!-- Champ Localité de départ -->
+                            <div class="row mb-3 align-items-center">
+                                <label for="{{ form.startLocation.id_for_label }}" class="col-md-3 col-form-label">Localité départ</label>
+                                <div class="col-md-9">
+                                    {{ form.startLocation }}
+                                </div>
+                            </div>
+                    
+                            <!-- Champ Localité d'arrivée -->
+                            <div class="row mb-3 align-items-center">
+                                <label for="{{ form.endLocation.id_for_label }}" class="col-md-3 col-form-label">Localité arrivée</label>
+                                <div class="col-md-9">
+                                    {{ form.endLocation }}
+                                </div>
+                            </div>
+                    
+                            <!-- Champ Détails -->
+                            <div class="row mb-3 align-items-center">
+                                <label for="{{ form.details.id_for_label }}" class="col-md-3 col-form-label">Détails</label>
+                                <div class="col-md-9">
+                                    {{ form.details }}
+                                </div>
+                            </div>
+                    
+                            <!-- Bouton Envoyer -->
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg">Envoyer</button>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-3 text-end">
-                                <label for="{{ form.details.id_for_label }}" class="form-label">Détails :</label>
-                            </div>
-                            <div class="col-md-9 text-start">
-                                {{ form.details }}
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-12 text-center">
-                                <button type="submit" class="btn btn-secondary">Envoyer</button>
-                            </div>
-                        </div>
-                    </div>
+                    </form>
+                    
+                    
                     {% elif service.nom == 'Service d\'Achat de Véhicule' %}
                     <div class="section">
                         <h4 class="row mx-3 mb-2">Votre voiture</h4>

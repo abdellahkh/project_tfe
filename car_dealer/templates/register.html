@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- Header-->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
@@ -10,28 +9,137 @@
         </div>
     </div>
 </header>
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
 
-        </div>
-            <div class="col-8">
-                <br /><br />
-                <form method="POST" action="{% url 'register' %}">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <br/><br/>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Affichage des messages d'erreur globaux -->
+            {% if messages %}
+                <div class="alert alert-dismissible fade show mt-3" role="alert">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-icon mt-2">
+                            <i class="fas fa-exclamation-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-                    <button type="submit" class="btn btn-secondary">
-                        S'inscrire
-                    </button>
-                    
-                </form>
-                <br /><br />
-            </div>
+            <!-- Formulaire d'inscription -->
+            <form method="POST" action="{% url 'register' %}">
+                {% csrf_token %}
+
+                <!-- Champ du nom d'utilisateur -->
+                <div class="form-group">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Champ de l'email -->
+                <div class="form-group">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.email.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Champ du prénom -->
+                <div class="form-group">
+                    {{ form.first_name.label_tag }}
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.first_name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Champ du nom de famille -->
+                <div class="form-group">
+                    {{ form.last_name.label_tag }}
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.last_name.errors }}
+                        </div>
+                    {% endif %}
+                </div>              
+
+                <!-- Champ du téléphone -->
+                <div class="form-group">
+                    {{ form.phone.label_tag }}
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.phone.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <!-- Champ de l'adresse -->
+                <div class="form-group">
+                    {{ form.address.label_tag }}
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.address.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Champ du code postal -->
+                <div class="form-group">
+                    {{ form.postal.label_tag }}
+                    {{ form.postal }}
+                    {% if form.postal.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.postal.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.ville.label_tag }}
+                    {{ form.ville }}
+                    {% if form.ville.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.ville.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Champ du mot de passe -->
+                <div class="form-group">
+                    {{ form.password1.label_tag }}
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.password1.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Champ de confirmation du mot de passe -->
+                <div class="form-group">
+                    {{ form.password2.label_tag }}
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ form.password2.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-block mt-3">S'inscrire</button>
+            </form>
         </div>
     </div>
 </div>
-
 
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
-
+from django.utils import timezone
 
 
 class Member(AbstractUser):
@@ -261,7 +261,7 @@ class Demande(models.Model):
     phone = models.CharField(max_length=100, help_text="Phone", blank=True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, help_text="Service selectionner")
     voiture = models.ForeignKey(Voiture, on_delete=models.CASCADE, blank=True, null=True, help_text="Email")
-    date = models.DateTimeField(auto_now_add=True, help_text="Date de la demande")
+    date = models.DateTimeField(default=timezone.now, help_text="Date de la demande") 
     date_desiree = models.DateField(auto_now_add=False, blank=True, null=True, help_text="  (Date d'intervention souhaitée)")
     details = models.TextField(blank=True, null=True, help_text="Details specifique")
     genre = models.CharField(

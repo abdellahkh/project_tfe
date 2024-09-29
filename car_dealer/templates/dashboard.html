@@ -56,7 +56,7 @@
                         <thead>
                             <tr>
                                 <th>Service</th>
-                                <th>Genre</th>
+                                <th>Date</th>
                                 <th>Demandeur</th>
                                 <th></th> 
                             </tr>
@@ -65,10 +65,10 @@
                             {% for demande in allRequest %}
                             <tr>
                                 <td>{{ demande.service }}</td>
-                                <td>{{ demande.genre }}</td>
+                                <td>{{ demande.date }}</td>
                                 <td>
                                     {% if demande.member %}
-                                        {{ demande.member }}
+                                        <div class="badge bg-warning text-dark">{{ demande.member }}</div>
                                     {% else %}
                                         {{ demande.first_name }} {{ demande.last_name }}
                                     {% endif %}
@@ -101,7 +101,7 @@
                                 <th>Client</th>
                                 <th>Total</th>
                                 <th>Etat paiement</th>
-                                <th>Etat véhicule</th>
+                                <th>Etat</th>
                                 <th></th> 
                             </tr>
                         </thead>
@@ -129,17 +129,21 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if vente.voiture_id.status == 'ready' %}
-                                        Prêt à livrer
-                                    {% endif %}
-                                    {% if vente.voiture_id.status == 'vendu' %}
-                                        Véhicule vendu en cours de livraison
-                                    {% endif %}
-                                    {% if vente.voiture_id.status == 'reservé' %}
-                                        Véhicule réservé
-                                    {% endif %}
-                                    {% if vente.voiture_id.status == 'livré' %}
-                                        Véhicule livré
+                                    {% if vente.voiture_id %}
+                                        {% if vente.voiture_id.status == 'ready' %}
+                                            Prêt à livrer
+                                        {% endif %}
+                                        {% if vente.voiture_id.status == 'vendu' %}
+                                            Véhicule vendu en cours de livraison
+                                        {% endif %}
+                                        {% if vente.voiture_id.status == 'reservé' %}
+                                            Véhicule réservé
+                                        {% endif %}
+                                        {% if vente.voiture_id.status == 'livré' %}
+                                            Véhicule livré
+                                        {% endif %}
+                                    {% else %}
+                                        Service
                                     {% endif %}
                                 </td>
                                 <td>

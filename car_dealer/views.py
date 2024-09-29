@@ -736,29 +736,37 @@ class CheckoutSessionRest(View):
     def get(self, request, *args, **kwargs):
         vente_id = kwargs.get('vente_id')
         vente = models.Vente.objects.get(id=vente_id)
+
+        marque = ''
+
+        if vente.voiture_id:
+            marque = vente.voiture_id.marque
+        else:
+            marque = 'Service'
         
-        # Check the type of payment: 'acompte' or 'reste'
-        amount_type = request.GET.get('type', 'reste')  # Default to 'reste' if not provided
+        amount_type = request.GET.get('type', 'reste')  
         YOUR_DOMAIN = 'http://127.0.0.1:8000'
-        # Determine the amount to pay based on the payment type
         if amount_type == 'acompte':
-            amount_to_pay = vente.montant_acompte
-            session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price_data': {
-                    'currency': 'eur',
-                    'product_data': {
-                        'name': vente.voiture_id.marque,
+            if vente.montant_acompte:
+                amount_to_pay = vente.montant_acompte
+            else:
+                amount_to_pay = vente.montant_total
+                session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': 'eur',
+                        'product_data': {
+                            'name': marque,
+                        },
+                        'unit_amount': int(amount_to_pay * 100),  
                     },
-                    'unit_amount': int(amount_to_pay * 100),  # Stripe expects amount in cents
-                },
-                'quantity': 1,
-            }],
-            mode='payment',
-            success_url=YOUR_DOMAIN + '/pay_success_accompte',
-            cancel_url=YOUR_DOMAIN + '/cancel',
-        )
+                    'quantity': 1,
+                }],
+                mode='payment',
+                success_url=YOUR_DOMAIN + '/pay_success_accompte',
+                cancel_url=YOUR_DOMAIN + '/cancel',
+            )
         else:
             amount_to_pay = vente.montant_restant
             
@@ -768,7 +776,7 @@ class CheckoutSessionRest(View):
                     'price_data': {
                         'currency': 'eur',
                         'product_data': {
-                            'name': vente.voiture_id.marque,
+                            'name': marque,
                         },
                         'unit_amount': int(amount_to_pay * 100),  # Stripe expects amount in cents
                     },
@@ -806,11 +814,13 @@ def pay_success_accompte(request):
     vente_id = request.session.get('vente_id')  
     vente = Vente.objects.get(id=vente_id)
 
-    vente.paid = 'partially'
-    vente.voiture_id.status = 'reservé'
-
+    vente.paid = 'yes'
+    if vente.voiture_id:
+        vente.voiture_id.status = 'reservé'
+        vente.paid = 'partially'
+        vente.voiture_id.save()
     vente.save()
-    vente.voiture_id.save()
+    
 
     return redirect(reverse('profile_view', kwargs={'username': request.user.username}))
 

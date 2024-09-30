@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'car_dealer',
     'cart',
     'import_export',
+    'rest_framework',
+    'api'
 ]
 
 AUTH_USER_MODEL = 'car_dealer.Member'

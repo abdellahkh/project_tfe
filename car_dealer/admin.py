@@ -193,3 +193,15 @@ class NotesAdmin(admin.ModelAdmin):
     # You can customize further with fields like raw_id_fields for better foreign key selection
 
 admin.site.register(Notes, NotesAdmin) 
+
+
+from .models import UserWishlist
+
+class UserWishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_voitures')  # Afficher l'utilisateur et les voitures
+
+    def get_voitures(self, obj):
+        return ", ".join([voiture.modele.nom for voiture in obj.voiture.all()])  # Afficher les noms des voitures
+    get_voitures.short_description = 'Voitures'  # Nom de la colonne
+
+admin.site.register(UserWishlist, UserWishlistAdmin)

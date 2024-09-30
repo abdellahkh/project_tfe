@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from django.contrib import messages
 import stripe 
 from django.conf import settings
-from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.views import View
 
@@ -53,8 +52,6 @@ def cart_update(request):
 
 
 ############################### to here ############################### 
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def checkout(request, voiture_id):
     return render(request, 'checkout.html', {})

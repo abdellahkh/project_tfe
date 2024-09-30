@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from .models import ImageVoiture, Notes, Service, Vente, Voiture, Member, Demande, VoitureSoumisse
+from .models import ImageVoiture, Notes, Service, UserWishlist, Vente, Voiture, Member, Demande, VoitureSoumisse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -19,7 +19,7 @@ from car_dealer import models
 
 # Create your views here.
 def home(request):
-    voitures = Voiture.objects.all().prefetch_related('images').order_by('-date_poste')[:6]
+    voitures = Voiture.objects.filter(status='avendre').prefetch_related('images').order_by('-date_poste')[:6]
     services = Service.objects.filter(is_available=True)
     
     return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
@@ -44,7 +44,7 @@ def activate(request, uidb64, token):
     return redirect('home')
 
 def dashboard(request):
-    ventes = Vente.objects.all()
+    ventes = Vente.objects.all().order_by('-date')
     # Récupérer les options pour les filtres
     demande_genres = [genre[0] for genre in Demande.GENRE_INTERVENTION]
     demande_status = [status[0] for status in Demande.STATUS_OPTIONS]
@@ -231,11 +231,14 @@ def allServices(request):
 
 def allVoitures(request):
     voitures = Voiture.objects.all()
+    wishes = UserWishlist.objects.filter(user=request.user)
+    wishlist_voiture_ids = wishes.values_list('voiture__id', flat=True)
 
-    # Filtrage par marque, carburant et transmission
+    # Filtrage par marque, carburant, transmission et status
     marque = request.GET.get('marque')
     carburant = request.GET.get('carburant')
     transmission = request.GET.get('transmission')
+    status = request.GET.get('status')  # Nouveau filtre
 
     if marque:
         voitures = voitures.filter(marque__nom=marque)
@@ -246,16 +249,22 @@ def allVoitures(request):
     if transmission:
         voitures = voitures.filter(transmission=transmission)
 
-    # Récupération des marques, carburants et transmissions distincts
+    if status:
+        voitures = voitures.filter(status=status)  # Application du filtre status
+
+    # Récupération des marques, carburants, transmissions et statuts distincts
     marques_disponibles = Voiture.objects.order_by('marque__nom').values_list('marque__nom', flat=True).distinct()
     carburants_disponibles = Voiture.objects.order_by('carburant').values_list('carburant', flat=True).distinct()
     transmissions_disponibles = Voiture.objects.order_by('transmission').values_list('transmission', flat=True).distinct()
+    status_disponibles = Voiture.objects.order_by('status').values_list('status', flat=True).distinct()  # Nouveaux statuts
 
     return render(request, 'allVoitures.html', {
         'voitures': voitures,
         'marques_disponibles': marques_disponibles,
         'carburants_disponibles': carburants_disponibles,
         'transmissions_disponibles': transmissions_disponibles,
+        'status_disponibles': status_disponibles,  # Ajout des statuts au contexte
+        'wishlist_voiture_ids': wishlist_voiture_ids
     })
 
 
@@ -823,3 +832,18 @@ def car_deliveryDirect(request, voiture_id):
     voiture.save()
 
     return redirect('dashboard')
+
+
+
+def toggleFavoriteCar(request, voiture_id):
+    voiture = get_object_or_404(Voiture, pk=voiture_id)
+    wishlist, created = UserWishlist.objects.get_or_create(user=request.user)
+
+    if wishlist.voiture.filter(pk=voiture_id).exists():
+        wishlist.voiture.remove(voiture)
+    else:
+        wishlist.voiture.add(voiture)
+
+    # Rediriger vers la page précédente
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+

@@ -114,7 +114,6 @@ class Voiture(models.Model):
     prix = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix de la voiture")
     prix_min = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix minimale de vente")
 
-    favoris = models.ManyToManyField(Member, related_name='voitures_favorites', blank=True)
 
     class Meta:
         ordering = ['-date_poste']
@@ -122,6 +121,10 @@ class Voiture(models.Model):
     def __str__(self):
         return f"{self.marque} {self.modele} - {self.annee_fabrication}"
     
+
+class UserWishlist(models.Model):
+    user = models.ForeignKey(Member, on_delete=models.CASCADE, blank=False, related_name='user_favourite')
+    voiture = models.ManyToManyField(Voiture, related_name='product_favourite', blank=True, )
 
     
 class ImageVoiture(models.Model):

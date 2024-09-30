@@ -99,6 +99,7 @@
                             <tr>
                                 <th>Véhicule</th>
                                 <th>Client</th>
+                                <th>Date</th>
                                 <th>Total</th>
                                 <th>Etat paiement</th>
                                 <th>Etat</th>
@@ -116,6 +117,7 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ vente.user_id }}</td>
+                                <td>{{ vente.date|date:"F j, Y" }}</td>
                                 <td>{{ vente.montant_total }}€</td>
                                 <td>
                                     {% if vente.paid == 'partially' %}

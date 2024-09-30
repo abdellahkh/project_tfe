@@ -45,10 +45,26 @@
                     <div class="col-md-4"> 
                         <p><strong>Voiture:</strong> {{ demand.voiture }}</p>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-8 text-end">
                         <a href="{% url 'voiture' demand.voiture.id %}" class="btn btn-primary">Ouvrir</a>
                     </div>
+                
+                    <div class="col-md-4"> 
+                        <p><strong>Prix:</strong> 
+                            <span class="text-success" style="font-size: 1.2em;">
+                                {{ demand.voiture.prix }}€
+                            </span>
+                        </p>
+                    </div>
+                
+                    <div class="col-md-4"> 
+                        <p><strong>Prix minimum de vente:</strong></p>
+                        <div class="badge bg-warning text-dark" style="font-size: 1.2em; padding: 10px;">
+                            {{ demand.voiture.prix_min }}€
+                        </div>
+                    </div>
                 </div>
+                
                 {% endif %}
 
                 <p><strong>Date de la demande:</strong> {{ demand.date }}</p>

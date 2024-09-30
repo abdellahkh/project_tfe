@@ -97,13 +97,15 @@
 
                 <div class="card-body">
                     {% if vente.paid == 'yes' %}
-                        {% if vente.voiture_id.status == 'livré' %}
-                        <a class="btn btn-primary" disabled >Véhicule livré</a> 
-                        {% else %}
-                            {% if vente.demande_id %}
-                            <a href="{% url 'car_delivery' vente.voiture_id.id vente.demande_id.id %}" class="btn btn-primary">Reception par client</a> 
+                        {% if vente.voiture_id.id %}
+                            {% if vente.voiture_id.status == 'livré' %}
+                            <a class="btn btn-primary" disabled >Véhicule livré</a> 
                             {% else %}
-                            <a href="{% url 'car_deliveryDirect' vente.voiture_id.id  %}" class="btn btn-primary">Reception par client</a> 
+                                {% if vente.demande_id and vente.voiture_id.id %}
+                                <a href="{% url 'car_delivery' vente.voiture_id.id vente.demande_id.id %}" class="btn btn-primary">Reception par client</a> 
+                                {% else %}
+                                <a href="{% url 'car_deliveryDirect' vente.voiture_id.id  %}" class="btn btn-primary">Reception par client</a> 
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     {% elif vente.paid == 'partially' %}

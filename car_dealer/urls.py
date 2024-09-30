@@ -36,4 +36,6 @@ urlpatterns = [
     path('delivery/<int:voiture_id>/<int:demande_id>/', views.car_delivery, name='car_delivery'),
     path('delivery/<int:voiture_id>/', views.car_deliveryDirect, name='car_deliveryDirect'),
     path('new_vente_service/<int:demande_id>/', views.startVenteService, name='startVenteService'),
+
+    path('addFavoriteCar/<int:voiture_id>/', views.toggleFavoriteCar, name='toggleFavoriteCar'),
 ]

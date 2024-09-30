@@ -111,8 +111,10 @@ def pay_success(request):
         voiture.save() 
 
     cart.clear()  
+    messages.success(request, 'Paiement effectué avec succès !') 
 
     return redirect(reverse('profile_view', kwargs={'username': request.user.username}))
 
 def pay_cancel(request):
+    messages.error(request, 'Paiement refusé par votre organisme!') 
     return render(request, 'cancel.html')

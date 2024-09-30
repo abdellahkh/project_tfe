@@ -797,6 +797,7 @@ def pay_success(request):
 
     vente.save()
     vente.voiture_id.save()
+    messages.success(request, 'Paiement effectué avec succès !') 
 
     return redirect(reverse('profile_view', kwargs={'username': request.user.username}))
 
@@ -810,6 +811,7 @@ def pay_success_accompte(request):
         vente.paid = 'partially'
         vente.voiture_id.save()
     vente.save()
+    messages.success(request, 'Paiement effectué avec succès !') 
     
 
     return redirect(reverse('profile_view', kwargs={'username': request.user.username}))

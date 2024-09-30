@@ -67,11 +67,23 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="status">Statut</label>
+                            <label for="status">Disponible - Réservé - Vendu</label>
                             <select id="status" name="status" class="form-select">
                                 <option value="">Tous</option>
                                 {% for status in status_disponibles %}
-                                    <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option>
+                                    {% if status == 'livré' %}
+                                    <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Vendu</option>
+                                    {% endif %}
+                                    {% if status == 'avendre' %}
+                                    <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Disponible</option>
+                                    {% endif %}
+                                    {% if status == 'reservé' %}
+                                    <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Réservé</option>
+                                    {% endif %}
+
+
+
+                                    <!-- <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option> -->
                                 {% endfor %}
                             </select>
                         </div>

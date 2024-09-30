@@ -10,6 +10,8 @@ def get_voiture(request):
     serializer = VoitureSerializer(voitures, many=True)  
     return Response(serializer.data)
 
+
+
 @api_view(['GET'])
 def get_voiture_status(request, pk):
     voitures = Voiture.objects.filter(status=pk )

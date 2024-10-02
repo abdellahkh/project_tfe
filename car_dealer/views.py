@@ -17,12 +17,20 @@ from django.views import View
 from car_dealer import models
 
 
-# Create your views here.
 def home(request):
     voitures = Voiture.objects.filter(status='avendre').prefetch_related('images').order_by('-date_poste')[:6]
     services = Service.objects.filter(is_available=True)
-    
-    return render(request, 'home.html', {'voitures' :voitures, 'services' : services})
+
+    wishlist_voiture_ids = []  # Initialize as an empty list
+    if request.user.is_authenticated:
+        wishes = UserWishlist.objects.filter(user=request.user)
+        wishlist_voiture_ids = wishes.values_list('voiture__id', flat=True)
+
+    return render(request, 'home.html', {
+        'voitures': voitures, 
+        'services': services,
+        'wishlist_voiture_ids': wishlist_voiture_ids  # Add this line
+    })
 
 def activate(request, uidb64, token):
     # User = get_user_model()
@@ -44,37 +52,39 @@ def activate(request, uidb64, token):
     return redirect('home')
 
 def dashboard(request):
+    # Filter ventes by genre (if provided)
+    genre_filter = request.GET.get('genre', '')
+    
+    # Get all sales
     ventes = Vente.objects.all().order_by('-date')
-    # Récupérer les options pour les filtres
+    
+    if genre_filter:
+        ventes = ventes.filter(genre=genre_filter)
+
+    # Other existing filters and logic
     demande_genres = [genre[0] for genre in Demande.GENRE_INTERVENTION]
     demande_status = [status[0] for status in Demande.STATUS_OPTIONS]
-    demande_services = Service.objects.all()  # Supposons que tu as un modèle Service
+    demande_services = Service.objects.all()
 
-    # Appliquer les filtres en fonction des paramètres GET
-    genre_filter = request.GET.get('genre', '')
     status_filter = request.GET.get('status', '')
     service_filter = request.GET.get('service', '')
-
-    # Récupérer toutes les demandes, ordonnées du plus récent au plus ancien
+    
     allRequest = Demande.objects.all().order_by('-date')
 
-    # Appliquer les filtres si nécessaire
-    if genre_filter:
-        allRequest = allRequest.filter(genre=genre_filter)
     if status_filter:
         allRequest = allRequest.filter(status=status_filter)
     if service_filter:
         allRequest = allRequest.filter(service=service_filter)
-
+    
     return render(request, 'dashboard.html', {
         'allRequest': allRequest,
         'demande_genres': demande_genres,
         'demande_status': demande_status,
         'demande_services': demande_services,
-        'genre_filter': genre_filter,
         'status_filter': status_filter,
         'service_filter': service_filter,
-        'ventes': ventes 
+        'genre_filter': genre_filter,  # Pass the genre filter to the template
+        'ventes': ventes
     })
 
 
@@ -231,8 +241,10 @@ def allServices(request):
 
 def allVoitures(request):
     voitures = Voiture.objects.all()
-    wishes = UserWishlist.objects.filter(user=request.user)
-    wishlist_voiture_ids = wishes.values_list('voiture__id', flat=True)
+    wishlist_voiture_ids = [] 
+    if request.user.is_authenticated:  # Check if the user is authenticated
+        wishes = UserWishlist.objects.filter(user=request.user)
+        wishlist_voiture_ids = wishes.values_list('voiture__id', flat=True)
 
     # Filtrage par marque, carburant, transmission et status
     marque = request.GET.get('marque')
@@ -550,7 +562,24 @@ def profile(request, username):
     voitureSoumisses = VoitureSoumisse.objects.filter(user_id=user)
     toutesDemandes = Demande.objects.all().order_by('-date')  
     ventes = Vente.objects.filter(user_id=user) 
-    return render(request, "profile_view.html", {'user':user, 'demandes': demandes, 'voitureSoumisses':voitureSoumisses, 'toutesDemandes': toutesDemandes, "ventes": ventes})
+
+    wishlist, created = UserWishlist.objects.get_or_create(user=request.user)
+    wishlist_voitures = wishlist.voiture.all()
+
+    wishlist_voiture_ids = []  
+    if request.user.is_authenticated:
+        wishes = UserWishlist.objects.filter(user=request.user)
+        wishlist_voiture_ids = wishes.values_list('voiture__id', flat=True)
+
+    return render(request, "profile_view.html", {
+        'user': user, 
+        'demandes': demandes, 
+        'voitureSoumisses': voitureSoumisses, 
+        'toutesDemandes': toutesDemandes, 
+        "ventes": ventes,
+        'wishlist_voiture_ids': wishlist_voiture_ids,
+        'wishlist_voitures': wishlist_voitures,  
+    })
 
 
 

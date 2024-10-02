@@ -112,15 +112,17 @@
                                 {% if voiture.images.all %}
                                 <img src="{{ voiture.images.first.image.url }}" class="fixed-image-size" alt="{{ voiture.modele.nom }}">
                                 {% endif %}
-                                {% if voiture.status == 'avendre' %} 
-                                <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
-                                    {% if voiture.id in wishlist_voiture_ids %}
-                                        <i class="bi bi-star-fill text-danger" style="font-size: 2rem;"></i> 
-                                    {% else %}
-                                        <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i> 
+                                {% if voiture.status == 'avendre' %}
+                                    {% if user.is_authenticated %} 
+                                    <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
+                                        {% if voiture.id in wishlist_voiture_ids %}
+                                            <i class="bi bi-star-fill text-danger" style="font-size: 2rem;"></i> 
+                                        {% else %}
+                                            <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i> 
+                                        {% endif %}
+                                        <span class="visually-hidden">Ajouter/Retirer des favoris</span> 
+                                    </a>
                                     {% endif %}
-                                    <span class="visually-hidden">Ajouter/Retirer des favoris</span> 
-                                </a>
                                 {% endif %}
 
                                 <div class="card-body text-center">

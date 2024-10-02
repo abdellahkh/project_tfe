@@ -80,9 +80,6 @@
                                     {% if status == 'reservé' %}
                                     <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Réservé</option>
                                     {% endif %}
-
-
-
                                     <!-- <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option> -->
                                 {% endfor %}
                             </select>
@@ -109,14 +106,16 @@
                             {% if voiture.images.all %}
                                 <img src="{{ voiture.images.first.image.url }}" class="card-img-top fixed-size-image" alt="{{ voiture.modele.nom }}">
                                 {% if voiture.status == 'avendre' %} 
-                                <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
-                                    {% if voiture.id in wishlist_voiture_ids %}
-                                        <i class="bi bi-star-fill text-danger" style="font-size: 2rem;"></i> 
-                                    {% else %}
-                                        <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i> 
+                                    {% if user.is_authenticated %} 
+                                    <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
+                                        {% if voiture.id in wishlist_voiture_ids %}
+                                            <i class="bi bi-star-fill text-danger" style="font-size: 2rem;"></i> 
+                                        {% else %}
+                                            <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i> 
+                                        {% endif %}
+                                        <span class="visually-hidden">Ajouter/Retirer des favoris</span> 
+                                    </a>
                                     {% endif %}
-                                    <span class="visually-hidden">Ajouter/Retirer des favoris</span> 
-                                </a>
                                 {% endif %}
                             {% endif %}
                             <div class="card-body">

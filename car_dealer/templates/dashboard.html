@@ -89,15 +89,23 @@
 
         <div class="col-md-6 mb-4"> 
             <div class="card h-100 shadow">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between">
                     <h3>Ventes / Réservations / Services</h3>
+                    <form method="GET" class="d-flex" id="genre-filter-form">
+                        <select id="genre" name="genre" class="form-select me-2">
+                            <option value="">Tous</option>
+                            <option value="Vente" {% if genre_filter == "Vente" %}selected{% endif %}>Ventes</option>
+                            <option value="Service" {% if genre_filter == "Service" %}selected{% endif %}>Services</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Filtrer</button>
+                    </form>
                 </div>
                 <div class="card-body">
                     {% if ventes %}
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Véhicule</th>
+                                <th>Véhicule / Services</th>
                                 <th>Client</th>
                                 <th>Date</th>
                                 <th>Total</th>
@@ -113,22 +121,16 @@
                                     {% if vente.voiture_id %}
                                         {{ vente.voiture_id }}
                                     {% else %}
-                                        {{ vente.demande_id.service }}
+                                        Service
                                     {% endif %}
                                 </td>
                                 <td>{{ vente.user_id }}</td>
                                 <td>{{ vente.date|date:"F j, Y" }}</td>
                                 <td>{{ vente.montant_total }}€</td>
                                 <td>
-                                    {% if vente.paid == 'partially' %}
-                                        Accompte payé
-                                    {% endif %}
-                                    {% if vente.paid == 'yes' %}
-                                        Solde total payé
-                                    {% endif %}
-                                    {% if vente.paid == 'no' %}
-                                        Impayé
-                                    {% endif %}
+                                    {% if vente.paid == 'partially' %}Accompte payé{% endif %}
+                                    {% if vente.paid == 'yes' %}Solde total payé{% endif %}
+                                    {% if vente.paid == 'no' %}Impayé{% endif %}
                                 </td>
                                 <td>
                                     {% if vente.voiture_id %}
@@ -139,18 +141,18 @@
                                             Véhicule vendu en cours de livraison
                                         {% endif %}
                                         {% if vente.voiture_id.status == 'reservé' %}
-                                            Véhicule réservé
+                                            Véhicule réservé    
                                         {% endif %}
                                         {% if vente.voiture_id.status == 'livré' %}
                                             Véhicule livré
                                         {% endif %}
                                     {% else %}
-                                        Service
+                                        {% if vente.voiture_id.status == 'livré' %}
+                                            Cloturer    
+                                        {% endif %}
                                     {% endif %}
                                 </td>
-                                <td>
-                                    <a href="{% url 'vente_details' vente.id %}" class="btn btn-primary">Ouvrir</a>
-                                </td>
+                                <td><a href="{% url 'vente_details' vente.id %}" class="btn btn-primary">Ouvrir</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -161,6 +163,7 @@
                 </div>
             </div>
         </div>
+        
     </div>
 </div>
 

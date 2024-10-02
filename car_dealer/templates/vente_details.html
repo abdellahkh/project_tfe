@@ -108,9 +108,18 @@
                                 {% endif %}
                             {% endif %}
                         {% endif %}
-                    {% elif vente.paid == 'partially' %}
-                        <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary">Générer demande de paiement</a> 
-                    {% endif %}
+                        {% elif vente.paid == 'partially' %}
+                        <div class="container">
+                          <div class="row"> 
+                            <div class="col-md-6">  
+                              <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary w-100">Générer demande de paiement</a> 
+                            </div>
+                            <div class="col-md-6">  
+                              <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary w-100">Annuler réservation</a>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
                 </div>
             </div>
         </div>

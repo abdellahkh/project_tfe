@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load i18n %}
 {% block content %}
 <style>
     .card {
@@ -86,7 +86,8 @@
             <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
             <div class="text-center">
                 <h1 class="display-4 fw-bolder">Cars - Services</h1>
-                <p class="lead fw-normal text-white-50 mb-0">Les meilleurs services d'accompagnement</p>
+                <!-- Les meilleurs services d'accompagnement -->
+                <p class="lead fw-normal text-white-50 mb-0">{{ var }}</p>  
             </div>
         </div>
     </div>
@@ -95,7 +96,7 @@
 <section class="container-fluid p-5 mb-6">
     <div class="row px-5">
         <div class="col-md-9 mb-4">
-            <h2 class="section-title text-center">Notre Showroom</h2>
+            <h2 class="section-title text-center">{% translate "Notre Showroom" %}</h2>
             <div class="card">
                 <div class="card-body">
                     <div class="row row-cols-1 row-cols-md-3 g-4"> 

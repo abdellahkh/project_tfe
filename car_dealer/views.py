@@ -15,6 +15,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.views import View
 from car_dealer import models
+from django.utils.translation import gettext as _
 
 
 def home(request):
@@ -26,10 +27,13 @@ def home(request):
         wishes = UserWishlist.objects.filter(user=request.user)
         wishlist_voiture_ids = wishes.values_list('voiture__id', flat=True)
 
+    var = _("Les meilleurs services d'accompagnement")
+
     return render(request, 'home.html', {
         'voitures': voitures, 
         'services': services,
-        'wishlist_voiture_ids': wishlist_voiture_ids  # Add this line
+        'wishlist_voiture_ids': wishlist_voiture_ids,  # Add this line
+        'var': var
     })
 
 def activate(request, uidb64, token):

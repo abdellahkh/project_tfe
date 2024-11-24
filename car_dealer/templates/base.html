@@ -1,8 +1,15 @@
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% load i18n %}
 
+<!DOCTYPE html>
+<html lang="fr">
+    <script type="text/javascript" src="https://cdn.weglot.com/weglot.min.js"></script>
+    <script>
+        Weglot.initialize({
+            api_key: 'wg_15b302b7885667654b52ba332a8cb8e05'
+        });
+    </script>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -58,22 +65,22 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 mb-4 mb-lg-0">
-                    <h5>Liens utiles</h5>
+                    <h5>{% translate "Liens utiles" %}</h5>
                     <nav>
                         <ul class="list-unstyled">
-                            <li><a href="{% url 'about' %}#info-legales">Informations légales</a></li>
-                            <li><a href="{% url 'about' %}#conditions-utilisation">Conditions d'utilisation</a></li>
-                            <li><a href="{% url 'about' %}#conditions-generales">Conditions Générales</a></li>
-                            <li><a href="{% url 'about' %}#protection-donnees">Protection des données</a></li>
-                            <li><a href="{% url 'about' %}#directives-mise-en-page">Directives de mise en page</a></li>
-                            <li><a href="{% url 'about' %}#declaration-consentement">Déclaration de consentement</a>
+                            <li><a href="{% url 'about' %}#info-legales">{% translate "Informations légales" %}</a></li>
+                            <li><a href="{% url 'about' %}#conditions-utilisation">{% translate "Conditions d'utilisation" %}</a></li>
+                            <li><a href="{% url 'about' %}#conditions-generales">{% translate "Conditions Générales" %}</a></li>
+                            <li><a href="{% url 'about' %}#protection-donnees">{% translate "Protection des données" %}</a></li>
+                            <li><a href="{% url 'about' %}#directives-mise-en-page">{% translate "Directives de mise en page" %}</a></li>
+                            <li><a href="{% url 'about' %}#declaration-consentement">{% translate "Déclaration de consentement" %}</a>
                             </li>
                         </ul>
                     </nav>
                 </div>
 
                 <div class="col-lg-3 mb-4 mb-lg-0">
-                    <h5>Coordonnées</h5>
+                    <h5>{% translate "Coordonnées" %}</h5>
                     <address>
                         <p class="m-0">0032 (0)489 45 44 32</p>
                         <p class="m-0">123 Rue des Voitures</p>
@@ -83,7 +90,7 @@
                 </div>
 
                 <div class="col-lg-3 mb-4 mb-lg-0">
-                    <h5>Suivez-nous</h5>
+                    <h5>{% translate "Suivez-nous" %}</h5>
                     <div class="social-links">
                         <a href="lien_vers_google" class="text-white me-3">
                             <i class="bi bi-google fs-4"></i> </a>
@@ -99,7 +106,7 @@
                 </div>
 
                 <div class="col-lg-3 mb-4 mb-lg-0">
-                    <h5>Horaires</h5>
+                    <h5>{% translate "Horaires" %}</h5>
                     <ul class="list-unstyled">
                         <li>Lundi - Vendredi : 9h00 - 18h00</li>
                         <li>Samedi - Dimanche : Fermé</li>

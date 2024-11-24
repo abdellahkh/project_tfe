@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load i18n %}
 {% block content %}
 
 <header class="bg-dark py-5">
@@ -18,22 +18,17 @@
       <div class="col-md-10">
         <div class="card shadow-lg">
           <div class="card-header bg-primary text-white text-center">
-            <h2>Notre Histoire</h2>
+            <h2>{% translate "Notre Histoire" %}</h2>
           </div>
           <div class="card-body">
             <p class="card-text">
-              Rafeek Mahbou et Samir Lahoud mettent à votre service leur expertise cumulée de plus de 20 ans dans le domaine de la vente de véhicules d'occasion.
-              Rafeek, fort d'une expérience variée avec des concessionnaires et des experts en automobiles, a acquis une connaissance approfondie du marché des voitures d'occasion. 
-              Samir, quant à lui, s'est spécialisé dans la fourniture de services de plaque Z, offrant des solutions pratiques pour les clients cherchant à immatriculer leurs véhicules.
+              {% translate "Rafeek Mahbou et Samir Lahoud mettent à votre service leur expertise cumulée de plus de 20 ans dans le domaine de la vente de véhicules d'occasion. Rafeek, fort d'une expérience variée avec des concessionnaires et des experts en automobiles, a acquis une connaissance approfondie du marché des voitures d'occasion. Samir, quant à lui, s'est spécialisé dans la fourniture de services de plaque Z, offrant des solutions pratiques pour les clients cherchant à immatriculer leurs véhicules." %}
             </p>
             <p class="card-text">
-              En unissant leurs forces, Rafeek et Samir ont créé une entreprise qui allie la vente de véhicules d'occasion de qualité à un service de plaque Z efficace et sans tracas. 
-              En tant que concessionnaires indépendants, ils s'engagent à fournir des voitures d'occasion soigneusement sélectionnées, passées en revue par des experts pour garantir la satisfaction de leurs clients.
+              {% translate "En unissant leurs forces, Rafeek et Samir ont créé une entreprise qui allie la vente de véhicules d'occasion de qualité à un service de plaque Z efficace et sans tracas. En tant que concessionnaires indépendants, ils s'engagent à fournir des voitures d'occasion soigneusement sélectionnées, passées en revue par des experts pour garantir la satisfaction de leurs clients." %}
             </p>
             <p class="card-text">
-              Leur service de plaque Z simplifie le processus administratif, permettant aux clients de recevoir rapidement leurs nouvelles plaques d'immatriculation sans tracas inutiles. 
-              Avec une approche axée sur le client, Rafeek et Samir offrent une expérience complète, combinant l'achat de véhicules d'occasion de qualité avec des solutions pratiques pour l'immatriculation. 
-              Chez Véhicules Select Rafeek & Samir, la satisfaction du client est la priorité, offrant un service personnalisé et fiable à chaque étape de votre achat automobile.
+              {% translate "Leur service de plaque Z simplifie le processus administratif, permettant aux clients de recevoir rapidement leurs nouvelles plaques d'immatriculation sans tracas inutiles. Avec une approche axée sur le client, Rafeek et Samir offrent une expérience complète, combinant l'achat de véhicules d'occasion de qualité avec des solutions pratiques pour l'immatriculation. Chez Véhicules Select Rafeek & Samir, la satisfaction du client est la priorité, offrant un service personnalisé et fiable à chaque étape de votre achat automobile." %}
             </p>
           </div>
         </div>
@@ -49,12 +44,12 @@
         <div class="row">
           <div class="col-md-3">
             <div class="list-group shadow-sm" id="legal-list"> 
-              <a href="#info-legales" class="list-group-item list-group-item-action text-center active" data-target="info-legales">Informations légales</a>
-              <a href="#conditions-utilisation" class="list-group-item list-group-item-action text-center" data-target="conditions-utilisation">Conditions d'utilisation</a>
-              <a href="#conditions-generales" class="list-group-item list-group-item-action text-center" data-target="conditions-generales">Conditions Générales</a>
-              <a href="#protection-donnees" class="list-group-item list-group-item-action text-center" data-target="protection-donnees">Protection des données</a>
-              <a href="#directives-mise-en-page" class="list-group-item list-group-item-action text-center" data-target="directives-mise-en-page">Directives de mise en page</a>
-              <a href="#declaration-consentement" class="list-group-item list-group-item-action text-center" data-target="declaration-consentement">Déclaration de consentement</a>
+              <a href="#info-legales" class="list-group-item list-group-item-action text-center active" data-target="info-legales">{% translate "Informations légales" %}</a>
+              <a href="#conditions-utilisation" class="list-group-item list-group-item-action text-center" data-target="conditions-utilisation">{% translate "Conditions d'utilisation" %}</a>
+              <a href="#conditions-generales" class="list-group-item list-group-item-action text-center" data-target="conditions-generales">{% translate "Conditions Générales" %}</a>
+              <a href="#protection-donnees" class="list-group-item list-group-item-action text-center" data-target="protection-donnees">{% translate "Protection des données" %}</a>
+              <a href="#directives-mise-en-page" class="list-group-item list-group-item-action text-center" data-target="directives-mise-en-page">{% translate "Directives de mise en page" %}</a>
+              <a href="#declaration-consentement" class="list-group-item list-group-item-action text-center" data-target="declaration-consentement">{% translate "Déclaration de consentement" %}</a>
             </div>
           </div>
 
@@ -62,44 +57,44 @@
             <div class="card shadow-sm">
               <!-- Les ID sont ajoutés ici pour correspondre aux ancres du footer -->
               <div class="card-body tab-content" id="info-legales">
-                <h4 class="card-title">Informations légales</h4>
+                <h4 class="card-title">{% translate "Informations légales" %}</h4>
                 <p class="card-text">
-                  Contenu en cours de rédaction et relecture par organisme juridique.
+                  {% translate "Contenu en cours de rédaction et relecture par organisme juridique." %}
                 </p>
               </div>
 
               <div class="card-body tab-content d-none" id="conditions-utilisation">
-                <h4 class="card-title">Conditions d'utilisation</h4>
+                <h4 class="card-title">{% translate "Conditions d'utilisation" %}</h4>
                 <p class="card-text">
-                  Contenu en cours de rédaction et relecture par organisme juridique.
+                  {% translate "Contenu en cours de rédaction et relecture par organisme juridique." %}
                 </p>
               </div>
 
               <div class="card-body tab-content d-none" id="conditions-generales">
-                <h4 class="card-title">Conditions Générales</h4>
+                <h4 class="card-title">{% translate "Conditions Générales" %}</h4>
                 <p class="card-text">
-                  Contenu en cours de rédaction et relecture par organisme juridique.
+                  {% translate "Contenu en cours de rédaction et relecture par organisme juridique." %}
                 </p>
               </div>
 
               <div class="card-body tab-content d-none" id="protection-donnees">
-                <h4 class="card-title">Protection des données</h4>
+                <h4 class="card-title">{% translate "Protection des données" %}</h4>
                 <p class="card-text">
-                  Contenu en cours de rédaction et relecture par organisme juridique.
+                  {% translate "Contenu en cours de rédaction et relecture par organisme juridique." %}
                 </p>
               </div>
 
               <div class="card-body tab-content d-none" id="directives-mise-en-page">
-                <h4 class="card-title">Directives de mise en page</h4>
+                <h4 class="card-title">{% translate "Directives de mise en page" %}</h4>
                 <p class="card-text">
-                  Contenu en cours de rédaction et relecture par organisme juridique.
+                  {% translate "Contenu en cours de rédaction et relecture par organisme juridique." %}
                 </p>
               </div>
 
               <div class="card-body tab-content d-none" id="declaration-consentement">
-                <h4 class="card-title">Déclaration de consentement</h4>
+                <h4 class="card-title">{% translate "Déclaration de consentement" %}</h4>
                 <p class="card-text">
-                  Contenu en cours de rédaction et relecture par organisme juridique.
+                  {% translate "Contenu en cours de rédaction et relecture par organisme juridique." %}
                 </p>
               </div>
             </div>

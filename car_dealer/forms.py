@@ -275,3 +275,19 @@ class VenteVehiculeMembre(forms.ModelForm):
         for field_name in ['marque', 'modele', 'annee_fabrication', 'carburant', 'transmission']:
             self.fields[field_name].required = True
         self.fields['car_doc'].required = False
+
+
+from django import forms
+from .models import Review
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Entrez votre commentaire ici...'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['comment'].required = True

@@ -113,6 +113,7 @@ class Voiture(models.Model):
 
     prix = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix de la voiture")
     prix_min = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix minimale de vente")
+    num_chassis = models.TextField(blank=True, null=True, help_text="Chassis de la voiture")
 
 
     class Meta:
@@ -232,6 +233,7 @@ class Review(models.Model):
     user_id = models.ForeignKey(Member, on_delete=models.CASCADE, help_text="Identifiant du membre qui a commenté")
     comment = models.TextField(blank=True, null=True, help_text="Commentaire")
     service_id = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True, help_text="Identifiant du Service")
+    date = models.DateTimeField(auto_now_add=True, blank=True, null=True, help_text="Date de création du commentaire") 
 
     def __str__(self):
         return f"({self.user_id.username}) : {self.comment}"

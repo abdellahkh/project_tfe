@@ -38,4 +38,9 @@ urlpatterns = [
     path('new_vente_service/<int:demande_id>/', views.startVenteService, name='startVenteService'),
 
     path('addFavoriteCar/<int:voiture_id>/', views.toggleFavoriteCar, name='toggleFavoriteCar'),
+    path('facture_pdf/<int:vente_id>/', views.vente_facture_pdf, name='facture_pdf'),
+    path('recu_accomte_pdf/<int:vente_id>', views.recu_accomte_pdf, name='recu_accomte_pdf'),
+    path('services/<int:service_id>/ajouter_commentaire/', views.ajouter_commentaire, name='ajouter_commentaire'),
+    
+
 ]

@@ -5,34 +5,91 @@
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
             <h1 class="display-4 fw-bolder">Nos Services</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Découvrez nos services automobiles</p> 
+            <p class="lead fw-normal text-white-50 mb-0">Découvrez nos services automobiles</p>
         </div>
     </div>
 </header>
 
-<section class="container py-5"> 
+<section class="container py-5">
     <div class="row">
         {% if services %}
         {% for service in services %}
         {% if service.is_available %}
-        <div class="col-lg-4 col-md-6 mb-4"> 
-            <div class="card h-100 shadow d-flex flex-column">  
-                {% if service.image %}
-                <img src="{{ service.image.url }}" alt="{{ service.nom }}" class="card-img-top" style="max-height: 200px; object-fit: cover;">
-                {% endif %}
-                <div class="card-body flex-grow-1"> <div class="d-flex flex-column h-100"> 
-                    <h5 class="card-title">{{ service.nom }}</h5>
-                    <p class="card-text">{{ service.description }}</p>
-                </div></div>
-                <div class="card-footer"> 
-                    <a href="{% url 'service_detail' service.id %}" class="btn btn-primary">Demander</a> 
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="card h-100 shadow-lg rounded">
+                <div class="card-img-top">
+                    {% if service.image %}
+                    <img src="{{ service.image.url }}" alt="{{ service.nom }}" class="card-img-top"
+                        style="max-height: 200px; object-fit: cover;">
+                    {% endif %}
                 </div>
+                <div class="card-body flex-grow-1">
+                    <div class="d-flex flex-column h-100">
+                        <h4 class="card-title">{{ service.nom }}</h4>
+                        <p class="card-text text-start">{{ service.description }}</p>
+                    </div>
+                </div>
+                <div class="card-footer bg-primary text-white">
+                    <a href="{% url 'service_detail' service.id %}" class="btn btn-light">En savoir plus</a>
+                </div>
+
+                <div class="reviews m-3">
+                    <h6 class="text-start">({{ service.review_set.count }}) Commentaires :</h6> 
+
+                    <div id="carousel{{ service.id }}" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for review in service.review_set.all %} 
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="card-title">{{ review.user_id.username }}</h6>
+                                            <small class="text-muted">{{ review.date }}</small>
+                                        </div>
+                                        <p class="card-text text-start">{{ review.comment }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="carousel-item active">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-center">Pas de commentaires pour le moment</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ service.id }}"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span> 
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ service.id }}"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span> 
+                        </button>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="ajouter-commentaire m-3">
+                        <form method="post" action="{% url 'ajouter_commentaire' service.id %}"> 
+                            {% csrf_token %}
+                            {{ form.comment }} 
+                            
+                            <button type="submit" class="btn btn-primary mt-2">Ajouter un commentaire</button>
+                            
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                
             </div>
         </div>
         {% endif %}
         {% endfor %}
         {% else %}
-        <div class="col-12 text-center"> 
+        <div class="col-12 text-center">
             <p>Aucun service disponible pour le moment.</p>
         </div>
         {% endif %}

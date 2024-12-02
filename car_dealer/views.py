@@ -1,6 +1,8 @@
+import datetime
+from decimal import Decimal
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from .models import ImageVoiture, Notes, Service, UserWishlist, Vente, Voiture, Member, Demande, VoitureSoumisse
+from .models import ImageVoiture, Notes, Review, Service, UserWishlist, Vente, Voiture, Member, Demande, VoitureSoumisse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
@@ -8,7 +10,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .forms import DemandeContactVoitureMembre, SignUpForm, UserUpdateForm, DemandeDeplacement, DemandeControlTech, DemandeControlTechMembre, DemandeDeplacementMembre, DemandeSortieDeFourriereMembre, DemandeSortieDeFourriere, VenteVehicule, VenteVehiculeMembre
+from .forms import DemandeContactVoitureMembre, ReviewForm, SignUpForm, UserUpdateForm, DemandeDeplacement, DemandeControlTech, DemandeControlTechMembre, DemandeDeplacementMembre, DemandeSortieDeFourriereMembre, DemandeSortieDeFourriere, VenteVehicule, VenteVehiculeMembre
 from django import forms
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
@@ -16,6 +18,12 @@ from django.contrib.auth import get_user_model
 from django.views import View
 from car_dealer import models
 from django.utils.translation import gettext as _
+
+from django.http import FileResponse, HttpResponse
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
 
 
 def home(request):
@@ -241,7 +249,26 @@ def about(request):
 
 def allServices(request):
     services = Service.objects.all()
-    return render(request, 'allServices.html', { 'services': services })
+    reviews = Review.objects.all()
+    form = ReviewForm()  # Instancier le formulaire
+    return render(request, 'allServices.html', { 
+        'services': services, 
+        'reviews': reviews, 
+        'form': form  # Passer le formulaire au template
+    })
+
+def ajouter_commentaire(request, service_id):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)  # Ne pas enregistrer tout de suite
+            review.user_id = request.user  # Associer l'utilisateur connecté
+            review.service_id = Service.objects.get(id=service_id)  # Associer le service
+            review.save()
+            return redirect('services')  # Rediriger après la création
+    else:
+        form = ReviewForm()
+    return redirect('services')
 
 def allVoitures(request):
     voitures = Voiture.objects.all()
@@ -881,4 +908,225 @@ def toggleFavoriteCar(request, voiture_id):
 
     # Rediriger vers la page précédente
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+from datetime import datetime
+from reportlab.platypus import Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+
+
+from datetime import datetime
+from decimal import Decimal
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph
+
+def vente_facture_pdf(request, vente_id):
+    # Récupérer la vente
+    vente = get_object_or_404(Vente, id=vente_id)
+    user = request.user
+    styles = getSampleStyleSheet()
+    style = styles["Normal"]
+    style.fontSize = 8
+
+    # Configuration de la réponse HTTP pour un fichier PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="facture_{vente.voiture_id.marque}.pdf"'
+
+    # Création du PDF avec ReportLab
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    # Informations de l'entreprise
+    p.setFont("Helvetica", 10)
+    entreprise_info = [
+        "Cars - Services",
+        "Adresse : 123, Rue des Voitures",
+        "Ville : Bruxelles, BE 1020",
+        "Tél. : +32 489 45 44 32",
+        "Email : info@Cars-Service@gmail.com",
+        "Horaires : Du Lu au Dim de 07h à 19h",
+    ]
+    for idx, line in enumerate(entreprise_info):
+        p.drawString(width - 200, height - 50 - (15 * idx), line)
+
+    # Informations sur l'utilisateur
+    p.setFont("Helvetica", 10)
+    user_info = [
+        "Adresse de livraison",
+        f"Nom: {user.first_name} {user.last_name}",
+        f"Email: {user.email}",
+        f"Tel: {getattr(user, 'phone', 'Non renseigné')}",
+        f"Adresse: {getattr(user, 'address', 'Non renseignée')}",
+    ]
+    for idx, line in enumerate(user_info):
+        p.drawString(50, height - 50 - (15 * idx), line)
+
+    # Détails de la facture
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(50, height - 145, f"Date de la facture : {datetime.now().strftime('%d/%m/%Y')}")
+    p.drawString(50, height - 160, f"Numéro de facture : {vente.id}-{datetime.now().strftime('%Y%m%d')}")
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(50, height - 200, "Facture d'achat")
+
+    # Totaux
+    y_position = height - 225
+    price_tvac = Decimal(vente.montant_total)
+    price_htva = price_tvac / Decimal("1.21")
+    tva_amount = price_tvac - price_htva
+
+    p.setFont("Helvetica", 12)
+    voiture_details = [
+        f"Marque du véhicule : {vente.voiture_id.marque}",
+        f"Modèle du véhicule : {vente.voiture_id.modele}",
+        f"Année du véhicule : {vente.voiture_id.annee_fabrication}",
+        f"Numéro de chassis : {vente.voiture_id.num_chassis}",
+        f"Total HTVA : {price_htva.quantize(Decimal('0.01'))}€",
+        f"Total TVA (21%) : {tva_amount.quantize(Decimal('0.01'))}€",
+        f"Total TVAC : {price_tvac.quantize(Decimal('0.01'))}€",
+    ]
+    for line in voiture_details:
+        p.drawString(50, y_position, line)
+        y_position -= 15
+
+    # Clauses légales
+    clauses = [
+        ("Politique de rétractation :", "Conformément à la législation en vigueur, le droit de rétractation de 14 jours ne s'applique pas aux contrats de vente de véhicules d'occasion conclus à distance ou hors établissement. La vente est donc considérée comme définitive dès la signature du bon de commande ou du contrat de vente."),
+        ("Garantie légale :", "Tous nos véhicules d'occasion sont couverts par la garantie légale de conformité de 2 ans, conformément aux articles L.217-4 et suivants du Code de la consommation. Cette garantie couvre les défauts de conformité existants au moment de la délivrance du véhicule et qui se manifestent dans un délai de 2 ans à compter de celle-ci. Sont exclus de la garantie légale les défauts résultant d'une usure normale du véhicule, d'un mauvais entretien ou d'une utilisation non conforme."),
+        ("Confidentialité :", "Les informations recueillies lors de votre achat sont utilisées pour le traitement de votre commande et la gestion de notre relation client. Elles peuvent également être utilisées à des fins statistiques ou pour vous informer de nos offres commerciales. Conformément à la loi \"Informatique et Libertés\" du 6 janvier 1978 modifiée, vous disposez d'un droit d'accès, de rectification et de suppression des données vous concernant."),
+    ]
+
+    for title, text in clauses:
+        p.setFont("Helvetica-Bold", 10)
+        p.drawString(50, y_position, title)
+        y_position -= 15
+        paragraph = Paragraph(text, style)
+        w, h = paragraph.wrap(500, 100)  # Ajustement dynamique
+        paragraph.drawOn(p, 50, y_position - h)
+        y_position -= h + 20
+
+    # Finalisation du PDF
+    p.showPage()
+    p.save()
+
+    return response
+
+def recu_accomte_pdf(request, vente_id):
+    # Récupérer la vente
+    vente = get_object_or_404(Vente, id=vente_id)
+    user = request.user
+    styles = getSampleStyleSheet()
+    style = styles["Normal"]
+    style.fontSize = 8
+
+    # Configuration de la réponse HTTP pour un fichier PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Recu_accompte_{vente.voiture_id.marque}_{vente.voiture_id.modele}_{vente.voiture_id.annee_fabrication}.pdf"'
+
+    # Création du PDF avec ReportLab
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    # Informations de l'entreprise
+    p.setFont("Helvetica", 10)
+    entreprise_info = [
+        "Cars - Services",
+        "Adresse : 123, Rue des Voitures",
+        "Ville : Bruxelles, BE 1020",
+        "Tél. : +32 489 45 44 32",
+        "Email : info@Cars-Service@gmail.com",
+        "Horaires : Du Lu au Dim de 07h à 19h",
+    ]
+    for idx, line in enumerate(entreprise_info):
+        p.drawString(width - 200, height - 50 - (15 * idx), line)
+
+    # Informations sur l'utilisateur
+    p.setFont("Helvetica", 10)
+    user_info = [
+        "Adresse de livraison",
+        f"Nom: {user.first_name} {user.last_name}",
+        f"Email: {user.email}",
+        f"Tel: {getattr(user, 'phone', 'Non renseigné')}",
+        f"Adresse: {getattr(user, 'address', 'Non renseignée')}",
+    ]
+    for idx, line in enumerate(user_info):
+        p.drawString(50, height - 50 - (15 * idx), line)
+
+    # Détails de la facture
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(50, height - 145, f"Date d'émmission' : {datetime.now().strftime('%d/%m/%Y')}")
+    p.drawString(50, height - 160, f"Numéro de transaction : {vente.id}-{datetime.now().strftime('%Y%m%d')}")
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(50, height - 200, "Reçu d'accomte")
+
+    # Totaux
+    y_position = height - 225
+    price_tvac = Decimal(vente.montant_total)
+    price_htva = price_tvac / Decimal("1.21")
+    tva_amount = price_tvac - price_htva
+    total_accomte = Decimal(vente.montant_acompte)
+    accomte_htva = Decimal(vente.montant_acompte / Decimal("1.21") )
+    accomte_tva = total_accomte - accomte_htva
+    
+    p.setFont("Helvetica", 12)
+    voiture_details = [
+        f"Marque du véhicule : {vente.voiture_id.marque}",
+        f"Modèle du véhicule : {vente.voiture_id.modele}",
+        f"Année du véhicule : {vente.voiture_id.annee_fabrication}",
+        f"Numéro de chassis : {vente.voiture_id.num_chassis}",
+        f"Total HTVA : {price_htva.quantize(Decimal('0.01'))}€",
+        f"Total TVA (21%) : {tva_amount.quantize(Decimal('0.01'))}€",
+        f"Total TVAC : {price_tvac.quantize(Decimal('0.01'))}€",
+        f"Montant de l'accomte reçu : {total_accomte.quantize(Decimal('0.01'))}€ dont {accomte_tva.quantize(Decimal('0.01'))}€ de tva",
+    ]
+    for line in voiture_details:
+        p.drawString(50, y_position, line)
+        y_position -= 15
+
+    # Clauses légales
+    clauses = [
+        ("Politique de rétractation :", "Conformément à la législation en vigueur, le droit de rétractation de 14 jours ne s'applique pas aux contrats de vente de véhicules d'occasion conclus à distance ou hors établissement. La vente est donc considérée comme définitive dès la signature du bon de commande ou du contrat de vente."),
+        ("Garantie légale :", "Tous nos véhicules d'occasion sont couverts par la garantie légale de conformité de 2 ans, conformément aux articles L.217-4 et suivants du Code de la consommation. Cette garantie couvre les défauts de conformité existants au moment de la délivrance du véhicule et qui se manifestent dans un délai de 2 ans à compter de celle-ci. Sont exclus de la garantie légale les défauts résultant d'une usure normale du véhicule, d'un mauvais entretien ou d'une utilisation non conforme."),
+        ("Confidentialité :", "Les informations recueillies lors de votre achat sont utilisées pour le traitement de votre commande et la gestion de notre relation client. Elles peuvent également être utilisées à des fins statistiques ou pour vous informer de nos offres commerciales. Conformément à la loi \"Informatique et Libertés\" du 6 janvier 1978 modifiée, vous disposez d'un droit d'accès, de rectification et de suppression des données vous concernant."),
+    ]
+    y_position -= 50
+    for title, text in clauses:
+        p.setFont("Helvetica-Bold", 10)
+        p.drawString(50, y_position, title)
+        y_position -= 15
+        paragraph = Paragraph(text, style)
+        w, h = paragraph.wrap(500, 100)  # Ajustement dynamique
+        paragraph.drawOn(p, 50, y_position - h)
+        y_position -= h + 20
+
+    # Finalisation du PDF
+    p.showPage()
+    p.save()
+
+    return response
+
+
+def service_list(request):
+    services = Service.objects.filter(is_available=True)
+    review_form = ReviewForm()
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user_id = request.user  # Assurez-vous que `request.user` est bien un `Member`
+            review.service_id = get_object_or_404(Service, id=request.POST.get('service_id'))
+            review.save()
+            return redirect('service_list')
+
+    return render(request, 'service_list.html', {
+        'services': services,
+        'review_form': review_form,
+    })
+
+
 

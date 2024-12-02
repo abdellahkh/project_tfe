@@ -273,6 +273,8 @@
                     <dd class="col-sm-9">{{ vente.montant_acompte }}€</dd>
                     <dt class="col-sm-3">Reste :</dt>
                     <dd class="col-sm-9">{{ vente.montant_restant }}€</dd>
+                    <a class="btn btn-secondary" href="{% url 'recu_accomte_pdf' vente.id %}" >Reçu</a> 
+
                     {% endif %}
                     {% if vente.voiture_id.status == 'ready' %}
                     <p>Ce véhicule est prêt.</p>
@@ -325,11 +327,10 @@
                     {% endif %}
                     {% endif %}
                     {% if vente.paid == 'yes' %}
-                    <p>Ce véhicule est entièrement payé, vous pouvez cliquer sur le lien ci-dessous pour obtenir la
-                        facture.</p>
-                    <dt class="col-sm-3">Véhicule :</dt>
-                    <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Facture</button>
+                        <p>Ce véhicule est entièrement payé, vous pouvez cliquer sur le lien ci-dessous pour obtenir la facture.</p>
+                        <dt class="col-sm-3">Véhicule :</dt>
+                        <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
+                        <a class="btn btn-secondary" href="{% url 'facture_pdf' vente.id %}" >Facture</a> 
                     {% endif %}
                 </dl>
             </div>

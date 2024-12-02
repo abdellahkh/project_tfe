@@ -47,6 +47,7 @@
         </td>
       </tr>
       {% endfor %}
+      
       {% else %}
       <tr>
         <td colspan="4" class="text-center">Votre panier est vide.</td>
@@ -90,50 +91,72 @@
       </tr>
     </tfoot>
   </table>
+  {% if cart_voitures %}
   <div class="d-grid gap-2 d-md-flex mb-4 justify-content-md-end">
     <div class="col-md-4 text-end">
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paiementModal">
         Payer l'accompte pour réserver
       </button>
+  </div>
+  {% endif %}
 </div>
 
 <div class="modal fade" id="paiementModal" tabindex="-1" aria-labelledby="paiementModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="paiementModalLabel">Détails</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <dl class="row"> 
-                <dt class="col-sm-3">Montant total :</dt>
-                <dd class="col-sm-9">{{ totaltvac |floatformat:2 }}€</dd>
-        
-                <dt class="col-sm-3">Accompte :</dt>
-                <dd class="col-sm-9">{{ total_10pourcent_tvac |floatformat:2 }}€</dd>
-        
-                <dt class="col-sm-3">Reste :</dt>
-                <dd class="col-sm-9">{{ sold_restant_tvac |floatformat:2 }}€</dd>
-            </dl>
-            <hr> 
-            <dl class="row">  
-                <div class="col-sm-6"> 
-                    <dt>Accompte à payer :</dt>
-                    <dd>{{ total_10pourcent_tvac |floatformat:2 }}€</dd> 
-                </div>
-                <div class="col-sm-6"> 
-                    <dd style="background-color: bisque;"> 
-                        <small style="font-style: italic; font-size: smaller;"> 
-                            Dès réception de votre acompte, vous recevrez un email de confirmation. Nous vous contacterons ensuite par téléphone afin de convenir des modalités de la prestation et finaliser la vente.
-                        </small>
-                    </dd>
-                </div>
-            </dl>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="confirmPayerBtn">PAYER</button>  {# Lien vers la vue de paiement #}
-          </div>
+    <div class="modal-content">
+      <!-- En-tête de la modale -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="paiementModalLabel">Détails du paiement</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
+
+      <!-- Corps de la modale -->
+      <div class="modal-body">
+        <!-- Informations de paiement -->
+        <dl class="row">
+          <dt class="col-sm-3">Montant total :</dt>
+          <dd class="col-sm-9">{{ totaltvac|floatformat:2 }} €</dd>
+
+          <dt class="col-sm-3">Acompte :</dt>
+          <dd class="col-sm-9">{{ total_10pourcent_tvac|floatformat:2 }} €</dd>
+
+          <dt class="col-sm-3">Reste :</dt>
+          <dd class="col-sm-9">{{ sold_restant_tvac|floatformat:2 }} €</dd>
+        </dl>
+
+        <hr>
+
+        <!-- Détails sur l'acompte -->
+        <div class="row">
+          <div class="col-sm-6">
+            <dl>
+              <dt>Acompte à payer :</dt>
+              <dd>{{ total_10pourcent_tvac|floatformat:2 }} €</dd>
+            </dl>
+          </div>
+          <div class="col-sm-6">
+            <div class="alert alert-warning" role="alert">
+              <small>
+                Dès réception de votre acompte, vous recevrez un email de confirmation. Nous vous contacterons ensuite par téléphone afin de convenir des modalités de la prestation et finaliser la vente.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Case à cocher CGV -->
+        <div class="form-check mt-3">
+          <input class="form-check-input" type="checkbox" id="cgvCheckbox" required>
+          <label class="form-check-label" for="cgvCheckbox">
+            En cochant cette case, vous acceptez les <a href="/about/#conditions-generales" target="_blank" rel="noopener">Conditions Générales de Vente</a> et donnez votre accord pour procéder au paiement.
+          </label>
+        </div>
+      </div>
+
+      <!-- Pied de la modale -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="confirmPayerBtn" disabled>PAYER</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -161,6 +184,15 @@
         // Gestion des erreurs 
       }
     });
+  });
+
+  const checkbox = document.getElementById('cgvCheckbox');
+  const payerButton = document.getElementById('confirmPayerBtn');
+
+  // Ajoutez un événement pour surveiller les changements sur la case à cocher
+  checkbox.addEventListener('change', function () {
+    // Activez ou désactivez le bouton en fonction de l'état de la case à cocher
+    payerButton.disabled = !checkbox.checked;
   });
 </script>
 

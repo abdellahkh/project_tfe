@@ -7,7 +7,12 @@ from import_export.fields import Field
 from .models import Modele, Marque, Notes, Voiture, ImageVoiture, Service, Review, Vente, Member, Demande, VoitureSoumisse
 
 admin.site.register(Member)
-admin.site.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('user_id', 'comment', 'service_id', 'date')
+    list_filter = ('service_id', 'date')
+    search_fields = ('user_id__username', 'comment') 
+
+admin.site.register(Review, ReviewAdmin)
 
 from .models import Voiture, ImageVoiture
 
@@ -35,6 +40,7 @@ class VoitureAdmin(ImportExportModelAdmin, admin.ModelAdmin):
         'kilometrage',
         'prix',
         'prix_min',
+        'num_chassis',
         'date_poste',
         'display_options'
     )
@@ -66,7 +72,7 @@ class VoitureAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('status', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage', 'prix', 'prix_min')
+            'fields': ('status', 'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 'kilometrage', 'prix', 'prix_min', 'num_chassis')
         }),
         ('Options', {
             'fields': ('cruise_control', 'direction_assistee', 'audio_interface', 'airbags', 'air_conditionne', 'siege_chauffant', 'alarm_system', 'parkassist', 'camera_recul', 'start_stop', 'essui_auto', 'car_play'),

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-2">
+        <div class="text-center text-white">
+            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
+            <div class="text-center">
+                <h1 class="display-4 fw-bolder">Vendeur Dashboard</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Bienvenue {{ user.username }}</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="m-5">
+    <div class="row">
+        <h1>New</h1>
+    </div>
+</div>
+
+
+
+{% endblock %}

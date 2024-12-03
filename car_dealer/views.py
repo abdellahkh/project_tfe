@@ -63,41 +63,72 @@ def activate(request, uidb64, token):
 
     return redirect('home')
 
+# 
+from django.core.paginator import Paginator
+
 def dashboard(request):
-    # Filter ventes by genre (if provided)
+    # Récupération des filtres
     genre_filter = request.GET.get('genre', '')
-    
-    # Get all sales
+    status_voiture_filter = request.GET.get('status_voiture', '')  # Nouveau filtre pour le statut des voitures
+
+    # Récupération de toutes les ventes et voitures
     ventes = Vente.objects.all().order_by('-date')
-    
+    voitures = Voiture.objects.all().order_by('-date_poste')
+
+    # Application du filtre de genre pour les ventes
     if genre_filter:
         ventes = ventes.filter(genre=genre_filter)
 
-    # Other existing filters and logic
+    # Application du filtre de statut pour les voitures
+    if status_voiture_filter:
+        voitures = voitures.filter(status=status_voiture_filter)
+
+    # Pagination pour les ventes et les voitures (6 éléments par page)
+    vente_paginator = Paginator(ventes, 6)  
+    voiture_paginator = Paginator(voitures, 6)  
+    page_number_ventes = request.GET.get('page_ventes')
+    page_number_voitures = request.GET.get('page_voitures')
+    ventes_page_obj = vente_paginator.get_page(page_number_ventes)
+    voitures_page_obj = voiture_paginator.get_page(page_number_voitures)
+
+    # Autres filtres pour les demandes
     demande_genres = [genre[0] for genre in Demande.GENRE_INTERVENTION]
     demande_status = [status[0] for status in Demande.STATUS_OPTIONS]
     demande_services = Service.objects.all()
 
     status_filter = request.GET.get('status', '')
     service_filter = request.GET.get('service', '')
-    
+
+    # Filtrage des demandes
     allRequest = Demande.objects.all().order_by('-date')
 
     if status_filter:
         allRequest = allRequest.filter(status=status_filter)
     if service_filter:
         allRequest = allRequest.filter(service=service_filter)
-    
+
+    # Pagination des demandes (6 éléments par page)
+    demande_paginator = Paginator(allRequest, 6)
+    page_number_demandes = request.GET.get('page_demandes')
+    demandes_page_obj = demande_paginator.get_page(page_number_demandes)
+
+    # Liste des statuts des voitures pour le filtre
+    voiture_status = Voiture.STATUS_CHOICES  # Assurez-vous d'avoir les choix de statut définis dans ton modèle
+
     return render(request, 'dashboard.html', {
-        'allRequest': allRequest,
+        'ventes': ventes_page_obj,
+        'voitures': voitures_page_obj,
+        'allRequest': demandes_page_obj,
         'demande_genres': demande_genres,
         'demande_status': demande_status,
         'demande_services': demande_services,
         'status_filter': status_filter,
         'service_filter': service_filter,
-        'genre_filter': genre_filter,  # Pass the genre filter to the template
-        'ventes': ventes
+        'genre_filter': genre_filter,
+        'voiture_status': voiture_status,  # Liste des statuts des voitures
+        'status_voiture_filter': status_voiture_filter,  # Filtre actuel du statut
     })
+
 
 
 

@@ -6,51 +6,102 @@
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
             <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
-            <div class="text-center">
-                <h1 class="display-4 fw-bolder">Vendeur Dashboard</h1>
-                <p class="lead fw-normal text-white-50 mb-0">Bienvenue {{ user.username }}</p>
-            </div>
+            <h1 class="display-4 fw-bolder">Tableau de bord Vendeur</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Bienvenue {{ user.username }}</p>
         </div>
     </div>
 </header>
 
-<div class="m-5">
+<div class="container my-5">
     <div class="row">
-        <div class="col-md-6 mb-4">
+        <!-- Voitures -->
+        <div class="col-md-9 mb-4">
             <div class="card h-100 shadow">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h1>Dashboard</h1>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Voitures</h2>
+                    <div class="d-flex align-items-center">
+                        <!-- Formulaire pour filtrer par statut -->
+                        <form method="GET" class="me-3 d-flex align-items-center">
+                            <select name="status_voiture" id="status_voiture" class="form-select me-2">
+                                <option value="">Tous les statuts</option>
+                                {% for status in voiture_status %}
+                                    <option value="{{ status.0 }}" {% if status_voiture_filter == status.0 %}selected{% endif %}>
+                                        {{ status.1 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-secondary">Filtrer</button>
+                        </form>
+                
+                        <!-- Bouton Ajouter un véhicule -->
                         <a href="/admin/car_dealer/voiture/add/" class="btn btn-primary">Ajouter un véhicule</a>
                     </div>
                 </div>
+                
+        
+                <!-- Formulaire pour filtrer les voitures par statut -->
+                
+        
                 <div class="card-body">
-                    <form method="GET" class="mb-3" id="filter-form">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="service">Service</label>
-                                <select id="service" name="service" class="form-select">
-                                    <option value="">Tous</option>
-                                    {% for service in demande_services %}
-                                        <option value="{{ service.id }}" {% if service.id|stringformat:"s" == service_filter %}selected{% endif %}>{{ service }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="status">Statut</label>
-                                <select id="status" name="status" class="form-select">
-                                    <option value="">Tous</option>
-                                    {% for status in demande_status %}
-                                        <option value="{{ status }}" {% if status == status_filter %}selected{% endif %}>{{ status }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Filtrer</button>
-                        </div>
-                    </form>
+                    <table class="table table-striped table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Marque</th>
+                                <th>Modèle</th>
+                                <th>Année</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for voiture in voitures %}
+                            <tr>
+                                <td>{{ voiture.marque }}</td>
+                                <td>{{ voiture.modele }}</td>
+                                <td>{{ voiture.annee_fabrication }}</td>
+                                <td>{{ voiture.status }}</td>
+                                <td><a href="{% url 'voiture' voiture.pk %}" class="btn btn-secondary">Modifier</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+        
+                    <!-- Pagination pour les voitures -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if voitures.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_voitures={{ voitures.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% for num in voitures.paginator.page_range %}
+                                <li class="page-item {% if voitures.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page_voitures={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+                            {% if voitures.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_voitures={{ voitures.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
 
+        <!-- Demand -->
+        <div class="col-md-9 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-header">
+                    <h2>Demandes</h2>
+                </div>
+                <div class="card-body">
                     {% if allRequest %}
                     <table class="table table-striped">
                         <thead>
@@ -58,7 +109,7 @@
                                 <th>Service</th>
                                 <th>Date</th>
                                 <th>Demandeur</th>
-                                <th></th> 
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -68,18 +119,42 @@
                                 <td>{{ demande.date }}</td>
                                 <td>
                                     {% if demande.member %}
-                                        <div class="badge bg-warning text-dark">{{ demande.member }}</div>
+                                        <span class="badge bg-warning text-dark">{{ demande.member }}</span>
                                     {% else %}
                                         {{ demande.first_name }} {{ demande.last_name }}
                                     {% endif %}
                                 </td>
-                                <td>
-                                    <a href="{% url 'demande_details' demande.id %}" class="btn btn-primary">Ouvrir</a>
-                                </td>
+                                <td><a href="{% url 'demande_details' demande.id %}" class="btn btn-primary">Ouvrir</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+
+                    <!-- Pagination pour les demandes -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if allRequest.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_demandes={{ allRequest.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% for num in allRequest.paginator.page_range %}
+                                <li class="page-item {% if allRequest.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page_demandes={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+                            {% if allRequest.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_demandes={{ allRequest.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+
                     {% else %}
                         <p class="text-center">Aucune demande trouvée.</p>
                     {% endif %}
@@ -87,11 +162,12 @@
             </div>
         </div>
 
-        <div class="col-md-6 mb-4"> 
+        <!-- Ventes -->
+        <div class="col-md-9 mb-4">
             <div class="card h-100 shadow">
-                <div class="card-header d-flex justify-content-between">
-                    <h3>Ventes / Réservations / Services</h3>
-                    <form method="GET" class="d-flex" id="genre-filter-form">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2>Ventes / Réservations / Services</h2>
+                    <form method="GET" class="d-flex">
                         <select id="genre" name="genre" class="form-select me-2">
                             <option value="">Tous</option>
                             <option value="Vente" {% if genre_filter == "Vente" %}selected{% endif %}>Ventes</option>
@@ -105,51 +181,35 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Véhicule / Services</th>
+                                <th>Véhicule / Service</th>
                                 <th>Client</th>
                                 <th>Date</th>
                                 <th>Total</th>
-                                <th>Etat paiement</th>
-                                <th>Etat</th>
-                                <th></th> 
+                                <th>État du paiement</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for vente in ventes %}
                             <tr>
-                                <td>
-                                    {% if vente.voiture_id %}
-                                        {{ vente.voiture_id }}
-                                    {% else %}
-                                        Service
-                                    {% endif %}
-                                </td>
+                                <td>{{ vente.voiture_id|default:"Service" }}</td>
                                 <td>{{ vente.user_id }}</td>
-                                <td>{{ vente.date|date:"F j, Y" }}</td>
+                                <td>{{ vente.date|date:"d F Y" }}</td>
                                 <td>{{ vente.montant_total }}€</td>
                                 <td>
-                                    {% if vente.paid == 'partially' %}Accompte payé{% endif %}
+                                    {% if vente.paid == 'partially' %}Acompte payé{% endif %}
                                     {% if vente.paid == 'yes' %}Solde total payé{% endif %}
                                     {% if vente.paid == 'no' %}Impayé{% endif %}
                                 </td>
                                 <td>
                                     {% if vente.voiture_id %}
-                                        {% if vente.voiture_id.status == 'ready' %}
-                                            Prêt à livrer
-                                        {% endif %}
-                                        {% if vente.voiture_id.status == 'vendu' %}
-                                            Véhicule vendu en cours de livraison
-                                        {% endif %}
-                                        {% if vente.voiture_id.status == 'reservé' %}
-                                            Véhicule réservé    
-                                        {% endif %}
-                                        {% if vente.voiture_id.status == 'livré' %}
-                                            Véhicule livré
-                                        {% endif %}
+                                        {% if vente.voiture_id.status == 'ready' %}Prêt à livrer{% endif %}
+                                        {% if vente.voiture_id.status == 'vendu' %}Véhicule vendu{% endif %}
+                                        {% if vente.voiture_id.status == 'reservé' %}Véhicule réservé{% endif %}
+                                        {% if vente.voiture_id.status == 'livré' %}Véhicule livré{% endif %}
                                     {% else %}
-                                        {% if vente.voiture_id.status == 'livré' %}
-                                            Cloturer    
-                                        {% endif %}
+                                        {% if vente.status == 'livré' %}Clôturé{% endif %}
                                     {% endif %}
                                 </td>
                                 <td><a href="{% url 'vente_details' vente.id %}" class="btn btn-primary">Ouvrir</a></td>
@@ -157,16 +217,39 @@
                             {% endfor %}
                         </tbody>
                     </table>
+
+                    <!-- Pagination pour les ventes -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if ventes.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_ventes={{ ventes.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% for num in ventes.paginator.page_range %}
+                                <li class="page-item {% if ventes.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page_ventes={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+                            {% if ventes.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_ventes={{ ventes.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+
                     {% else %}
                         <p class="text-center">Aucune vente trouvée.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
-        
     </div>
 </div>
-
-
 
 {% endblock %}

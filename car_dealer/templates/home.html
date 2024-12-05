@@ -4,57 +4,66 @@
 <style>
     .card {
         position: relative;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
+        border-radius: 12px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .card:hover {
-        transform: scale(1.03);
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
 
     .badge {
         position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        z-index: 10;
+        top: 10px;
+        right: 10px;
         border-radius: 8px;
-        padding: 5px 10px;
-        font-size: 0.8rem;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        z-index: 10;
     }
 
     .fixed-image-size {
         width: 100%;
-        height: 200px;
+        height: 220px;
         object-fit: cover;
-        border-radius: 10px 10px 0 0;
+    }
+
+    .card-body h6 {
+        font-size: 1.1rem;
+        font-weight: bold;
     }
 
     .card-footer {
         background-color: #f8f9fa;
     }
 
-    .card-body h6 {
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
-    .card-body p {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-
     .section-title {
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        text-align: center;
         color: #333;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: "";
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: #007bff;
+        margin: 10px auto;
     }
 
     .btn-outline-dark {
         border-color: #343a40;
         color: #343a40;
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
     }
 
     .btn-outline-dark:hover {
@@ -62,104 +71,103 @@
         color: #fff;
     }
 
+    .service-card {
+        background: #f9f9f9;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 8px;
+    }
+
+    .service-card:hover {
+        background-color: #f0f0f0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon {
+        font-size: 3rem;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
     .logo {
         height: 100px;
         margin-right: 20px;
     }
-
-    .service-card {
-        transition: background-color 0.2s ease;
-    }
-
-    .service-card:hover {
-        background-color: #f8f9fa;
-    }
-
-    .list-group-item-action {
-        color: #343a40;
-    }
 </style>
 
-<header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-2">
-        <div class="d-flex justify-content-center align-items-center text-white">
-            <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mr-3">
-            <div class="text-center">
-                <h1 class="display-4 fw-bolder">Cars - Services</h1>
-                <!-- Les meilleurs services d'accompagnement -->
-                <p class="lead fw-normal text-white-50 mb-0">{{ var }}</p>  
-            </div>
-        </div>
+<header class="bg-dark py-3">
+    <div class="container px-3 px-lg-4 my-1 text-center text-white">
+        <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo" style="max-height: 60px;">
+        <h1 class="fw-bold" style="font-size: 2rem; margin-top: 10px;">Cars - Services</h1>
+        <p class="lead text-white-50" style="font-size: 0.9rem; margin-bottom: 0;">{{ var }}</p>
     </div>
 </header>
 
-<section class="container-fluid p-5 mb-6">
-    <div class="row px-5">
+
+<section class="container py-5">
+    <div class="row">
+        <!-- Showroom -->
         <div class="col-md-9 mb-4">
-            <h2 class="section-title text-center">{% translate "Notre Showroom" %}</h2>
-            <div class="card">
-                <div class="card-body">
-                    <div class="row row-cols-1 row-cols-md-3 g-4"> 
-                        {% for voiture in voitures %}
-                        <div class="col"> 
-                            <div class="card h-100 position-relative">
-                                {% if voiture.status == 'reservé' or voiture.status == 'ready' %}
-                                <div class="badge bg-warning text-dark">Réservé !</div>
-                                {% endif %}
-                                {% if voiture.status == 'vendu' or voiture.status == "livré" %}
-                                <div class="badge bg-danger text-white">Vendu !</div>
-                                {% endif %}
-
-                                {% if voiture.images.all %}
-                                <img src="{{ voiture.images.first.image.url }}" class="fixed-image-size" alt="{{ voiture.modele.nom }}">
-                                {% endif %}
-                                {% if voiture.status == 'Available' %}
-                                    {% if user.is_authenticated %} 
-                                    <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
-                                        {% if voiture.id in wishlist_voiture_ids %}
-                                            <i class="bi bi-star-fill text-danger" style="font-size: 2rem;"></i> 
-                                        {% else %}
-                                            <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i> 
-                                        {% endif %}
-                                        <span class="visually-hidden">Ajouter/Retirer des favoris</span> 
-                                    </a>
-                                    {% endif %}
-                                {% endif %}
-
-                                <div class="card-body text-center">
-                                    <h6>{{ voiture.marque.nom }}- {{ voiture.modele.nom }} - {{ voiture.annee_fabrication }}</h6>
-                                    <h5 class="text-muted">{{ voiture.prix }}.00€</h5>
-                                </div>
-
-                                <div class="card-footer text-center">
-                                    <a class="btn btn-outline-dark mt-auto" href="{% url 'voiture' voiture.id %}">Détails</a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <h2 class="section-title text-center">Services</h2>
-            <div class="card">
-                <div class="card-body">
-                    {% for service in services %}
-                    <div class="card mb-2 service-card">
-                        <a href="{% url 'service_detail' service.id %}" class="list-group-item list-group-item-action">
-                            <div class="card-body text-center">
-                                <h6>{{ service.nom }}</h6>
-                                <p class="text-muted">Demandez notre service</p>
-                            </div>
+            <h2 class="section-title">{% translate "Notre Showroom" %}</h2>
+            <div class="row g-4">
+                {% for voiture in voitures %}
+                <div class="col-md-4">
+                    <div class="card h-100 position-relative">
+                        <!-- Badge -->
+                        {% if voiture.status == 'reservé' or voiture.status == 'ready' %}
+                        <div class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Réservé</div>
+                        {% elif voiture.status == 'vendu' or voiture.status == 'livré' %}
+                        <div class="badge bg-danger text-white position-absolute top-0 end-0 m-2">Vendu</div>
+                        {% endif %}
+            
+                        <!-- Image -->
+                        {% if voiture.images.exists %}
+                        <img src="{{ voiture.images.first.image.url }}" class="fixed-image-size" alt="{{ voiture.modele.nom }}">
+                        {% else %}
+                        <img src="/static/images/placeholder.png" class="fixed-image-size" alt="Image indisponible">
+                        {% endif %}
+            
+                        <!-- Favorite Button -->
+                        {% if voiture.status == 'Available' and user.is_authenticated %}
+                        <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0 p-2">
+                            {% if voiture.id in wishlist_voiture_ids %}
+                            <i class="bi bi-star-fill text-danger" style="font-size: 1.5rem;"></i>
+                            {% else %}
+                            <i class="bi bi-star text-warning" style="font-size: 1.5rem;"></i>
+                            {% endif %}
                         </a>
+                        {% endif %}
+            
+                        <!-- Card Content -->
+                        <div class="card-body text-center">
+                            <h6>{{ voiture.marque.nom }} - {{ voiture.modele.nom }} ({{ voiture.annee_fabrication }})</h6>
+                            <h5 class="text-muted">{{ voiture.prix }}.00€</h5>
+                        </div>
+            
+                        <!-- Card Footer -->
+                        <div class="card-footer text-center">
+                            <a href="{% url 'voiture' voiture.id %}" class="btn btn-outline-dark">Détails</a>
+                        </div>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
+            
         </div>
+
+        <!-- Services -->
+<div class="col-md-3">
+    <h2 class="section-title">{% translate "Services" %}</h2>
+    <div class="list-group">
+        {% for service in services %}
+        <div class="service-card mb-2 p-2 text-center" style="border: 1px solid #ddd; border-radius: 8px;">
+            <i class="bi bi-gear-fill icon" style="font-size: 1.5rem; color: #343a40;"></i>
+            <h6 class="mt-2 mb-1" style="font-size: 0.9rem; font-weight: 600;">{{ service.nom }}</h6>
+            <a href="{% url 'service_detail' service.id %}" class="btn btn-outline-dark btn-sm mt-1">En savoir plus</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
     </div>
 </section>
-
 {% endblock %}

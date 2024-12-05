@@ -2,30 +2,112 @@
 
 {% block content %}
 <style>
+    /* Style global */
     .red-transparent {
         color: rgba(255, 0, 0, 0.5); /* Rouge avec une opacité de 50% */
     }
     .fixed-size-image {
         width: 100%;
-        height: 200px;
+        height: 250px;
         object-fit: cover;
+        border-radius: 10px;
     }
-
-    .card-badge { /* Nouveau style pour les badges */
+    .card-badge {
         position: absolute;
         top: 10px;
         right: 10px;
-        z-index: 1; /* Assurez-vous que le badge est au-dessus de l'image */
+        z-index: 1;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 0.9rem;
+    }
+
+    /* Card Hover Effect */
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Form Styling */
+    .form-select {
+        border-radius: 5px;
+        padding: 10px;
+    }
+    .form-control:focus {
+        border-color: #0056b3;
+        box-shadow: 0 0 5px rgba(0, 85, 179, 0.5);
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    /* Filter Sidebar */
+    .filter-sidebar {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header */
+    header {
+        background-color: #212529;
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+        border-bottom: 5px solid #007bff;
+    }
+    header img.logo {
+        width: 50px;
+        margin-right: 20px;
+    }
+    header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+    }
+
+    /* Grid Layout */
+    .car-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    /* Badge Styles */
+    .badge-warning {
+        background-color: #ffc107;
+    }
+    .badge-danger {
+        background-color: #dc3545;
+    }
+
+    /* Fancy button */
+    .btn-outline-dark {
+        border: 2px solid #343a40;
+        color: #343a40;
+        transition: all 0.3s ease;
+    }
+    .btn-outline-dark:hover {
+        background-color: #343a40;
+        color: white;
     }
 </style>
 
-<header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-2">
-        <div class="d-flex justify-content-center align-items-center text-white">
-            <img src="/media/photos/site/cardealerLogo.png" alt="Logo" class="logo mr-3">
-            <div class="text-center">
-                <h1 class="display-4 fw-bolder">Nos véhicules d'occasion</h1> 
-            </div>
+<header>
+    <div class="container">
+        <div class="d-flex justify-content-center align-items-center">
+            <img src="/media/photos/site/cardealerLogo.png" alt="Logo" class="logo">
+            <h1>Nos véhicules d'occasion</h1>
         </div>
     </div>
 </header>
@@ -33,100 +115,93 @@
 <section class="container-fluid mb-6">
     <div class="row px-5 m-4">
         <div class="col-md-3 mb-4"> 
-            <div class="card">
-                <div class="card-header">
-                    <h2>Filtrer</h2>
-                </div>
-                <div class="card-body">
-                    <form method="GET" class="mb-3" id="filter-form">
-                        <div class="mb-3">
-                            <label for="marque">Marque</label>
-                            <select id="marque" name="marque" class="form-select">
-                                <option value="">Tous</option>
-                                {% for marque in marques_disponibles %}
+            <div class="filter-sidebar">
+                <h2>Filtrer</h2>
+                <form method="GET" class="mb-3" id="filter-form">
+                    <div class="mb-3">
+                        <label for="marque">Marque</label>
+                        <select id="marque" name="marque" class="form-select">
+                            <option value="">Tous</option>
+                            {% for marque in marques_disponibles %}
                                 <option value="{{ marque }}" {% if request.GET.marque == marque %}selected{% endif %}>{{ marque }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="carburant">Carburant</label>
-                            <select id="carburant" name="carburant" class="form-select">
-                                <option value="">Tous</option>
-                                {% for carburant in carburants_disponibles %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="carburant">Carburant</label>
+                        <select id="carburant" name="carburant" class="form-select">
+                            <option value="">Tous</option>
+                            {% for carburant in carburants_disponibles %}
                                 <option value="{{ carburant }}" {% if request.GET.carburant == carburant %}selected{% endif %}>{{ carburant }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="transmission">Transmission</label>
-                            <select id="transmission" name="transmission" class="form-select">
-                                <option value="">Tous</option>
-                                {% for transmission in transmissions_disponibles %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transmission">Transmission</label>
+                        <select id="transmission" name="transmission" class="form-select">
+                            <option value="">Tous</option>
+                            {% for transmission in transmissions_disponibles %}
                                 <option value="{{ transmission }}" {% if request.GET.transmission == transmission %}selected{% endif %}>{{ transmission }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="status">Disponible - Réservé - Vendu</label>
-                            <select id="status" name="status" class="form-select">
-                                <option value="">Tous</option>
-                                {% for status in status_disponibles %}
-                                    {% if status == 'livré' %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status">Disponible - Réservé - Vendu</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="">Tous</option>
+                            {% for status in status_disponibles %}
+                                {% if status == 'livré' %}
                                     <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Vendu</option>
-                                    {% endif %}
-                                    {% if status == 'Available' %}
+                                {% endif %}
+                                {% if status == 'Available' %}
                                     <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Disponible</option>
-                                    {% endif %}
-                                    {% if status == 'reservé' %}
+                                {% endif %}
+                                {% if status == 'reservé' %}
                                     <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Réservé</option>
-                                    {% endif %}
-                                    <!-- <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option> -->
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Filtrer</button>
-                        </div>
-                    </form>
-                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Filtrer</button>
+                    </div>
+                </form>
             </div>
         </div>
 
         <div class="col-md-9">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> 
+            <div class="car-grid">
                 {% for voiture in voitures %}
-                    <div class="col">
-                        <div class="card h-100 position-relative">
-                            {% if voiture.status == 'reservé' %}
-                                <span class="badge bg-warning text-dark card-badge">Réservé !</span>
-                            {% endif %}
-                            {% if voiture.status == 'vendu' or voiture.status == "livré" %}
-                                <span class="badge bg-danger text-white card-badge">Vendu !</span>
-                            {% endif %}
-                            {% if voiture.images.all %}
-                                <img src="{{ voiture.images.first.image.url }}" class="card-img-top fixed-size-image" alt="{{ voiture.modele.nom }}">
-                                {% if voiture.status == 'Available' %} 
-                                    {% if user.is_authenticated %} 
-                                    <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
+                    <div class="card h-100 position-relative">
+                        {% if voiture.status == 'reservé' %}
+                            <span class="badge badge-warning card-badge">Réservé</span>
+                        {% endif %}
+                        {% if voiture.status == 'vendu' or voiture.status == "livré" or voiture.status == "ready" %}
+                            <span class="badge badge-danger card-badge">Vendu</span>
+                        {% endif %}
+                        {% if voiture.images.all %}
+                            <img src="{{ voiture.images.first.image.url }}" class="card-img-top fixed-size-image" alt="{{ voiture.modele.nom }}">
+                            {% if voiture.status == 'Available' %}
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0">
                                         {% if voiture.id in wishlist_voiture_ids %}
-                                            <i class="bi bi-star-fill text-danger" style="font-size: 2rem;"></i> 
+                                            <i class="bi bi-star-fill text-danger" style="font-size: 2rem;"></i>
                                         {% else %}
-                                            <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i> 
+                                            <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i>
                                         {% endif %}
-                                        <span class="visually-hidden">Ajouter/Retirer des favoris</span> 
+                                        <span class="visually-hidden">Ajouter/Retirer des favoris</span>
                                     </a>
-                                    {% endif %}
                                 {% endif %}
                             {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ voiture.modele.nom }} - {{ voiture.annee_fabrication }}</h5>
-                                <p class="card-text">{{ voiture.marque.nom }}</p>
-                                <p class="card-text text-muted">{{ voiture.prix }}.00€</p>
-                            </div>
-                            <div class="card-footer">
-                                <div class="text-center">
-                                    <a class="btn btn-outline-dark mt-auto" href="{% url 'voiture' voiture.id %}">Détails</a>
-                                </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ voiture.modele.nom }} - {{ voiture.annee_fabrication }}</h5>
+                            <p class="card-text">{{ voiture.marque.nom }}</p>
+                            <p class="card-text text-muted">{{ voiture.prix }}.00€</p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto" href="{% url 'voiture' voiture.id %}">Détails</a>
                             </div>
                         </div>
                     </div>
@@ -137,5 +212,3 @@
 </section>
 
 {% endblock %}
-
-

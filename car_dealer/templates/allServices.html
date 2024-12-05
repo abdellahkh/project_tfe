@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-2">
         <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Nos Services</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Découvrez nos services automobiles</p>
+            <h1 class="display-4 fw-bold">Nos Services</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Découvrez nos services automobiles d'exception</p>
         </div>
     </div>
 </header>
@@ -16,31 +15,28 @@
         {% for service in services %}
         {% if service.is_available %}
         <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-            <div class="card h-100 shadow-lg rounded">
-                <div class="card-img-top">
+            <div class="card h-100 shadow-lg rounded-lg border-light overflow-hidden">
+                <div class="card-img-top position-relative">
                     {% if service.image %}
-                    <img src="{{ service.image.url }}" alt="{{ service.nom }}" class="card-img-top"
-                        style="max-height: 200px; object-fit: cover;">
+                    <img src="{{ service.image.url }}" alt="{{ service.nom }}" class="card-img-top rounded-3" style="max-height: 200px; object-fit: cover;">
                     {% endif %}
+                    <div class="overlay"></div>
                 </div>
-                <div class="card-body flex-grow-1">
-                    <div class="d-flex flex-column h-100">
-                        <h4 class="card-title">{{ service.nom }}</h4>
-                        <p class="card-text text-start">{{ service.description }}</p>
-                    </div>
+                <div class="card-body d-flex flex-column justify-content-between py-4 px-5">
+                    <h4 class="card-title text-dark">{{ service.nom }}</h4>
+                    <p class="card-text text-muted">{{ service.description }}</p>
                 </div>
-                <div class="card-footer bg-primary text-white">
-                    <a href="{% url 'service_detail' service.id %}" class="btn btn-light">En savoir plus</a>
+                <div class="card-footer bg-primary text-white py-3 px-5">
+                    <a href="{% url 'service_detail' service.id %}" class="btn btn-light btn-lg w-100">En savoir plus</a>
                 </div>
 
-                <div class="reviews m-3">
-                    <h6 class="text-start">({{ service.review_set.count }}) Commentaires :</h6> 
-
+                <div class="reviews p-4 bg-light">
+                    <h6 class="text-start mb-3">({{ service.review_set.count }}) Commentaires :</h6>
                     <div id="carousel{{ service.id }}" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
-                            {% for review in service.review_set.all %} 
+                            {% for review in service.review_set.all %}
                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                <div class="card mb-3">
+                                <div class="card mb-3 shadow-sm">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between">
                                             <h6 class="card-title">{{ review.user_id.username }}</h6>
@@ -52,7 +48,7 @@
                             </div>
                             {% empty %}
                             <div class="carousel-item active">
-                                <div class="card mb-3">
+                                <div class="card mb-3 shadow-sm">
                                     <div class="card-body">
                                         <h6 class="card-title text-center">Pas de commentaires pour le moment</h6>
                                     </div>
@@ -60,25 +56,22 @@
                             </div>
                             {% endfor %}
                         </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ service.id }}"
-                            data-bs-slide="prev">
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ service.id }}" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                             <span class="sr-only">Previous</span> 
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ service.id }}"
-                            data-bs-slide="next">
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ service.id }}" data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                             <span class="sr-only">Next</span> 
                         </button>
                     </div>
+
                     {% if user.is_authenticated %}
-                    <div class="ajouter-commentaire m-3">
-                        <form method="post" action="{% url 'ajouter_commentaire' service.id %}"> 
+                    <div class="ajouter-commentaire mt-4">
+                        <form method="post" action="{% url 'ajouter_commentaire' service.id %}">
                             {% csrf_token %}
-                            {{ form.comment }} 
-                            
-                            <button type="submit" class="btn btn-primary mt-2">Ajouter un commentaire</button>
-                            
+                            {{ form.comment }}
+                            <button type="submit" class="btn btn-primary mt-2 w-100">Ajouter un commentaire</button>
                         </form>
                     </div>
                     {% endif %}
@@ -90,10 +83,167 @@
         {% endfor %}
         {% else %}
         <div class="col-12 text-center">
-            <p>Aucun service disponible pour le moment.</p>
+            <p class="display-6 text-muted">Aucun service disponible pour le moment.</p>
         </div>
         {% endif %}
     </div>
 </section>
+<style>
+    /* Global Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Header */
+header {
+    background: #212529;
+    color: white;
+}
+
+header .container {
+    max-width: 100%;
+}
+
+header .display-4 {
+    font-size: 3rem;
+}
+
+header .lead {
+    font-size: 1.25rem;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.card-img-top img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.card-img-top:hover img {
+    transform: scale(1.05);
+}
+
+.card-body {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #666;
+}
+
+/* Card Footer */
+.card-footer {
+    background-color: #007bff;
+    padding: 1.5rem;
+    border-top: none;
+}
+
+.card-footer .btn {
+    font-size: 1.125rem;
+    padding: 10px 20px;
+}
+
+/* Reviews Section */
+.reviews {
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+.reviews .carousel-inner {
+    padding: 10px;
+}
+
+.reviews .carousel-item .card {
+    border-radius: 8px;
+}
+
+.reviews .carousel-item .card-body {
+    padding: 1.25rem;
+}
+
+/* Comment Form */
+.ajouter-commentaire form {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ajouter-commentaire form .btn {
+    padding: 12px;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-light {
+    background-color: #f8f9fa;
+    border-color: #e2e6ea;
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+    header .display-4 {
+        font-size: 2rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .reviews .carousel-inner {
+        padding: 0;
+    }
+}
+
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const carousels = document.querySelectorAll('.carousel');
+
+    carousels.forEach(carousel => {
+        new bootstrap.Carousel(carousel, {
+            interval: 5000, // Interval between slides in ms
+            ride: 'carousel'
+        });
+    });
+});
+
+</script>
 
 {% endblock %}

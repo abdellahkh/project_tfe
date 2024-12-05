@@ -10,7 +10,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .forms import DemandeContactVoitureMembre, ReviewForm, SignUpForm, UserUpdateForm, DemandeDeplacement, DemandeControlTech, DemandeControlTechMembre, DemandeDeplacementMembre, DemandeSortieDeFourriereMembre, DemandeSortieDeFourriere, VenteVehicule, VenteVehiculeMembre
+from .forms import DemandeContactVoitureMembre, ImageVoitureForm, ReviewForm, SignUpForm, UserUpdateForm, DemandeDeplacement, DemandeControlTech, DemandeControlTechMembre, DemandeDeplacementMembre, DemandeSortieDeFourriereMembre, DemandeSortieDeFourriere, VenteVehicule, VenteVehiculeMembre, VoitureForm
 from django import forms
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
@@ -24,10 +24,10 @@ import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
-
+from django.contrib.auth.decorators import login_required
 
 def home(request):
-    voitures = Voiture.objects.filter(status='avendre').prefetch_related('images').order_by('-date_poste')[:6]
+    voitures = Voiture.objects.filter(status='Available').prefetch_related('images').order_by('-date_poste')[:6]
     services = Service.objects.filter(is_available=True)
 
     wishlist_voiture_ids = []  # Initialize as an empty list
@@ -66,71 +66,116 @@ def activate(request, uidb64, token):
 # 
 from django.core.paginator import Paginator
 
+from datetime import timedelta
+from django.db.models import Count, Sum
+from django.utils.timezone import now
+from django.core.paginator import Paginator
+import json
+
+from datetime import timedelta
+from django.db.models import Count, Sum
+from django.utils.timezone import now
+from django.core.paginator import Paginator
+
 def dashboard(request):
     # Récupération des filtres
     genre_filter = request.GET.get('genre', '')
-    status_voiture_filter = request.GET.get('status_voiture', '')  # Nouveau filtre pour le statut des voitures
-
-    # Récupération de toutes les ventes et voitures
-    ventes = Vente.objects.all().order_by('-date')
-    voitures = Voiture.objects.all().order_by('-date_poste')
-
-    # Application du filtre de genre pour les ventes
-    if genre_filter:
-        ventes = ventes.filter(genre=genre_filter)
-
-    # Application du filtre de statut pour les voitures
-    if status_voiture_filter:
-        voitures = voitures.filter(status=status_voiture_filter)
-
-    # Pagination pour les ventes et les voitures (6 éléments par page)
-    vente_paginator = Paginator(ventes, 6)  
-    voiture_paginator = Paginator(voitures, 6)  
-    page_number_ventes = request.GET.get('page_ventes')
-    page_number_voitures = request.GET.get('page_voitures')
-    ventes_page_obj = vente_paginator.get_page(page_number_ventes)
-    voitures_page_obj = voiture_paginator.get_page(page_number_voitures)
-
-    # Autres filtres pour les demandes
-    demande_genres = [genre[0] for genre in Demande.GENRE_INTERVENTION]
-    demande_status = [status[0] for status in Demande.STATUS_OPTIONS]
-    demande_services = Service.objects.all()
-
+    status_voiture_filter = request.GET.get('status_voiture', '')
     status_filter = request.GET.get('status', '')
     service_filter = request.GET.get('service', '')
+    status_vente_filter = request.GET.get('status_vente', '')  # Nouveau filtre pour le statut des ventes
 
-    # Filtrage des demandes
-    allRequest = Demande.objects.all().order_by('-date')
+    # Récupération des données
+    ventes = Vente.objects.all().order_by('-date')
+    voitures = Voiture.objects.all().order_by('-date_poste')
+    demandes = Demande.objects.all().order_by('-date')
 
+    # Application des filtres
+    if genre_filter:
+        ventes = ventes.filter(genre=genre_filter)
+    if status_voiture_filter:
+        voitures = voitures.filter(status=status_voiture_filter)
     if status_filter:
-        allRequest = allRequest.filter(status=status_filter)
+        demandes = demandes.filter(status=status_filter)
     if service_filter:
-        allRequest = allRequest.filter(service=service_filter)
+        demandes = demandes.filter(service_id=service_filter)
+    if status_vente_filter:
+        ventes = ventes.filter(paid=status_vente_filter)
 
-    # Pagination des demandes (6 éléments par page)
-    demande_paginator = Paginator(allRequest, 6)
+    # Pagination
+    voiture_paginator = Paginator(voitures, 6)
+    ventes_paginator = Paginator(ventes, 6)
+    demandes_paginator = Paginator(demandes, 6)
+
+    page_number_voitures = request.GET.get('page_voitures')
+    page_number_ventes = request.GET.get('page_ventes')
     page_number_demandes = request.GET.get('page_demandes')
-    demandes_page_obj = demande_paginator.get_page(page_number_demandes)
 
-    # Liste des statuts des voitures pour le filtre
-    voiture_status = Voiture.STATUS_CHOICES  # Assurez-vous d'avoir les choix de statut définis dans ton modèle
+    voitures_page_obj = voiture_paginator.get_page(page_number_voitures)
+    ventes_page_obj = ventes_paginator.get_page(page_number_ventes)
+    demandes_page_obj = demandes_paginator.get_page(page_number_demandes)
+
+    # Statistiques globales
+    total_voitures_vendues = Vente.objects.filter(voiture_id__isnull=False).count()
+    ventes_semaine = Vente.objects.filter(date__gte=now() - timedelta(days=7)).count()
+    total_revenus = Vente.objects.aggregate(Sum('montant_total'))['montant_total__sum'] or 0
+
+    # Statistiques pour les employés
+    voitures_disponibles = Voiture.objects.filter(status='Available').count()
+    demandes_attente = Demande.objects.filter(status='Actif').count()
+    total_voitures = Voiture.objects.count()
+    pourcentage_voitures_vendues = round((total_voitures_vendues / total_voitures) * 100, 2) if total_voitures > 0 else 0
+
+    # Comparaison des ventes hebdomadaires
+    ventes_semaine_derniere = Vente.objects.filter(
+        date__gte=now() - timedelta(days=14),
+        date__lt=now() - timedelta(days=7)
+    ).count()
+    progression_semaine = (
+        round(((ventes_semaine - ventes_semaine_derniere) / ventes_semaine_derniere) * 100, 2)
+        if ventes_semaine_derniere > 0 else 0
+    )
+
+    # Graphiques
+    sales_by_service = Vente.objects.values('demande_id__service__nom').annotate(count=Count('id'))
+    sales_by_service_labels = [item['demande_id__service__nom'] for item in sales_by_service]
+    sales_by_service_data = [item['count'] for item in sales_by_service]
+
+    requests_by_service = Demande.objects.values('service__nom').annotate(count=Count('id'))
+    requests_by_service_labels = [item['service__nom'] for item in requests_by_service]
+    requests_by_service_data = [item['count'] for item in requests_by_service]
+
+    # Liste des statuts et services pour les filtres
+    voiture_status = Voiture.STATUS_CHOICES
+    demande_status = [status[0] for status in Demande.STATUS_OPTIONS]
+    demande_services = Service.objects.all()
+    vente_status = Vente.PAIEMENT_CHOICES  # Liste des choix de statut de paiement
 
     return render(request, 'dashboard.html', {
         'ventes': ventes_page_obj,
         'voitures': voitures_page_obj,
-        'allRequest': demandes_page_obj,
-        'demande_genres': demande_genres,
+        'demandes': demandes_page_obj,
+        'total_voitures_vendues': total_voitures_vendues,
+        'ventes_semaine': ventes_semaine,
+        'total_revenus': total_revenus,
+        'voitures_disponibles': voitures_disponibles,
+        'demandes_attente': demandes_attente,
+        'pourcentage_voitures_vendues': pourcentage_voitures_vendues,
+        'progression_semaine': progression_semaine,
+        'sales_by_service_labels': json.dumps(sales_by_service_labels),
+        'sales_by_service_data': json.dumps(sales_by_service_data),
+        'requests_by_service_labels': json.dumps(requests_by_service_labels),
+        'requests_by_service_data': json.dumps(requests_by_service_data),
+        'voiture_status': voiture_status,
         'demande_status': demande_status,
         'demande_services': demande_services,
+        'vente_status': vente_status,  # Liste des statuts de vente pour le filtre
+        'status_voiture_filter': status_voiture_filter,
         'status_filter': status_filter,
         'service_filter': service_filter,
         'genre_filter': genre_filter,
-        'voiture_status': voiture_status,  # Liste des statuts des voitures
-        'status_voiture_filter': status_voiture_filter,  # Filtre actuel du statut
+        'status_vente_filter': status_vente_filter,  # Ajout du filtre actuel pour le statut de vente
     })
-
-
-
 
 
     
@@ -619,29 +664,36 @@ def contact_vehicule(request, voiture_id):
 
 
 def profile(request, username):
-    user = get_user_model().objects.filter(username=username).first()
-    demandes = Demande.objects.filter(member=user).order_by('-date')  
+    user = get_object_or_404(get_user_model(), username=username)
+    
+    demandes = Demande.objects.filter(member=user).order_by('-date')
     voitureSoumisses = VoitureSoumisse.objects.filter(user_id=user)
-    toutesDemandes = Demande.objects.all().order_by('-date')  
-    ventes = Vente.objects.filter(user_id=user) 
+    toutesDemandes = Demande.objects.all().order_by('-date')
+    ventes = Vente.objects.filter(user_id=user)
+    
+    # Vérification explicite de la visibilité des notes
+    notes = Notes.objects.filter(customer_visible=True).order_by('-date')
 
+    # Wishlist
     wishlist, created = UserWishlist.objects.get_or_create(user=request.user)
     wishlist_voitures = wishlist.voiture.all()
 
-    wishlist_voiture_ids = []  
+    wishlist_voiture_ids = []
     if request.user.is_authenticated:
         wishes = UserWishlist.objects.filter(user=request.user)
         wishlist_voiture_ids = wishes.values_list('voiture__id', flat=True)
 
     return render(request, "profile_view.html", {
-        'user': user, 
-        'demandes': demandes, 
-        'voitureSoumisses': voitureSoumisses, 
-        'toutesDemandes': toutesDemandes, 
-        "ventes": ventes,
+        'user': user,
+        'demandes': demandes,
+        'voitureSoumisses': voitureSoumisses,
+        'toutesDemandes': toutesDemandes,
+        'ventes': ventes,
         'wishlist_voiture_ids': wishlist_voiture_ids,
-        'wishlist_voitures': wishlist_voitures,  
+        'wishlist_voitures': wishlist_voitures,
+        'notes': notes
     })
+
 
 
 
@@ -734,13 +786,15 @@ def ajouter_note(request, vente_id):
     vente = get_object_or_404(Vente, pk=vente_id)
 
     if request.method == 'POST':
-        contenu = request.POST.get('contenu')
+        contenu = request.POST.get('contenu', '')  # Récupère le contenu de la note
+        customer_visible = request.POST.get('customer_visible') == 'on'  # Récupère l'état de la checkbox
         Notes.objects.create(
-            user_id=request.user,  # Assuming you have request.user available
+            user_id=request.user,  # Assurez-vous que `request.user` est une instance valide
             vente_id=vente,
-            contenu=contenu
+            contenu=contenu,
+            customer_visible=customer_visible
         )
-        return redirect('vente_details', vente_id=vente.id)  # Redirect back to the vente details page
+        return redirect('vente_details', vente_id=vente.id)  # Redirection vers la page de détails de la vente
 
     return redirect('vente_details', vente_id=vente.id)
 
@@ -749,14 +803,32 @@ def ajouter_note_demande(request, demande_id):
 
     if request.method == 'POST':
         contenu = request.POST.get('contenu')
+        customer_visible = request.POST.get('customer_visible') == 'on'
         Notes.objects.create(
             user_id=request.user,  
             demande_id=demande,
-            contenu=contenu
+            contenu=contenu,
+            customer_visible=customer_visible
         )
         return redirect('demande_details', demande_id=demande.id)  #
 
     return redirect('demande_details', demande_id=demande.id)
+
+def ajouter_note_vente(request, vente_id):
+    vente = get_object_or_404(Vente, pk=vente_id)
+
+    if request.method == 'POST':
+        contenu = request.POST.get('contenu')
+        customer_visible = request.POST.get('customer_visible') == 'on'
+        Notes.objects.create(
+            user_id=request.user,  
+            vente_id=vente,
+            contenu=contenu,
+            customer_visible=customer_visible
+        )
+        return redirect('vente_details', demande_id=vente.id)  #
+
+    return redirect('vente_details', demande_id=vente.id)
 
 def startVente(request, demande_id):
     demande = get_object_or_404(Demande, pk=demande_id)
@@ -767,7 +839,7 @@ def startVente(request, demande_id):
         prix_min = float(demande.voiture.prix_min)  
 
         if prix >= prix_min:
-            Vente.objects.create(
+            vente = Vente.objects.create(
                 genre='Vente',
                 paid='no',
                 demande_id=demande,
@@ -776,8 +848,13 @@ def startVente(request, demande_id):
                 montant_total=prix,
                 montant_acompte=prix * 0.1,
             )
+
             demande.status = 'En preparation' 
             demande.save()
+            notes = Notes.objects.filter(demande_id = demande_id)
+            for note in notes:
+                note.vente_id = vente
+                note.save()
             return redirect('home')  
         else:
             messages.error(request, 'Prix trop bas, le prix min est ' + str(prix_min))  # Add request object and convert prix_min to string
@@ -791,7 +868,6 @@ def startVente(request, demande_id):
 def startVenteService(request, demande_id):
     demande = get_object_or_404(Demande, pk=demande_id)
     prix = request.POST.get('contenu')
-
     try:
         prix = float(prix)  # Convert prix to a float
 
@@ -803,6 +879,7 @@ def startVenteService(request, demande_id):
                 user_id=demande.member,
                 montant_total=prix,
             )
+            
             demande.status = 'En preparation'
             demande.save()
             return redirect('dashboard')
@@ -814,7 +891,77 @@ def startVenteService(request, demande_id):
         messages.error(request, 'Veuillez entrer un prix valide.')
         return redirect('demande_details', demande_id=demande.id)
 
+def annuleVente(request, vente_id):
+    if request.method == "POST":
+        vente = get_object_or_404(Vente, pk=vente_id)
+        raison = request.POST.get('raison', '').strip()  # Utiliser 'raison', comme dans le formulaire
+        
+        if raison:
+            Notes.objects.create(
+                user_id=request.user,
+                vente_id=vente,
+                contenu=f"Demande d'annulation par le client : {raison}"
+            )
+            messages.success(request, "Votre demande d'annulation a été soumise avec succès.")
+        else:
+            messages.error(request, "Vous devez fournir une raison pour l'annulation.")
+        
+        # Reste sur la même page
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+    else:
+        messages.error(request, "Méthode non autorisée.")
+        return redirect(request.META.get('HTTP_REFERER', '/'))
 
+    
+
+def annuler_vente_admin(request, vente_id):
+    vente = get_object_or_404(Vente, pk=vente_id)
+    vente.paid = 'cancelled'
+    vente.save()
+    voiture = get_object_or_404(Voiture, pk=vente.voiture_id.id)
+    voiture.status = 'Available'
+    voiture.save()
+    Notes.objects.create(
+                user_id=request.user,
+                vente_id=vente,
+                contenu=f"Annulation valider par : {request.user}"
+            )
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+    
+def voitureEdit(request, voiture_id):
+    voiture = get_object_or_404(Voiture, pk=voiture_id)
+
+    if request.method == "POST":
+        form = VoitureForm(request.POST, instance=voiture)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "La voiture a été mise à jour avec succès.")
+            return redirect('voitureEdit', voiture_id=voiture.id)  # Redirige vers la même page pour revoir les changements
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+    else:
+        form = VoitureForm(instance=voiture)
+
+    return render(request, 'voitureEdit.html', {'form': form, 'voiture': voiture})
+
+@login_required
+def addVoiture(request):
+    ImageFormSet = forms.modelformset_factory(ImageVoiture, form=ImageVoitureForm, extra=9)  # Permet d'ajouter jusqu'à 3 images
+    if request.method == 'POST':
+        voiture_form = VoitureForm(request.POST)
+        formset = ImageFormSet(request.POST, request.FILES, queryset=ImageVoiture.objects.none())
+        if voiture_form.is_valid() and formset.is_valid():
+            voiture = voiture_form.save()
+            for form in formset.cleaned_data:
+                if form:
+                    image = form['image']
+                    ImageVoiture.objects.create(voiture=voiture, image=image)
+            return redirect('dashboard')  # Remplacez par le nom de l'URL de redirection
+    else:
+        voiture_form = VoitureForm()
+        formset = ImageFormSet(queryset=ImageVoiture.objects.none())
+    
+    return render(request, 'addVoiture.html', {'voiture_form': voiture_form, 'formset': formset})
 
 
 import stripe 

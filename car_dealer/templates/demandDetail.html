@@ -110,12 +110,18 @@
             <div class="card-body">
                 <h5>Ajouter une note</h5>
                 <form method="post" action="{% url 'ajouter_note_demande' demand.id %}"> {% csrf_token %} 
+                    {% csrf_token %}
                     <div class="mb-3">
                         <textarea class="form-control" name="contenu" rows="3" placeholder="Entrez votre note ici"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="customerVisible" name="customer_visible">
+                        <label class="form-check-label" for="customerVisible">Visible par le client</label>
                     </div>
                     <button type="submit" class="btn btn-primary">Ajouter Note</button>
                 </form>
             </div>
+            
             
             {% if demand.status == 'Actif' %}
                 {% if demand.member %}

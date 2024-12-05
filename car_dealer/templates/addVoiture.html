@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="bg-gradient-primary text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Ajouter un Véhicule</h1>
+        <p class="lead">Renseignez les informations nécessaires pour ajouter un nouveau véhicule.</p>
+    </div>
+</header>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h2 class="mb-0">Formulaire d'ajout</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% if messages %}
+                        <div>
+                            {% for message in messages %}
+                                <div class="alert alert-info">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Formulaire -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <h3>Ajouter une voiture</h3>
+                        {{ voiture_form.as_p }}
+                        <h4>Ajouter des images</h4>
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                            {{ form.as_p }}
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg shadow">Retour</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #1d3557, #457b9d, #a8dadc);
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #007bff, #0056b3);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #0056b3, #004085);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(90deg, #6c757d, #495057);
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(90deg, #495057, #343a40);
+    }
+</style>
+
+{% endblock %}

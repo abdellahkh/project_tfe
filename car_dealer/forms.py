@@ -1,4 +1,4 @@
-from .models import Member, VoitureSoumisse
+from .models import ImageVoiture, Member, Voiture, VoitureSoumisse
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from .models import Member, Demande
@@ -291,3 +291,42 @@ class ReviewForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['comment'].required = True
+
+
+from django import forms
+from .models import Voiture
+
+class VoitureForm(forms.ModelForm):
+    class Meta:
+        model = Voiture
+        fields = [
+            'marque', 'modele', 'annee_fabrication', 'carburant', 'transmission', 
+            'kilometrage', 'description', 'prix', 'prix_min', 'num_chassis', 'status'
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'annee_fabrication': forms.NumberInput(attrs={'class': 'form-control'}),
+            'prix': forms.NumberInput(attrs={'class': 'form-control'}),
+            'prix_min': forms.NumberInput(attrs={'class': 'form-control'}),
+            'kilometrage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'num_chassis': forms.TextInput(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+        }
+        labels = {
+            'marque': 'Marque',
+            'modele': 'Modèle',
+            'annee_fabrication': 'Année de fabrication',
+            'carburant': 'Type de carburant',
+            'transmission': 'Type de transmission',
+            'kilometrage': 'Kilométrage',
+            'description': 'Description',
+            'prix': 'Prix',
+            'prix_min': 'Prix minimal',
+            'num_chassis': 'Numéro de châssis',
+            'status': 'Statut',
+        }
+
+class ImageVoitureForm(forms.ModelForm):
+    class Meta:
+        model = ImageVoiture
+        fields = ['image']

@@ -104,7 +104,7 @@
 
                             {% if user.is_authenticated %}
 
-                            {% if voiture.status == 'avendre' %}
+                            {% if voiture.status == 'Available' %}
                             <button type="button" class="btn btn-outline-dark me-2" id="add-cart"
                                 value="{{ voiture.id }}">Ajouter à la sélection</button>
                             {% else %}

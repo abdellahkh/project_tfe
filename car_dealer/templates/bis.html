@@ -250,22 +250,6 @@
                     </dd>
                     {% endif %}
                 </dl>
-                <div>
-                    {% if notes %}
-                        {% for note in notes %}
-                            {% if note.demande_id == demande %}
-                                <span class="text-success">Postée par : {{ note.user_id }}</span>
-
-                                <p>{{ note.contenu }}</p>
-                                <hr>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <p>Pas de notes</p>
-                    {% endif %}
-                    
-                </div>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
@@ -285,9 +269,6 @@
             </div>
             <div class="modal-body">
                 <dl class="row">
-                    {% if vente.paid == 'cancelled' %}
-                    <p>La vente a été annulée, vous serez remboursé sous 5 jours ouvrables</p>
-                    {% endif %}
                     {% if vente.paid == 'partially' %}
                     {% if vente.voiture_id.status == 'reservé' %}
                     <p>Ce véhicule est réservé et est en cours de préparation</p>
@@ -299,39 +280,22 @@
                     <dd class="col-sm-9">{{ vente.montant_acompte }}€</dd>
                     <dt class="col-sm-3">Reste :</dt>
                     <dd class="col-sm-9">{{ vente.montant_restant }}€</dd>
-
+            
                     <div>
                         <a class="btn btn-secondary" href="{% url 'recu_accomte_pdf' vente.id %}">Imprimer Reçu</a>
-
-                        <form method="POST" action="{% url 'annuleVente' vente.id %}"
-                            onsubmit="return verifierRaison(event, {{ vente.id }})">
+            
+                        <form method="POST" action="{% url 'annuleVente' vente.id %}" onsubmit="return verifierRaison(event, {{ vente.id }})">
                             {% csrf_token %}
-                            <input type="text" name="raison" id="raison-annulation-{{ vente.id }}"
-                                placeholder="Indiquez une raison" class="form-control my-2" required>
+                            <input type="text" name="raison" id="raison-annulation-{{ vente.id }}" placeholder="Indiquez une raison" class="form-control my-2" required>
                             <button type="submit" class="btn btn-danger">Demande d'annulation</button>
                         </form>
-
+            
                         <!-- Message d'erreur -->
                         <div id="error-message-{{ vente.id }}" class="text-danger" style="display: none;">
                             Vous devez fournir une raison pour l'annulation.
                         </div>
                     </div>
-                    <div>
-                        {% if notes %}
-                            {% for note in notes %}
-                                {% if note.vente_id == vente %}
-                                
-                                    <span class="text-success">Postée par : {{ note.user_id }}</span>
-                
-                                    <p>{{ note.contenu }}</p>
-                                    <hr>                                 
-                               {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <p>Aucune note à afficher.</p>    
-                        {% endif %}
-                    </div>
-
+            
                     {% endif %}
                     {% if vente.voiture_id.status == 'ready' %}
                     <p>Ce véhicule est prêt.</p>
@@ -347,17 +311,16 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="cgvCheckbox" required>
                             <label class="form-check-label" for="cgvCheckbox">
-                                En cochant cette case, vous acceptez les <a href="about/" target="_blank">Conditions
-                                    Générales de Vente</a> et donnez votre accord pour procéder au paiement.
+                                En cochant cette case, vous acceptez les <a href="about/" target="_blank">Conditions Générales de Vente</a> et donnez votre accord pour procéder au paiement.
                             </label>
                         </div>
-
+            
                         <button type="button" class="btn btn-secondary me-2 confirmPayerBtn"
-                            data-vente-id="{{ vente.id }}" data-type="reste" disabled id="payerBtn">
-                            Payer le montant {{ vente.montant_restant }}€
+                                data-vente-id="{{ vente.id }}" data-type="reste" disabled id="payerBtn">
+                            Payer le montant {{ vente.montant_total }}€
                         </button>
                     </div>
-
+            
                     {% endif %}
                     {% endif %}
                     {% if vente.paid == 'no' %}
@@ -367,65 +330,40 @@
                     <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
                     <dt class="col-sm-3">Acompte :</dt>
                     <dd class="col-sm-9">{{ vente.montant_acompte }}€</dd>
-                    <div>
-                        <button type="button" class="btn btn-secondary me-2 confirmPayerBtn" data-vente-id="{{ vente.id }}" data-type="acompte" disabled id="payerBtn">
-                            Payer l'acompte {{ vente.montant_acompte }}€
-                        </button>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="cgvCheckbox" required>
-                            <label class="form-check-label" for="cgvCheckbox">
-                                En cochant cette case, vous acceptez les <a href="/about" target="_blank">Conditions
-                                    Générales
-                                    de Vente</a> et donnez votre accord pour procéder au paiement.
-                            </label>
-                        </div>
-                    </div>
-                    {% if notes %}
-                            {% for note in notes %}
-                                {% if note.vente_id == vente %}
-                                
-                                    <span class="text-success">Postée par : {{ note.user_id }}</span>
-                
-                                    <p>{{ note.contenu }}</p>
-                                    <hr>                                 
-                                {% endif %}
-                            {% endfor %}
-                    {% else %}
-                            <p>Aucune note à afficher.</p>    
-                    {% endif %}
-
+                    <button type="button" class="btn btn-secondary me-2 confirmPayerBtn" data-vente-id="{{ vente.id }}"
+                            data-type="acompte">
+                        Payer l'acompte {{ vente.montant_acompte }}€
+                    </button>
                     {% else %}
                     <p>Vous pouvez effectuer le paiement ici</p>
                     <dt class="col-sm-3">Service :</dt>
                     <dd class="col-sm-9">{{ vente.demande_id.service }}</dd>
                     <dt class="col-sm-3">Prix :</dt>
                     <dd class="col-sm-9">{{ vente.montant_total }}€</dd>
-
+            
                     <!-- Ajout de la case à cocher pour accepter les CGV -->
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="cgvCheckbox" required>
                         <label class="form-check-label" for="cgvCheckbox">
-                            En cochant cette case, vous acceptez les <a href="/about" target="_blank">Conditions Générales
-                                de Vente</a> et donnez votre accord pour procéder au paiement.
+                            En cochant cette case, vous acceptez les <a href="/cgv" target="_blank">Conditions Générales de Vente</a> et donnez votre accord pour procéder au paiement.
                         </label>
                     </div>
-
+            
                     <button type="button" class="btn btn-secondary me-2 confirmPayerBtn" data-vente-id="{{ vente.id }}"
-                        data-type="acompte" disabled id="payerBtn">
+                            data-type="acompte" disabled id="payerBtn">
                         Payer le montant {{ vente.montant_total }}€
                     </button>
                     {% endif %}
                     {% endif %}
                     {% if vente.paid == 'yes' %}
-                    <p>Ce véhicule est entièrement payé, vous pouvez cliquer sur le lien ci-dessous pour obtenir la
-                        facture.</p>
+                    <p>Ce véhicule est entièrement payé, vous pouvez cliquer sur le lien ci-dessous pour obtenir la facture.</p>
                     <dt class="col-sm-3">Véhicule :</dt>
                     <dd class="col-sm-9">{{ vente.voiture_id }}</dd>
                     <a class="btn btn-secondary" href="{% url 'facture_pdf' vente.id %}">Facture</a>
                     {% endif %}
                 </dl>
             </div>
-
+            
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>

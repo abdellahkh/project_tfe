@@ -15,6 +15,8 @@ urlpatterns = [
 
     path('voiture/<int:pk>', views.voiture, name='voiture'),
     path('voitures/', views.allVoitures, name='voitures'),
+    path('addVoiture/', views.addVoiture, name='addVoiture'),
+    path('voitures/edit/<int:voiture_id>', views.voitureEdit, name='voitureEdit'),
     path('sale_add_car/', views.saleAddCar, name='saleAddCar'),
 
     path('vendre/', views.vendre, name='vendre'),
@@ -32,10 +34,14 @@ urlpatterns = [
     path('pay_success_accompte/', views.pay_success_accompte, name='pay_success_accompte'),
     path('vente/<int:vente_id>/ajouter_note/', views.ajouter_note, name='ajouter_note'),
     path('demande/<int:demande_id>/ajouter_note/', views.ajouter_note_demande, name='ajouter_note_demande'),
+    path('vente/<int:demande_id>/ajouter_note/', views.ajouter_note_vente, name='ajouter_note_vente'),
     path('new_vente/<int:demande_id>/', views.startVente, name='start_vente'),
     path('delivery/<int:voiture_id>/<int:demande_id>/', views.car_delivery, name='car_delivery'),
     path('delivery/<int:voiture_id>/', views.car_deliveryDirect, name='car_deliveryDirect'),
     path('new_vente_service/<int:demande_id>/', views.startVenteService, name='startVenteService'),
+
+    path('venteCancel/<int:vente_id>/', views.annuleVente, name='annuleVente'),
+    path('venteCanceladmin/<int:vente_id>/', views.annuler_vente_admin, name='annuler_vente_admin'),
 
     path('addFavoriteCar/<int:voiture_id>/', views.toggleFavoriteCar, name='toggleFavoriteCar'),
     path('facture_pdf/<int:vente_id>/', views.vente_facture_pdf, name='facture_pdf'),

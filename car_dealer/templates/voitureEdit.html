@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="bg-gradient-primary text-white py-5">
+    <div class="container text-center">
+        <img src="/media/photos/site/cardealerLogoSansTexte.png" alt="Logo" class="logo mb-3">
+        <h1 class="display-4 fw-bold">Modifier les informations de la voiture</h1>
+        <p class="lead">Ajoutez ou modifiez les détails de votre véhicule avec style.</p>
+    </div>
+</header>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h2 class="mb-0">Formulaire de modification</h2>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Messages de feedback -->
+                    {% if messages %}
+                        <div class="alert alert-info" role="alert">
+                            {% for message in messages %}
+                                <div>{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Formulaire -->
+                    <form method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Rendu dynamique des champs -->
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        
+                        <!-- Boutons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-success btn-lg shadow">Enregistrer</button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg shadow">Retour</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #1d3557, #457b9d, #a8dadc);
+        color: white;
+    }
+
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        animation: fadeInUp 1s ease-in-out;
+    }
+
+    .card-header {
+        background: linear-gradient(90deg, #457b9d, #1d3557);
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    button {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    button:hover {
+        transform: translateY(-3px);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-success {
+        background: linear-gradient(90deg, #28a745, #218838);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(90deg, #218838, #1e7e34);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(90deg, #6c757d, #5a6268);
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(90deg, #5a6268, #4e555b);
+    }
+</style>
+
+<script>
+    // Validation Bootstrap
+    (function () {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })();
+</script>
+
+{% endblock %}

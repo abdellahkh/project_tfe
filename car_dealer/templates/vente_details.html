@@ -23,10 +23,17 @@
                 </div>
                 <div class="card-body">
                     <dl class="row">
-                        <dt class="col-sm-4">Client :</dt>
-                        <dd class="col-sm-8">
-                            <a href="{% url 'profile_view' vente.user_id.username %}">{{ vente.user_id.username }}</a> 
-                        </dd>
+                            <dt class="col-md-4"> 
+                                <p><strong>Membre:</strong> {{ vente.user_id.username }}</p> 
+                            </dt>
+                            <dd class="col-md-8">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#memberModal">Info</button> 
+                            </dd>
+                        
+                        
+                        
+                        
+                        
                         {% if vente.voiture_id %}
                         <dt class="col-sm-4">Véhicule :</dt>
                         <dd class="col-sm-8">
@@ -87,9 +94,14 @@
 
                 <div class="card-body">
                     <h5>Ajouter une note</h5>
-                    <form method="post" action="{% url 'ajouter_note' vente.id %}">  {% csrf_token %} 
+                    <form method="post" action="{% url 'ajouter_note_vente' vente.id %}"> {% csrf_token %} 
+                        {% csrf_token %}
                         <div class="mb-3">
                             <textarea class="form-control" name="contenu" rows="3" placeholder="Entrez votre note ici"></textarea>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="customerVisible" name="customer_visible">
+                            <label class="form-check-label" for="customerVisible">Visible par le client</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Ajouter Note</button>
                     </form>
@@ -115,12 +127,32 @@
                               <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary w-100">Générer demande de paiement</a> 
                             </div>
                             <div class="col-md-6">  
-                              <a href="{% url 'vente_payer' vente.id %}" class="btn btn-primary w-100">Annuler réservation</a>
+                              <a href="{% url 'annuler_vente_admin' vente.id %}" class="btn btn-primary w-100">Annuler réservation</a>
                             </div>
                           </div>
                         </div>
                         {% endif %}
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="memberModalLabel">Informations du membre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <p><strong>Nom d'utilisateur :</strong> {{ vente.user_id.username }}</p>
+                    <p><strong>Email :</strong> {{ vente.user_id.email }}</p>
+                    <p><strong>Téléphone :</strong> {{ vente.user_id.phone }}</p> 
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
     </div>

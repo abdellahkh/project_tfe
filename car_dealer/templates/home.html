@@ -113,7 +113,7 @@
                                 {% if voiture.images.all %}
                                 <img src="{{ voiture.images.first.image.url }}" class="fixed-image-size" alt="{{ voiture.modele.nom }}">
                                 {% endif %}
-                                {% if voiture.status == 'avendre' %}
+                                {% if voiture.status == 'Available' %}
                                     {% if user.is_authenticated %} 
                                     <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
                                         {% if voiture.id in wishlist_voiture_ids %}

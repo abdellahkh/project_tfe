@@ -50,32 +50,25 @@ class Voiture(models.Model):
         ('Hybride (Elec - Diesel)', 'Hybride (Elec - Diesel)'),
         ('Autres', 'Autres'),
     ]
-    
     TRANSMISSION_CHOICES = [
         ('Manuelle', 'Manuelle'),
         ('Automatique', 'Automatique'),
         ('Semi-automatique', 'Semi-automatique'),
     ]
-    
     STATUS_CHOICES = [
         ('standby', 'Standby'),
-        ('avendre' ,'A vendre'),
-        ('ready', 'Ready'),
+        ('Available' ,'Available'),
         ('reservé', 'Reservé'),
-        ('transit' ,'transit'),
+        ('ready', 'Ready'),
         ('vendu', 'Vendu'),
         ('livré', 'Livré'),
     ]
-    
-    
-
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
         default='standby',
         help_text="Statut de la voiture"
     )
-    
     marque = models.ForeignKey(Marque, on_delete=models.PROTECT, related_name='voitures', help_text="Marque de la voiture")
     modele = models.ForeignKey(Modele, on_delete=models.CASCADE, help_text="Modèle de la voiture")
     annee_fabrication = models.PositiveIntegerField(help_text="Année de fabrication")
@@ -94,7 +87,6 @@ class Voiture(models.Model):
         help_text="Type de transmission"
     )
     kilometrage = models.PositiveIntegerField(help_text="Kilométrage actuel")
-
     cruise_control = models.BooleanField(default=False, help_text="Contrôle de croisière")
     direction_assistee = models.BooleanField(default=False, help_text="Direction assistée")
     audio_interface = models.BooleanField(default=False, help_text="Interface audio")
@@ -107,18 +99,13 @@ class Voiture(models.Model):
     start_stop = models.BooleanField(default=False, help_text="Système start/stop")
     essui_auto = models.BooleanField(default=False, help_text="Essuie-glace automatique")
     car_play = models.BooleanField(default=False, help_text="Apple CarPlay")
-    
     description = models.TextField(blank=True, null=True, help_text="Description de la voiture")
     date_poste = models.DateTimeField(auto_now_add=True, help_text="Date de publication de l'annonce")
-
     prix = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix de la voiture")
     prix_min = models.DecimalField(max_digits=10, decimal_places=0, help_text="Prix minimale de vente")
     num_chassis = models.TextField(blank=True, null=True, help_text="Chassis de la voiture")
-
-
     class Meta:
         ordering = ['-date_poste']
-
     def __str__(self):
         return f"{self.marque} {self.modele} - {self.annee_fabrication}"
     
@@ -303,6 +290,7 @@ class Vente(models.Model):
         ('yes', 'Oui'),
         ('no', 'Non'),
         ('partially', 'Partiellement'),
+        ('cancelled', 'Cancelled')
     ]
     paid = models.CharField(
         max_length=10,
@@ -338,9 +326,10 @@ class Notes(models.Model):
     user_id = models.ForeignKey(Member, on_delete=models.CASCADE, help_text="Utilisateur qui a ajouté la note")
     demande_id = models.ForeignKey(Demande, on_delete=models.CASCADE,null=True, blank=True, help_text="Demande lié à la note")
     vente_id = models.ForeignKey(Vente, on_delete=models.CASCADE, null=True, blank=True, help_text="Vente lié à la note")
+    customer_visible = models.BooleanField(default=False, help_text="Visible par le membre")
 
     date = models.DateTimeField(auto_now_add=True, null= True, help_text="Date de la note")
     contenu = models.TextField(blank=True, null=True, help_text="Contenu de la note")
 
     def __str__(self):
-        return f"Note de {self.user_id} - {self.contenu} ({self.date})"
+        return f"Note de 1{self.user_id} - 2{self.vente_id} - 3{self.demande_id} - 4{self.contenu} ({self.date})"

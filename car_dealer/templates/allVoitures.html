@@ -74,7 +74,7 @@
                                     {% if status == 'livré' %}
                                     <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Vendu</option>
                                     {% endif %}
-                                    {% if status == 'avendre' %}
+                                    {% if status == 'Available' %}
                                     <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>Disponible</option>
                                     {% endif %}
                                     {% if status == 'reservé' %}
@@ -105,7 +105,7 @@
                             {% endif %}
                             {% if voiture.images.all %}
                                 <img src="{{ voiture.images.first.image.url }}" class="card-img-top fixed-size-image" alt="{{ voiture.modele.nom }}">
-                                {% if voiture.status == 'avendre' %} 
+                                {% if voiture.status == 'Available' %} 
                                     {% if user.is_authenticated %} 
                                     <a href="{% url 'toggleFavoriteCar' voiture.id %}" class="position-absolute top-0 start-0"> 
                                         {% if voiture.id in wishlist_voiture_ids %}

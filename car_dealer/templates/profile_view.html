@@ -174,19 +174,27 @@
                                     {% endif %}
                                 </div>
                                 {% if vente.paid == 'no' %}
-                                <div class="col-md-2 text-end">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#venteModal{{ vente.id }}">
-                                        Détails
-                                    </button>
-                                </div>
+                                    <div class="col-md-2 text-end">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#venteModal{{ vente.id }}">
+                                            Détails
+                                        </button>
+                                    </div>
+                                {% elif vente.paid == 'partially' and vente.voiture_id.status == 'ready' %}
+                                    <div class="col-md-2 text-end">
+                                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#venteModal{{ vente.id }}">
+                                            Finaliser Achat
+                                        </button>
+                                    </div>
+
                                 {% else %}
-                                <div class="col-md-2 text-end">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#venteModal{{ vente.id }}">
-                                        Détails
-                                    </button>
-                                </div>
+                                    <div class="col-md-2 text-end">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#venteModal{{ vente.id }}">
+                                            Détails
+                                        </button>
+                                    </div>
                                 {% endif %}
                             </div>
                         </li>
